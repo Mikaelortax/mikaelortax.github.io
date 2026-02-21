@@ -1,0 +1,76 @@
+---
+const rawPathname = Astro.url.pathname;
+
+const normalizePath = (path) => {
+  if (!path || path === '/') return '/';
+  const withLeadingSlash = path.startsWith('/') ? path : `/${path}`;
+  return withLeadingSlash.length > 1
+    ? withLeadingSlash.replace(/\/+$/, '')
+    : withLeadingSlash;
+};
+
+const pathname = normalizePath(rawPathname);
+
+const svToEn = {
+  '/sv': '/en',
+  '/sv/projekt': '/en/projects',
+  '/sv/guider': '/en/guides',
+  '/sv/om': '/en/about',
+  '/sv/cv': '/en/cv',
+  '/sv/kontakt': '/en/contact',
+};
+
+const enToSv = Object.fromEntries(
+  Object.entries(svToEn).map(([svPath, enPath]) => [enPath, svPath])
+);
+
+const isSv = pathname === '/sv' || pathname.startsWith('/sv/');
+const isEn = pathname === '/en' || pathname.startsWith('/en/');
+const currentLocale = isSv ? 'sv' : 'en';
+
+const swapLocalePrefix = (path, targetLocale) => {
+  const noLocalePrefix = path.replace(/^\/(sv|en)(?=\/|$)/, '');
+  return normalizePath(`/${targetLocale}${noLocalePrefix}`);
+};
+
+const getPathForLocale = (targetLocale) => {
+  if (targetLocale === 'sv') {
+    if (currentLocale === 'sv') return pathname;
+    return enToSv[pathname] ?? swapLocalePrefix(pathname, 'sv');
+  }
+
+  if (currentLocale === 'en') return pathname;
+  return svToEn[pathname] ?? swapLocalePrefix(pathname, 'en');
+};
+
+const svHref = getPathForLocale('sv');
+const enHref = getPathForLocale('en');
+
+const baseClasses =
+  'inline-flex min-w-10 items-center justify-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.2em] transition';
+
+const activeClasses =
+  'border-cyan-300 bg-cyan-300/20 text-cyan-100 shadow-[0_0_14px_rgba(34,211,238,0.35)]';
+
+const inactiveClasses =
+  'border-cyan-500/30 bg-slate-950/40 text-cyan-300 hover:border-cyan-300/70 hover:text-cyan-100';
+---
+
+<nav class="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-slate-950/60 p-1" aria-label="Language switcher">
+  <a
+    href={svHref}
+    class={`${baseClasses} ${currentLocale === 'sv' ? activeClasses : inactiveClasses}`}
+    aria-label="Switch language to Swedish"
+    aria-current={currentLocale === 'sv' ? 'page' : undefined}
+  >
+    SV
+  </a>
+  <a
+    href={enHref}
+    class={`${baseClasses} ${currentLocale === 'en' ? activeClasses : inactiveClasses}`}
+    aria-label="Switch language to English"
+    aria-current={currentLocale === 'en' ? 'page' : undefined}
+  >
+    EN
+  </a>
+</nav>

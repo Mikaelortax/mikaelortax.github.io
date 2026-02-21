@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 interface Props {
   title: string;
   lang: 'en' | 'sv';
@@ -16,6 +17,11 @@ const { title, lang } = Astro.props;
     <title>{title}</title>
   </head>
   <body>
+    <header class="px-4 py-3">
+      <div class="mx-auto flex w-full max-w-6xl justify-center sm:justify-end">
+        <LanguageSwitcher />
+      </div>
+    </header>
     <main>
       <slot />
     </main>
