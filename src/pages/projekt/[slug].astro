@@ -1,0 +1,36 @@
+﻿---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectDetail from '../../components/projects/ProjectDetail.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<BaseLayout title={`${project.data.title} | Projekt`} description={project.data.excerpt} lang="sv">
+  <ProjectDetail
+    title={project.data.title}
+    excerpt={project.data.excerpt}
+    role={project.data.role}
+    stack={project.data.stack}
+    tags={project.data.tags}
+    outcomes={project.data.outcomes}
+    backHref="/projekt"
+    backLabel="<- Tillbaka till projekt"
+    contactHref="/kontakt"
+    contactLabel="Boka kontakt"
+    ctaTitle="Vill du bygga ett liknande system?"
+    ctaText="Boka ett kort intro sa tittar vi pa nulage, prioriteringar och ett realistiskt nasta steg."
+  >
+    <Content />
+  </ProjectDetail>
+</BaseLayout>

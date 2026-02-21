@@ -1,0 +1,36 @@
+﻿---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ProjectDetail from '../../../components/projects/ProjectDetail.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects-en');
+
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<BaseLayout title={`${project.data.title} | Project`} description={project.data.excerpt} lang="en">
+  <ProjectDetail
+    title={project.data.title}
+    excerpt={project.data.excerpt}
+    role={project.data.role}
+    stack={project.data.stack}
+    tags={project.data.tags}
+    outcomes={project.data.outcomes}
+    backHref="/en/projects"
+    backLabel="<- Back to projects"
+    contactHref="/en/contact"
+    contactLabel="Book contact"
+    ctaTitle="Want to build a similar system?"
+    ctaText="Book a short intro and we can map your current setup, priorities, and next delivery steps."
+  >
+    <Content />
+  </ProjectDetail>
+</BaseLayout>
