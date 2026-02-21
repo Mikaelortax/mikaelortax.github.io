@@ -1,0 +1,114 @@
+---
+interface Props {
+  lang: 'sv' | 'en';
+  path: string;
+}
+
+const { lang, path } = Astro.props;
+
+const normalizePath = (value: string) => {
+  if (!value || value === '/') return '/';
+  const withLeadingSlash = value.startsWith('/') ? value : `/${value}`;
+  return withLeadingSlash.length > 1
+    ? withLeadingSlash.replace(/\/+$/, '')
+    : withLeadingSlash;
+};
+
+const currentPath = normalizePath(path);
+const effectivePath = currentPath === '/' ? '/sv' : currentPath;
+
+const svToEnMap: Record<string, string> = {
+  '/sv': '/en',
+  '/sv/om': '/en/about',
+  '/sv/projekt': '/en/projects',
+  '/sv/guider': '/en/guides',
+  '/sv/kontakt': '/en/contact',
+};
+
+const enToSvMap: Record<string, string> = Object.fromEntries(
+  Object.entries(svToEnMap).map(([svPath, enPath]) => [enPath, svPath])
+);
+
+const getOtherLanguagePath = (pathname: string) => {
+  if (pathname.startsWith('/sv')) {
+    if (svToEnMap[pathname]) return svToEnMap[pathname];
+    if (pathname === '/sv') return '/en';
+    return `/en${pathname.slice(3)}`;
+  }
+
+  if (pathname.startsWith('/en')) {
+    if (enToSvMap[pathname]) return enToSvMap[pathname];
+    if (pathname === '/en') return '/sv';
+    return `/sv${pathname.slice(3)}`;
+  }
+
+  return lang === 'sv' ? '/en' : '/sv';
+};
+
+const otherLanguagePath = getOtherLanguagePath(effectivePath);
+
+const navItems =
+  lang === 'sv'
+    ? [
+        { label: 'Start', href: '/sv' },
+        { label: 'Om', href: '/sv/om' },
+        { label: 'Projekt', href: '/sv/projekt' },
+        { label: 'Guider', href: '/sv/guider' },
+        { label: 'Kontakt', href: '/sv/kontakt' },
+      ]
+    : [
+        { label: 'Home', href: '/en' },
+        { label: 'About', href: '/en/about' },
+        { label: 'Projects', href: '/en/projects' },
+        { label: 'Guides', href: '/en/guides' },
+        { label: 'Contact', href: '/en/contact' },
+      ];
+
+const isSvActive = lang === 'sv';
+const isEnActive = lang === 'en';
+const svHref = isSvActive ? effectivePath : otherLanguagePath;
+const enHref = isEnActive ? effectivePath : otherLanguagePath;
+---
+
+<header class="border-b border-neutral-800">
+  <div class="mx-auto flex w-full max-w-5xl flex-col gap-4 px-6 py-5 md:flex-row md:items-center md:justify-between">
+    <a href={lang === 'sv' ? '/sv' : '/en'} class="text-lg font-semibold text-white">
+      Mikael Johansson
+    </a>
+    <div class="flex flex-wrap items-center gap-4 md:gap-6">
+      <nav aria-label="Main navigation">
+        <ul class="flex flex-wrap items-center gap-4 text-sm text-neutral-200">
+          {navItems.map((item) => (
+            <li>
+              <a class="transition hover:text-white" href={item.href}>
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <nav class="inline-flex items-center gap-1 rounded-full border border-neutral-700 p-1" aria-label="Language switcher">
+        <a
+          href={svHref}
+          class={`rounded-full px-3 py-1 text-xs font-semibold tracking-wide transition ${
+            isSvActive ? 'bg-white text-black' : 'text-neutral-200 hover:text-white'
+          }`}
+          aria-current={isSvActive ? 'page' : undefined}
+          aria-label="Switch language to Swedish"
+        >
+          SV
+        </a>
+        <a
+          href={enHref}
+          class={`rounded-full px-3 py-1 text-xs font-semibold tracking-wide transition ${
+            isEnActive ? 'bg-white text-black' : 'text-neutral-200 hover:text-white'
+          }`}
+          aria-current={isEnActive ? 'page' : undefined}
+          aria-label="Switch language to English"
+        >
+          EN
+        </a>
+      </nav>
+    </div>
+  </div>
+</header>
