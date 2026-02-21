@@ -1,0 +1,27 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Frontmatter {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  ogImage?: string;
+}
+
+interface Props {
+  frontmatter?: Frontmatter;
+}
+
+const { frontmatter = {} } = Astro.props;
+const { title, description, noindex, ogImage } = frontmatter;
+
+if (!title || !description) {
+  throw new Error(
+    'MDX page requires frontmatter `title` and `description` when using the default layout.'
+  );
+}
+---
+
+<BaseLayout title={title} description={description} noindex={noindex} ogImage={ogImage}>
+  <slot />
+</BaseLayout>

@@ -1,40 +1,59 @@
 ---
 import '../styles/global.css';
-import { localizePath } from '../lib/i18n';
 import Header from '../components/Header.astro';
+import { buildI18nSeo } from '../lib/seo';
 
 interface Props {
   title: string;
+  description: string;
+  noindex?: boolean;
+  ogImage?: string;
   lang?: 'sv' | 'en';
 }
 
-const { title, lang = 'en' } = Astro.props;
-const site = Astro.site ?? new URL(Astro.url.origin);
+const { title, description, noindex = false, ogImage } = Astro.props;
 const pathname = Astro.url.pathname || '/';
-const canonicalPath = pathname === '' ? '/' : pathname;
-const svPath = localizePath(pathname, 'sv');
-const enPath = localizePath(pathname, 'en');
-const xDefaultPath = '/';
+const siteBase = Astro.site?.toString() ?? process.env.SITE_URL;
 
-const canonicalUrl = new URL(canonicalPath, site).toString();
-const svHref = new URL(svPath, site).toString();
-const enHref = new URL(enPath, site).toString();
-const xDefaultHref = new URL(xDefaultPath, site).toString();
+if (!siteBase) {
+  throw new Error(
+    'Missing site URL. Set `site` in astro.config.mjs or define SITE_URL.'
+  );
+}
+
+const seo = buildI18nSeo(siteBase, pathname);
+const siteUrl = new URL(siteBase);
+const ogImageUrl = ogImage ? new URL(ogImage, siteUrl).toString() : undefined;
+const ogLocale = seo.lang === 'sv' ? 'sv_SE' : 'en_US';
+const twitterCard = ogImageUrl ? 'summary_large_image' : 'summary';
 ---
 
 <!DOCTYPE html>
-<html lang={lang}>
+<html lang={seo.lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
-    <link rel="canonical" href={canonicalUrl} />
-    <link rel="alternate" hreflang="sv" href={svHref} />
-    <link rel="alternate" hreflang="en" href={enHref} />
-    <link rel="alternate" hreflang="x-default" href={xDefaultHref} />
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex,nofollow" />}
+    {noindex && <meta name="googlebot" content="noindex,nofollow" />}
+    <link rel="canonical" href={seo.canonical} />
+    {seo.alternates.map((alternate) => (
+      <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />
+    ))}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={seo.canonical} />
+    <meta property="og:locale" content={ogLocale} />
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    <meta name="twitter:card" content={twitterCard} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
   </head>
   <body class="bg-neutral-950 text-white">
-    <Header lang={lang} path={pathname} />
+    <Header lang={seo.lang} path={pathname} />
     <main class="mx-auto max-w-5xl px-6 py-10">
       <slot />
     </main>

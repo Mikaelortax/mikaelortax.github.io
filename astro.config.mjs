@@ -6,6 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@astrojs/react';
 
 import mdx from '@astrojs/mdx';
+import { rehypeMdxDefaultLayout } from './src/lib/rehype-mdx-default-layout.mjs';
 
 import sitemap from '@astrojs/sitemap';
 
@@ -21,5 +22,11 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
 
-  integrations: [react(), mdx(), sitemap()],
+  integrations: [
+    react(),
+    mdx({
+      rehypePlugins: [rehypeMdxDefaultLayout()],
+    }),
+    sitemap(),
+  ],
 });
