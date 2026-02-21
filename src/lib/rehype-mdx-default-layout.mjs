@@ -1,5 +1,7 @@
 export function rehypeMdxDefaultLayout(layoutPath = '/src/layouts/MdxLayout.astro') {
   return function (_tree, vfile) {
+    if (!vfile) return;
+
     const data = vfile.data ?? (vfile.data = {});
     const astro = data.astro ?? (data.astro = {});
     const frontmatter = astro.frontmatter ?? (astro.frontmatter = {});

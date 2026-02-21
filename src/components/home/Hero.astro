@@ -1,40 +1,63 @@
-﻿<section class="band band--mesh" aria-labelledby="hero-title">
+﻿---
+interface Props {
+  lang?: 'sv' | 'en';
+}
+
+const { lang = 'sv' } = Astro.props;
+const isEn = lang === 'en';
+const projectsHref = isEn ? '/en/projects' : '/projekt';
+const contactHref = isEn ? '/en/contact' : '/kontakt';
+---
+
+<section class="band band--mesh" aria-labelledby="hero-title">
   <p class="inline-flex rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-xs font-semibold tracking-[0.18em] text-cyan-200">
-    HYBRID PROFILE: SEO + WEB + AUTOMATION
+    {isEn ? 'HYBRID PROFILE: SEO + WEB + AUTOMATION' : 'HYBRID PROFILE: SEO + WEB + AUTOMATION'}
   </p>
 
-  <h1 id="hero-title" class="mt-5 max-w-4xl text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl">
-    Jag bygger tillvaxtsystem som kombinerar Technical SEO, snabb webbutveckling och smart automation.
+  <h1 id="hero-title" class="mt-6 max-w-[50rem] text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl">
+    {
+      isEn
+        ? 'I build growth systems that combine technical SEO, fast web engineering, and smart automation.'
+        : 'Jag bygger tillvaxtsystem som kombinerar Technical SEO, snabb webbutveckling och smart automation.'
+    }
   </h1>
 
-  <p class="mt-6 max-w-3xl text-lg leading-relaxed text-neutral-300">
-    Resultatet ar snabbare lanseringar, tydligare informationsfloden och battre organisk synlighet. Mindre handpahallning, mer fart och stabil drift.
+  <p class="mt-7 max-w-[50rem] text-lg leading-relaxed text-neutral-300 sm:text-xl">
+    {
+      isEn
+        ? 'The result is faster launches, clearer information flow, and stronger organic visibility. Less overhead, more momentum, stable delivery.'
+        : 'Resultatet ar snabbare lanseringar, tydligare informationsfloden och battre organisk synlighet. Mindre handpahallning, mer fart och stabil drift.'
+    }
   </p>
 
-  <div class="mt-8 flex flex-wrap gap-3">
+  <div class="mt-9 flex flex-wrap gap-3">
     <a
-      href="#contact"
+      href={contactHref}
       class="rounded-xl bg-cyan-300 px-5 py-3 text-sm font-semibold text-neutral-950 transition hover:-translate-y-0.5 hover:bg-cyan-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
     >
-      Boka 15 min intro
+      {isEn ? 'Book 15 min intro' : 'Boka 15 min intro'}
     </a>
     <a
-      href="#work"
+      href={projectsHref}
       class="rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
     >
-      Se projekt
+      {isEn ? 'View projects' : 'Se projekt'}
     </a>
   </div>
 
-  <ul class="mt-8 grid gap-3 text-sm text-neutral-200 sm:grid-cols-2 lg:grid-cols-4" aria-label="Kompetenschips">
+  <ul class="mt-9 grid max-w-[50rem] gap-3 text-sm text-neutral-200 sm:grid-cols-2 lg:grid-cols-4" aria-label={isEn ? 'Capabilities chips' : 'Kompetenschips'}>
     <li class="rounded-xl border border-white/10 bg-black/20 px-4 py-3">Technical SEO / AEO</li>
     <li class="rounded-xl border border-white/10 bg-black/20 px-4 py-3">Astro / React</li>
     <li class="rounded-xl border border-white/10 bg-black/20 px-4 py-3">Automation (n8n)</li>
     <li class="rounded-xl border border-white/10 bg-black/20 px-4 py-3">Laravel / Wave</li>
   </ul>
 
-  <p class="mt-6 text-sm text-neutral-400">
-    <span class="font-semibold text-neutral-200">Now:</span> bygger ett SEO-drivet innehallsflode med automation mellan CMS, Search Console och CRM.
+  <p class="mt-8 max-w-[50rem] text-sm text-neutral-400">
+    <span class="font-semibold text-neutral-200">Now:</span>
+    {
+      isEn
+        ? ' building an SEO-driven content flow with automation between CMS, Search Console, and CRM.'
+        : ' bygger ett SEO-drivet innehallsflode med automation mellan CMS, Search Console och CRM.'
+    }
   </p>
 </section>
-

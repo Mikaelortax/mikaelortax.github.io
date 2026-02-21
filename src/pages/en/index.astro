@@ -1,9 +1,16 @@
 ﻿---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/home/Hero.astro';
+import FeaturedWork from '../../components/home/FeaturedWork.astro';
 ---
 
-<BaseLayout title="Home | Mikael Johansson" description="Portfolio page in English." lang="en">
-  <h1>Home</h1>
-  <p>Welcome.</p>
+<BaseLayout
+  title="Mikael Johansson | SEO, Web, and Automation"
+  description="Portfolio for a hybrid profile across SEO engineering, web development, and automation."
+  lang="en"
+>
+  <div class="space-y-10 md:space-y-14">
+    <Hero lang="en" />
+    <FeaturedWork lang="en" />
+  </div>
 </BaseLayout>
-

@@ -1,4 +1,4 @@
----
+﻿---
 interface Props {
   lang: 'sv' | 'en';
   path: string;
@@ -7,63 +7,76 @@ interface Props {
 const { lang, path } = Astro.props;
 
 const normalizePath = (value: string) => {
-  if (!value || value === '/') return '/';
+  if (!value) return '/';
   const withLeadingSlash = value.startsWith('/') ? value : `/${value}`;
-  return withLeadingSlash.length > 1
-    ? withLeadingSlash.replace(/\/+$/, '')
-    : withLeadingSlash;
+  const collapsed = withLeadingSlash.replace(/\/{2,}/g, '/');
+  const withoutTrailing = collapsed.length > 1 ? collapsed.replace(/\/+$/g, '') : collapsed;
+  return withoutTrailing || '/';
 };
 
 const currentPath = normalizePath(path);
-const effectivePath = currentPath === '/' ? '/sv' : currentPath;
 
 const svToEnMap: Record<string, string> = {
+  '/': '/en',
+  '/projekt': '/en/projects',
+  '/kompetens': '/en/capabilities',
+  '/om': '/en/about',
+  '/kontakt': '/en/contact',
   '/sv': '/en',
-  '/sv/om': '/en/about',
   '/sv/projekt': '/en/projects',
-  '/sv/guider': '/en/guides',
+  '/sv/om': '/en/about',
   '/sv/kontakt': '/en/contact',
 };
 
 const enToSvMap: Record<string, string> = Object.fromEntries(
-  Object.entries(svToEnMap).map(([svPath, enPath]) => [enPath, svPath])
+  Object.entries(svToEnMap).map(([svPath, enPath]) => [enPath, svPath.startsWith('/sv') ? svPath.replace(/^\/sv/, '') || '/' : svPath])
 );
 
-const getOtherLanguagePath = (pathname: string) => {
-  if (pathname.startsWith('/sv')) {
-    if (svToEnMap[pathname]) return svToEnMap[pathname];
-    if (pathname === '/sv') return '/en';
-    return `/en${pathname.slice(3)}`;
-  }
-
-  if (pathname.startsWith('/en')) {
-    if (enToSvMap[pathname]) return enToSvMap[pathname];
-    if (pathname === '/en') return '/sv';
-    return `/sv${pathname.slice(3)}`;
-  }
-
-  return lang === 'sv' ? '/en' : '/sv';
+const toEnglishPath = (pathname: string) => {
+  const normalized = normalizePath(pathname);
+  if (svToEnMap[normalized]) return svToEnMap[normalized];
+  if (normalized.startsWith('/projekt/')) return `/en/projects/${normalized.slice('/projekt/'.length)}`;
+  if (normalized.startsWith('/sv/projekt/')) return `/en/projects/${normalized.slice('/sv/projekt/'.length)}`;
+  if (normalized.startsWith('/en')) return normalized;
+  return '/en';
 };
 
-const otherLanguagePath = getOtherLanguagePath(effectivePath);
+const toSwedishPath = (pathname: string) => {
+  const normalized = normalizePath(pathname);
+  if (enToSvMap[normalized]) return enToSvMap[normalized];
+  if (normalized.startsWith('/en/projects/')) return `/projekt/${normalized.slice('/en/projects/'.length)}`;
+  if (normalized.startsWith('/en/')) return `/${normalized.slice('/en/'.length)}`;
+  if (normalized === '/en') return '/';
+  if (normalized.startsWith('/sv/')) return `/${normalized.slice('/sv/'.length)}`;
+  return '/';
+};
+
+const svHref = toSwedishPath(currentPath);
+const enHref = toEnglishPath(currentPath);
 
 const homeHref = lang === 'sv' ? '/' : '/en';
-const navItems = [
-  { label: 'Projekt', href: `${homeHref}#work` },
-  { label: 'Kompetens', href: `${homeHref}#capabilities` },
-  { label: 'Process', href: `${homeHref}#process` },
-  { label: 'Om', href: `${homeHref}#about` },
-  { label: 'Kontakt', href: `${homeHref}#contact` },
-];
+const navItems =
+  lang === 'sv'
+    ? [
+        { label: 'Projekt', href: '/projekt' },
+        { label: 'Kompetens', href: '/kompetens' },
+        { label: 'Om', href: '/om' },
+        { label: 'Kontakt', href: '/kontakt' },
+      ]
+    : [
+        { label: 'Projects', href: '/en/projects' },
+        { label: 'Capabilities', href: '/en/capabilities' },
+        { label: 'About', href: '/en/about' },
+        { label: 'Contact', href: '/en/contact' },
+      ];
 
 const isSvActive = lang === 'sv';
 const isEnActive = lang === 'en';
-const svHref = isSvActive ? effectivePath : otherLanguagePath;
-const enHref = isEnActive ? effectivePath : otherLanguagePath;
 ---
 
-<header class="border-b border-neutral-800">
-  <div class="mx-auto flex w-full max-w-5xl flex-col gap-4 px-6 py-5 md:flex-row md:items-center md:justify-between">
+<header class="sticky top-0 z-40 border-b border-white/10 bg-neutral-950/70 backdrop-blur-md">
+  <div class="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-200/20 to-transparent"></div>
+  <div class="relative mx-auto flex w-full max-w-5xl flex-col gap-4 px-6 py-6 md:flex-row md:items-center md:justify-between">
     <a href={homeHref} class="text-lg font-semibold text-white transition hover:text-cyan-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950">
       Mikael Johansson
     </a>
@@ -73,10 +86,10 @@ const enHref = isEnActive ? effectivePath : otherLanguagePath;
           {navItems.map((item) => (
             <li>
               <a
-                class="rounded-lg px-2 py-1 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                class="rounded-lg px-2 py-1 text-neutral-200 transition duration-200 hover:text-white hover:brightness-110 hover:[&_span]:border-cyan-200/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
                 href={item.href}
               >
-                {item.label}
+                <span class="border-b border-transparent pb-0.5 transition">{item.label}</span>
               </a>
             </li>
           ))}

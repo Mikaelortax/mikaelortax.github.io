@@ -1,4 +1,4 @@
-export type SeoLang = 'sv' | 'en';
+﻿export type SeoLang = 'sv' | 'en';
 
 export interface SeoAlternate {
   hreflang: 'sv' | 'en' | 'x-default';
@@ -27,14 +27,34 @@ const normalizePathname = (pathname: string): string => {
 
 const hasEnPrefix = (pathname: string): boolean => /^\/en(?:\/|$)/.test(pathname);
 
-const toSwedishPath = (pathname: string): string => {
-  if (!hasEnPrefix(pathname)) return pathname;
-  const stripped = pathname.replace(/^\/en(?=\/|$)/, '');
-  return stripped === '' ? '/' : stripped;
+const svToEnExact: Record<string, string> = {
+  '/': '/en',
+  '/projekt': '/en/projects',
+  '/kompetens': '/en/capabilities',
+  '/om': '/en/about',
+  '/kontakt': '/en/contact',
 };
 
-const toEnglishPath = (swedishPath: string): string =>
-  swedishPath === '/' ? '/en' : `/en${swedishPath}`;
+const enToSvExact: Record<string, string> = Object.fromEntries(
+  Object.entries(svToEnExact).map(([svPath, enPath]) => [enPath, svPath])
+);
+
+const toEnglishPath = (swedishPath: string): string => {
+  const path = normalizePathname(swedishPath);
+  if (svToEnExact[path]) return svToEnExact[path];
+  if (path.startsWith('/projekt/')) return `/en/projects/${path.slice('/projekt/'.length)}`;
+  if (path.startsWith('/en')) return path;
+  return path === '/' ? '/en' : `/en${path}`;
+};
+
+const toSwedishPath = (pathname: string): string => {
+  const path = normalizePathname(pathname);
+  if (enToSvExact[path]) return enToSvExact[path];
+  if (path.startsWith('/en/projects/')) return `/projekt/${path.slice('/en/projects/'.length)}`;
+  if (path === '/en') return '/';
+  if (path.startsWith('/en/')) return `/${path.slice('/en/'.length)}`;
+  return path;
+};
 
 const normalizeSite = (site: string): URL => {
   const url = new URL(site);
@@ -53,7 +73,7 @@ export function buildI18nSeo(site: string, pathname: string): I18nSeo {
   const normalizedPath = normalizePathname(pathname);
   const lang: SeoLang = hasEnPrefix(normalizedPath) ? 'en' : 'sv';
 
-  const svPath = toSwedishPath(normalizedPath);
+  const svPath = lang === 'en' ? toSwedishPath(normalizedPath) : normalizedPath;
   const enPath = toEnglishPath(svPath);
   const canonicalPath = lang === 'en' ? enPath : svPath;
 
