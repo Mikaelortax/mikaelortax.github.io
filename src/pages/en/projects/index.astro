@@ -1,50 +1,23 @@
 ﻿---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
-
-const projects = (await getCollection('projects-en', ({ data }) => !data.draft)).sort((a, b) => {
-  const aDate = a.data.date ? Date.parse(a.data.date) : 0;
-  const bDate = b.data.date ? Date.parse(b.data.date) : 0;
-  return bDate - aDate;
-});
 ---
 
-<BaseLayout title="Projects | Mikael Johansson" description="Selected projects across SEO, web engineering, and automation." lang="en">
+<BaseLayout
+  title="Projects | Mikael Johansson"
+  description="Selected projects across SEO, web engineering, and automation."
+  lang="en"
+>
   <section class="band band--surface" aria-labelledby="projects-title">
     <h1 id="projects-title" class="text-3xl font-semibold tracking-tight text-white md:text-4xl">Projects</h1>
     <p class="mt-4 max-w-3xl text-neutral-300">
-      A focused set of products and systems built to improve delivery speed, operational clarity, and growth outcomes.
+      A focused overview of work where strategy and implementation come together to create measurable momentum.
     </p>
 
-    <div class="mt-10 grid gap-5 md:grid-cols-2">
-      {projects.map((project) => (
-        <article class="ui-card ui-card--interactive p-6" tabindex="0">
-          <div class="flex flex-wrap items-center gap-2 text-xs text-cyan-200">
-            {project.data.tags.map((tag) => (
-              <span class="rounded-full border border-cyan-300/30 bg-cyan-300/10 px-2.5 py-1">{tag}</span>
-            ))}
-          </div>
-
-          <h2 class="mt-4 text-xl font-semibold text-white">{project.data.title}</h2>
-          <p class="mt-2 text-sm leading-relaxed text-neutral-300">{project.data.excerpt}</p>
-
-          <ul class="mt-4 space-y-2 text-sm text-neutral-200">
-            {project.data.outcomes.map((item) => (
-              <li class="flex gap-2">
-                <span aria-hidden="true" class="text-cyan-300">•</span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-
-          <a
-            href={`/en/projects/${project.slug}`}
-            class="mt-6 inline-flex items-center text-sm font-semibold text-cyan-300 transition hover:text-cyan-200"
-          >
-            Read case
-          </a>
-        </article>
-      ))}
+    <div class="ui-card mt-8 p-6">
+      <p class="text-sm text-neutral-300">Want to discuss your next initiative?</p>
+      <a href="/en/contact" class="mt-4 inline-flex rounded-xl bg-cyan-300 px-4 py-2 text-sm font-semibold text-neutral-950 transition hover:bg-cyan-200">
+        Book contact
+      </a>
     </div>
   </section>
 </BaseLayout>
