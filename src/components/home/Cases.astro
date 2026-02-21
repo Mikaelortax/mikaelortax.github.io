@@ -1,0 +1,31 @@
+---
+const cases = [
+  {
+    title: 'Portfolio med två språk',
+    result: 'Stabil routning med tydliga språkväxlingar och korrekt indexering.',
+  },
+  {
+    title: 'Guidesida för tekniskt innehåll',
+    result: 'Snabb laddningstid och bättre läsbarhet för längre artiklar.',
+  },
+  {
+    title: 'Kontaktflöde med tydlig CTA',
+    result: 'Färre friktioner i användarresan och högre andel kvalificerade leads.',
+  },
+];
+---
+
+<section aria-labelledby="case" class="mt-16">
+  <div class="flex items-end justify-between gap-4">
+    <h2 id="case" class="text-2xl font-semibold tracking-tight text-white">Mini-case</h2>
+    <a href="/sv/projekt" class="text-sm font-semibold text-cyan-300 hover:text-cyan-200">Visa alla projekt</a>
+  </div>
+  <div class="mt-8 grid gap-4 md:grid-cols-3">
+    {cases.map((entry) => (
+      <article class="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+        <h3 class="text-lg font-semibold text-white">{entry.title}</h3>
+        <p class="mt-3 text-sm text-neutral-300">{entry.result}</p>
+      </article>
+    ))}
+  </div>
+</section>

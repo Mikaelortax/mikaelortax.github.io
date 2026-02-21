@@ -1,3 +1,26 @@
 ﻿---
-return Astro.redirect('/sv/');
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/home/Hero.astro';
+import FeaturedWork from '../components/home/FeaturedWork.astro';
+import Capabilities from '../components/home/Capabilities.astro';
+import OperatingSystem from '../components/home/OperatingSystem.astro';
+import ProofBand from '../components/home/ProofBand.astro';
+import About from '../components/home/About.astro';
+import FinalCTA from '../components/home/FinalCTA.astro';
 ---
+
+<BaseLayout
+  title="Mikael Johansson | Portfolio"
+  description="Portfolio i svensk premiumstil med utvalda projekt, arbetssatt och tydliga resultat."
+  lang="sv"
+>
+  <div class="space-y-10 md:space-y-14">
+    <Hero />
+    <FeaturedWork />
+    <Capabilities />
+    <OperatingSystem />
+    <ProofBand />
+    <About />
+    <FinalCTA />
+  </div>
+</BaseLayout>

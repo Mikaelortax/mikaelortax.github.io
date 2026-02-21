@@ -47,22 +47,14 @@ const getOtherLanguagePath = (pathname: string) => {
 
 const otherLanguagePath = getOtherLanguagePath(effectivePath);
 
-const navItems =
-  lang === 'sv'
-    ? [
-        { label: 'Start', href: '/sv' },
-        { label: 'Om', href: '/sv/om' },
-        { label: 'Projekt', href: '/sv/projekt' },
-        { label: 'Guider', href: '/sv/guider' },
-        { label: 'Kontakt', href: '/sv/kontakt' },
-      ]
-    : [
-        { label: 'Home', href: '/en' },
-        { label: 'About', href: '/en/about' },
-        { label: 'Projects', href: '/en/projects' },
-        { label: 'Guides', href: '/en/guides' },
-        { label: 'Contact', href: '/en/contact' },
-      ];
+const homeHref = lang === 'sv' ? '/' : '/en';
+const navItems = [
+  { label: 'Work', href: `${homeHref}#work` },
+  { label: 'Capabilities', href: `${homeHref}#capabilities` },
+  { label: 'Process', href: `${homeHref}#process` },
+  { label: 'About', href: `${homeHref}#about` },
+  { label: 'Contact', href: `${homeHref}#contact` },
+];
 
 const isSvActive = lang === 'sv';
 const isEnActive = lang === 'en';
@@ -72,7 +64,7 @@ const enHref = isEnActive ? effectivePath : otherLanguagePath;
 
 <header class="border-b border-neutral-800">
   <div class="mx-auto flex w-full max-w-5xl flex-col gap-4 px-6 py-5 md:flex-row md:items-center md:justify-between">
-    <a href={lang === 'sv' ? '/sv' : '/en'} class="text-lg font-semibold text-white">
+    <a href={homeHref} class="text-lg font-semibold text-white transition hover:text-cyan-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950">
       Mikael Johansson
     </a>
     <div class="flex flex-wrap items-center gap-4 md:gap-6">
@@ -80,7 +72,10 @@ const enHref = isEnActive ? effectivePath : otherLanguagePath;
         <ul class="flex flex-wrap items-center gap-4 text-sm text-neutral-200">
           {navItems.map((item) => (
             <li>
-              <a class="transition hover:text-white" href={item.href}>
+              <a
+                class="rounded-lg px-2 py-1 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                href={item.href}
+              >
                 {item.label}
               </a>
             </li>
@@ -91,7 +86,9 @@ const enHref = isEnActive ? effectivePath : otherLanguagePath;
         <a
           href={svHref}
           class={`rounded-full px-3 py-1 text-xs font-semibold tracking-wide transition ${
-            isSvActive ? 'bg-white text-black' : 'text-neutral-200 hover:text-white'
+            isSvActive
+              ? 'bg-white text-black'
+              : 'text-neutral-200 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950'
           }`}
           aria-current={isSvActive ? 'page' : undefined}
           aria-label="Switch language to Swedish"
@@ -101,7 +98,9 @@ const enHref = isEnActive ? effectivePath : otherLanguagePath;
         <a
           href={enHref}
           class={`rounded-full px-3 py-1 text-xs font-semibold tracking-wide transition ${
-            isEnActive ? 'bg-white text-black' : 'text-neutral-200 hover:text-white'
+            isEnActive
+              ? 'bg-white text-black'
+              : 'text-neutral-200 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950'
           }`}
           aria-current={isEnActive ? 'page' : undefined}
           aria-label="Switch language to English"

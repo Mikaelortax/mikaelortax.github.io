@@ -1,0 +1,35 @@
+---
+const services = [
+  {
+    title: 'Webbplattformar',
+    text: 'Strukturerade Astro-baserade sajter med hög prestanda och tydlig innehållsmodell.',
+  },
+  {
+    title: 'UX och informationsflöde',
+    text: 'Förenklar användarresor så att besökaren hittar rätt innehåll snabbare.',
+  },
+  {
+    title: 'Teknisk SEO',
+    text: 'Canonical, hreflang, metadata och indexeringsstrategi för rätt synlighet.',
+  },
+  {
+    title: 'Lansering och drift',
+    text: 'GitHub Pages/CI, kvalitetskontroller och robust deployprocess utan friktion.',
+  },
+];
+---
+
+<section aria-labelledby="tjanster" class="mt-16">
+  <h2 id="tjanster" class="text-2xl font-semibold tracking-tight text-white">Tjänster</h2>
+  <p class="mt-3 max-w-2xl text-neutral-300">
+    Jag hjälper små team och solo-founders att bygga stabila webbsystem med tydlig struktur.
+  </p>
+  <div class="mt-8 grid gap-4 md:grid-cols-2">
+    {services.map((service) => (
+      <article class="rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur">
+        <h3 class="text-lg font-semibold text-white">{service.title}</h3>
+        <p class="mt-3 text-sm leading-relaxed text-neutral-300">{service.text}</p>
+      </article>
+    ))}
+  </div>
+</section>

@@ -1,0 +1,33 @@
+---
+const steps = [
+  {
+    title: 'Analys och scope',
+    text: 'Vi definierar mål, innehållsstruktur och prioriterad leveransplan.',
+  },
+  {
+    title: 'Design och arkitektur',
+    text: 'Jag sätter UI-system, routing och komponentgränser för långsiktig hållbarhet.',
+  },
+  {
+    title: 'Bygg och kvalitetssäkring',
+    text: 'Implementering med fokus på prestanda, SEO och tillgänglighet.',
+  },
+  {
+    title: 'Lansering och förbättring',
+    text: 'Driftsättning, mätning och iterativa förbättringar baserat på data.',
+  },
+];
+---
+
+<section aria-labelledby="process" class="mt-16">
+  <h2 id="process" class="text-2xl font-semibold tracking-tight text-white">Process</h2>
+  <ol class="mt-8 grid gap-4 md:grid-cols-2">
+    {steps.map((step, index) => (
+      <li class="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+        <p class="text-xs font-semibold tracking-[0.2em] text-cyan-300">STEG {index + 1}</p>
+        <h3 class="mt-2 text-lg font-semibold text-white">{step.title}</h3>
+        <p class="mt-3 text-sm text-neutral-300">{step.text}</p>
+      </li>
+    ))}
+  </ol>
+</section>

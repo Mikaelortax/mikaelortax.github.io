@@ -1,0 +1,20 @@
+---
+const items = [
+  'Snabba leveranser med tydlig scope',
+  'SEO och semantik från start',
+  'Komponentdriven arkitektur',
+  'Mätbar prestanda i produktion',
+  'Dokumentation som teamet kan använda',
+];
+---
+
+<section aria-labelledby="förtroende" class="mt-10">
+  <h2 id="förtroende" class="sr-only">Förtroende</h2>
+  <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    {items.map((item) => (
+      <li class="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-neutral-300">
+        {item}
+      </li>
+    ))}
+  </ul>
+</section>

@@ -1,0 +1,36 @@
+---
+const items = [
+  {
+    question: 'Hur lång tid tar ett projekt?',
+    answer: 'En första version tar ofta 2-4 veckor beroende på omfattning och tillgängligt material.',
+  },
+  {
+    question: 'Jobbar du med befintliga kodbaser?',
+    answer: 'Ja. Jag kan gå in i befintliga Astro-projekt och förbättra struktur, SEO och prestanda.',
+  },
+  {
+    question: 'Kan du hjälpa med innehållsstruktur?',
+    answer: 'Absolut. Jag hjälper gärna till att strukturera navigering, rubriker och sidtyper.',
+  },
+  {
+    question: 'Hur hanteras SEO i två språk?',
+    answer: 'Jag sätter canonical + hreflang korrekt och säkrar symmetri mellan språkversionerna.',
+  },
+  {
+    question: 'Erbjuder du löpande förbättring?',
+    answer: 'Ja, jag erbjuder iterativt stöd efter lansering med mätning och förbättring i sprintar.',
+  },
+];
+---
+
+<section aria-labelledby="faq" class="mt-16">
+  <h2 id="faq" class="text-2xl font-semibold tracking-tight text-white">Vanliga frågor</h2>
+  <div class="mt-6 space-y-3">
+    {items.map((item) => (
+      <details class="rounded-xl border border-white/10 bg-white/[0.03] p-4 open:bg-white/[0.05]">
+        <summary class="cursor-pointer list-none font-semibold text-white">{item.question}</summary>
+        <p class="mt-3 text-sm text-neutral-300">{item.answer}</p>
+      </details>
+    ))}
+  </div>
+</section>
