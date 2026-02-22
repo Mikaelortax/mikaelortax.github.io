@@ -1,4 +1,4 @@
-﻿---
+---
 interface Props {
   lang?: 'sv' | 'en';
 }
@@ -6,58 +6,58 @@ interface Props {
 const { lang = 'sv' } = Astro.props;
 const isEn = lang === 'en';
 const projectsHref = isEn ? '/en/projects' : '/projekt';
-const contactHref = isEn ? '/en/contact' : '/kontakt';
+const aboutHref = isEn ? '/en/about' : '/om';
 ---
 
-<section class="band band--mesh" aria-labelledby="hero-title">
-  <p class="inline-flex rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-xs font-semibold tracking-[0.18em] text-cyan-200">
-    {isEn ? 'HYBRID PROFILE: SEO + WEB + AUTOMATION' : 'HYBRID PROFILE: SEO + WEB + AUTOMATION'}
-  </p>
+<section class="band band--mesh overflow-hidden" aria-labelledby="hero-title">
+  <div class="hero-content">
+    <p class="section-kicker reveal-block">
+      {isEn ? 'HYBRID PROFILE: SEO + WEB + AUTOMATION' : 'HYBRID PROFIL: SEO + WEB + AUTOMATION'}
+    </p>
 
-  <h1 id="hero-title" class="mt-6 max-w-[50rem] text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl">
-    {
-      isEn
-        ? 'I build growth systems that combine technical SEO, fast web engineering, and smart automation.'
-        : 'Jag bygger tillvaxtsystem som kombinerar Technical SEO, snabb webbutveckling och smart automation.'
-    }
-  </h1>
+    <h1 id="hero-title" class="reveal-block reveal-delay-1 mx-auto mt-6 max-w-[56rem] text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl">
+      {isEn ? 'I build practical ' : 'Jag bygger praktiska '}
+      <span class="hero-accent">{isEn ? 'digital systems' : 'digitala system'}</span>
+      {isEn ? ' with SEO, web engineering, and automation.' : ' med SEO, webbutveckling och automation.'}
+    </h1>
 
-  <p class="mt-7 max-w-[50rem] text-lg leading-relaxed text-neutral-300 sm:text-xl">
-    {
-      isEn
-        ? 'The result is faster launches, clearer information flow, and stronger organic visibility. Less overhead, more momentum, stable delivery.'
-        : 'Resultatet ar snabbare lanseringar, tydligare informationsfloden och battre organisk synlighet. Mindre handpahallning, mer fart och stabil drift.'
-    }
-  </p>
+    <p class="reveal-block reveal-delay-2 mx-auto mt-7 max-w-[46rem] text-lg leading-relaxed text-neutral-300 sm:text-xl">
+      {
+        isEn
+          ? 'This site is a portfolio of how I think, build, and iterate in real projects. Clear structure, measurable outcomes, and long-term maintainability.'
+          : 'Det här är en portfolio över hur jag tänker, bygger och förbättrar i riktiga projekt. Tydlig struktur, mätbar effekt och hållbar drift över tid.'
+      }
+    </p>
 
-  <div class="mt-9 flex flex-wrap gap-3">
-    <a
-      href={contactHref}
-      class="rounded-xl bg-cyan-300 px-5 py-3 text-sm font-semibold text-neutral-950 transition hover:-translate-y-0.5 hover:bg-cyan-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-    >
-      {isEn ? 'Book 15 min intro' : 'Boka 15 min intro'}
-    </a>
-    <a
-      href={projectsHref}
-      class="rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-    >
-      {isEn ? 'View projects' : 'Se projekt'}
-    </a>
+    <div class="reveal-block reveal-delay-3 mt-9 flex flex-wrap justify-center gap-3">
+      <a
+        href={aboutHref}
+        class="btn-primary px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+      >
+        {isEn ? 'How I work' : 'Så arbetar jag'}
+      </a>
+      <a
+        href={projectsHref}
+        class="btn-secondary px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+      >
+        {isEn ? 'View projects' : 'Se projekt'}
+      </a>
+    </div>
+
+    <ul class="mx-auto mt-9 grid max-w-[56rem] gap-3 text-sm text-neutral-200 sm:grid-cols-2 lg:grid-cols-4" aria-label={isEn ? 'Capabilities chips' : 'Kompetenschips'}>
+      <li class="pill-chip reveal-card px-4 py-3">Technical SEO / AEO</li>
+      <li class="pill-chip reveal-card px-4 py-3">Astro / React</li>
+      <li class="pill-chip reveal-card px-4 py-3">Automation (n8n)</li>
+      <li class="pill-chip reveal-card px-4 py-3">Laravel / Wave</li>
+    </ul>
+
+    <p class="mx-auto mt-8 max-w-[56rem] text-sm text-neutral-400">
+      <span class="font-semibold text-neutral-200">{isEn ? 'Now:' : 'Nu:'}</span>
+      {
+        isEn
+          ? ' I am building an SEO-driven content workflow between CMS, Search Console, and CRM.'
+          : ' bygger jag ett SEO-drivet innehållsflöde mellan CMS, Search Console och CRM.'
+      }
+    </p>
   </div>
-
-  <ul class="mt-9 grid max-w-[50rem] gap-3 text-sm text-neutral-200 sm:grid-cols-2 lg:grid-cols-4" aria-label={isEn ? 'Capabilities chips' : 'Kompetenschips'}>
-    <li class="rounded-xl border border-white/10 bg-black/20 px-4 py-3">Technical SEO / AEO</li>
-    <li class="rounded-xl border border-white/10 bg-black/20 px-4 py-3">Astro / React</li>
-    <li class="rounded-xl border border-white/10 bg-black/20 px-4 py-3">Automation (n8n)</li>
-    <li class="rounded-xl border border-white/10 bg-black/20 px-4 py-3">Laravel / Wave</li>
-  </ul>
-
-  <p class="mt-8 max-w-[50rem] text-sm text-neutral-400">
-    <span class="font-semibold text-neutral-200">Now:</span>
-    {
-      isEn
-        ? ' building an SEO-driven content flow with automation between CMS, Search Console, and CRM.'
-        : ' bygger ett SEO-drivet innehallsflode med automation mellan CMS, Search Console och CRM.'
-    }
-  </p>
 </section>

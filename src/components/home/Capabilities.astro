@@ -1,38 +1,86 @@
-﻿<section id="capabilities" class="band band--surface band--dot" aria-labelledby="capabilities-title">
-  <h2 id="capabilities-title" class="text-2xl font-semibold tracking-tight text-white md:text-3xl">Capabilities</h2>
-  <p class="mt-3 max-w-2xl text-neutral-300">
-    Min leveransmodell ar byggd for team som vill kombinera teknisk precision med tillvaxtfokus.
-  </p>
+﻿---
+const capabilities = [
+  {
+    title: 'Technical SEO & CWV',
+    text: 'Teknisk SEO som förbättrar synlighet, laddtid och stabilitet under riktig trafik.',
+    tags: ['Crawl', 'Core Web Vitals'],
+  },
+  {
+    title: 'Informationsarkitektur',
+    text: 'Struktur för sidor och innehåll som gör det lätt att hitta, förstå och agera.',
+    tags: ['Sidtyper', 'Content ops'],
+  },
+  {
+    title: 'Web engineering',
+    text: 'Snabba, komponentdrivna gränssnitt i Astro/React med tydlig kodstruktur.',
+    tags: ['Astro', 'React'],
+  },
+  {
+    title: 'Automation',
+    text: 'Automatiserade flöden mellan formulär, inbox, CRM och interna handoffs.',
+    tags: ['n8n', 'API-flöden'],
+  },
+  {
+    title: 'AI-assisterad utveckling',
+    text: 'Praktiska AI-flöden för snabbare iteration med kvalitet och kontroll i varje steg.',
+    tags: ['OpenAI', 'Codex'],
+  },
+  {
+    title: 'Analytics & mätning',
+    text: 'Mätning som kopplar implementation till effekt, så prioriteringar blir tydliga.',
+    tags: ['GA4', 'Search Console'],
+  },
+  {
+    title: 'Konverteringsfokus',
+    text: 'Skärpt copy och tydliga CTA-flöden som minskar friktion och ökar kvaliteten på leads.',
+    tags: ['UX copy', 'CRO'],
+  },
+  {
+    title: 'Systemkopplingar',
+    text: 'Integrationer som binder ihop verktyg så data rör sig rätt utan manuellt arbete.',
+    tags: ['Integration', 'Datakvalitet'],
+  },
+  {
+    title: 'Drift & release',
+    text: 'Förutsägbara leveranser med testtänk, release-disciplin och stabil drift över tid.',
+    tags: ['Kvalitet', 'Release flow'],
+  },
+];
+---
 
-  <div class="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-    <article class="ui-card ui-card--interactive p-6" tabindex="0">
-      <h3 class="text-lg font-semibold text-white">Technical SEO & CWV</h3>
-      <p class="mt-2 text-sm text-neutral-300">Teknisk grund som gor att innehall rankar och sidan levererar under belastning.</p>
-    </article>
+<section id="capabilities" class="band band--surface band--dot" aria-labelledby="capabilities-title">
+  <header class="section-head reveal-block">
+    <p class="section-kicker">Kompetens</p>
+    <h2 id="capabilities-title" class="section-title">Kompetenser</h2>
+    <p class="section-lead">
+      Ett koncentrerat urval av områden där jag bygger robusta lösningar med tydlig effekt.
+    </p>
+  </header>
 
-    <article class="ui-card ui-card--interactive p-6" tabindex="0">
-      <h3 class="text-lg font-semibold text-white">Information architecture & content ops</h3>
-      <p class="mt-2 text-sm text-neutral-300">Navigering, sidtyper och innehallsflode som ar enkla att driva och vidareutveckla.</p>
-    </article>
+  <div class="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+    {capabilities.map((item, index) => (
+      <article class="ui-card ui-card--interactive capability-card reveal-card p-6 text-left" tabindex="0">
+        <div class="capability-topline" aria-hidden="true"></div>
+        <p class="capability-index">{String(index + 1).padStart(2, '0')}</p>
+        <h3 class="mt-3 text-xl font-semibold text-white">{item.title}</h3>
+        <p class="mt-3 text-sm text-neutral-300">{item.text}</p>
 
-    <article class="ui-card ui-card--interactive p-6" tabindex="0">
-      <h3 class="text-lg font-semibold text-white">Web engineering (Astro/Tailwind/React)</h3>
-      <p class="mt-2 text-sm text-neutral-300">Komponentdriven implementation med fokus pa snabb rendering och ren struktur.</p>
-    </article>
+        <div class="mt-5 flex flex-wrap gap-2" aria-label="Kompetensdetaljer">
+          {item.tags.map((tag) => (
+            <span class="capability-tag">{tag}</span>
+          ))}
+        </div>
+      </article>
+    ))}
+  </div>
 
-    <article class="ui-card ui-card--interactive p-6" tabindex="0">
-      <h3 class="text-lg font-semibold text-white">Automation (n8n, APIs, workflows)</h3>
-      <p class="mt-2 text-sm text-neutral-300">Automatiserar repetitiva steg sa teamet kan lagga tid pa ratt beslut.</p>
-    </article>
-
-    <article class="ui-card ui-card--interactive p-6" tabindex="0">
-      <h3 class="text-lg font-semibold text-white">AI-assisted tooling (OpenAI/Codex workflows)</h3>
-      <p class="mt-2 text-sm text-neutral-300">Praktiska AI-floden for snabbare utveckling, dokumentation och kvalitetssakring.</p>
-    </article>
-
-    <article class="ui-card ui-card--interactive p-6" tabindex="0">
-      <h3 class="text-lg font-semibold text-white">Analytics & measurement (GA4/Search Console mindset)</h3>
-      <p class="mt-2 text-sm text-neutral-300">Bygger beslut pa signaler, inte antaganden, med tydlig matning av effekt.</p>
-    </article>
+  <div class="mt-10 flex justify-center">
+    <a
+      href="/kompetens"
+      class="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+    >
+      Se alla kompetenser
+      <span aria-hidden="true">-&gt;</span>
+    </a>
   </div>
 </section>

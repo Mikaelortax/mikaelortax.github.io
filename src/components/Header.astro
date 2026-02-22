@@ -24,7 +24,9 @@ const svToEnMap: Record<string, string> = {
   '/kontakt': '/en/contact',
   '/sv': '/en',
   '/sv/projekt': '/en/projects',
+  '/sv/guider': '/en/guides',
   '/sv/om': '/en/about',
+  '/sv/cv': '/en/cv',
   '/sv/kontakt': '/en/contact',
 };
 
@@ -55,7 +57,8 @@ const svHref = toSwedishPath(currentPath);
 const enHref = toEnglishPath(currentPath);
 
 const homeHref = lang === 'sv' ? '/' : '/en';
-const navItems =
+
+const desktopNavItems =
   lang === 'sv'
     ? [
         { label: 'Projekt', href: '/projekt' },
@@ -72,38 +75,92 @@ const navItems =
         { label: 'Contact', href: '/en/contact' },
       ];
 
+const mobileNavItems =
+  lang === 'sv'
+    ? [
+        { label: 'Hem', href: '/' },
+        { label: 'Projekt', href: '/projekt' },
+        { label: 'Kompetens', href: '/kompetens' },
+        { label: 'Om', href: '/om' },
+        { label: 'Kontakt', href: '/kontakt' },
+      ]
+    : [
+        { label: 'Home', href: '/en' },
+        { label: 'Projects', href: '/en/projects' },
+        { label: 'Skills', href: '/en/capabilities' },
+        { label: 'About', href: '/en/about' },
+        { label: 'Contact', href: '/en/contact' },
+      ];
+
 const isSvActive = lang === 'sv';
 const isEnActive = lang === 'en';
+
+const isPathActive = (href: string) => {
+  const basePath = normalizePath((href || '/').split('#')[0] || '/');
+
+  if (href.includes('#process')) {
+    return currentPath === homeHref;
+  }
+
+  if (basePath === '/' || basePath === '/en') {
+    return currentPath === basePath;
+  }
+
+  return currentPath === basePath || currentPath.startsWith(`${basePath}/`);
+};
 ---
 
-<header class="sticky top-0 z-40 border-b border-white/10 bg-neutral-950/70 backdrop-blur-md">
-  <div class="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-200/20 to-transparent"></div>
-  <div class="relative mx-auto flex w-full max-w-5xl flex-col gap-4 px-6 py-6 md:flex-row md:items-center md:justify-between">
-    <a href={homeHref} class="text-lg font-semibold text-white transition hover:text-cyan-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950">
+<header class="site-header-shell sticky top-0 z-40 backdrop-blur-xl">
+  <div class="site-header relative mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6 md:grid md:grid-cols-[1fr_auto_1fr] md:py-5">
+    <a
+      href={homeHref}
+      class="site-brand text-lg font-semibold tracking-tight transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 md:justify-self-start md:text-xl"
+    >
       Mikael Johansson
     </a>
-    <div class="flex flex-wrap items-center gap-4 md:gap-6">
-      <nav aria-label="Main navigation">
-        <ul class="flex flex-wrap items-center gap-4 text-sm text-neutral-200">
-          {navItems.map((item) => (
-            <li>
-              <a
-                class="rounded-lg px-2 py-1 text-neutral-200 transition duration-200 hover:text-white hover:brightness-110 hover:[&_span]:border-cyan-200/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-                href={item.href}
-              >
-                <span class="border-b border-transparent pb-0.5 transition">{item.label}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-      <nav class="inline-flex items-center gap-1 rounded-full border border-neutral-700 p-1" aria-label="Language switcher">
+
+    <nav aria-label="Main navigation" class="hidden md:block md:justify-self-center">
+      <ul class="site-nav-list flex items-center justify-center gap-5 text-sm">
+        {desktopNavItems.map((item) => (
+          <li>
+            <a
+              class={`site-nav-link group rounded-lg px-2 py-1 transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 ${
+                isPathActive(item.href) ? 'is-active' : ''
+              }`}
+              href={item.href}
+              aria-current={isPathActive(item.href) ? 'page' : undefined}
+            >
+              <span class="relative pb-0.5">
+                {item.label}
+                <span class="absolute inset-x-0 -bottom-0.5 h-px scale-x-0 bg-cyan-200/70 transition duration-200 group-hover:scale-x-100"></span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2 md:justify-self-end md:gap-3">
+      <button
+        id="theme-toggle"
+        type="button"
+        class="theme-toggle inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold tracking-wide"
+        aria-label={lang === 'sv' ? 'Byt tema' : 'Switch theme'}
+        aria-pressed="false"
+        data-label-dark={lang === 'sv' ? 'Mork' : 'Dark'}
+        data-label-light={lang === 'sv' ? 'Ljus' : 'Light'}
+      >
+        <span aria-hidden="true" class="theme-toggle-icon">D</span>
+        <span class="theme-toggle-text">{lang === 'sv' ? 'Mork' : 'Dark'}</span>
+      </button>
+
+      <nav class="language-switch inline-flex items-center gap-1 rounded-full p-1" aria-label="Language switcher">
         <a
           href={svHref}
-          class={`rounded-full px-3 py-1 text-xs font-semibold tracking-wide transition ${
+          class={`language-pill rounded-full px-3 py-1 text-xs font-semibold tracking-wide transition ${
             isSvActive
-              ? 'bg-white text-black'
-              : 'text-neutral-200 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950'
+              ? 'is-active'
+              : 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950'
           }`}
           aria-current={isSvActive ? 'page' : undefined}
           aria-label="Switch language to Swedish"
@@ -112,10 +169,10 @@ const isEnActive = lang === 'en';
         </a>
         <a
           href={enHref}
-          class={`rounded-full px-3 py-1 text-xs font-semibold tracking-wide transition ${
+          class={`language-pill rounded-full px-3 py-1 text-xs font-semibold tracking-wide transition ${
             isEnActive
-              ? 'bg-white text-black'
-              : 'text-neutral-200 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950'
+              ? 'is-active'
+              : 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950'
           }`}
           aria-current={isEnActive ? 'page' : undefined}
           aria-label="Switch language to English"
@@ -126,3 +183,20 @@ const isEnActive = lang === 'en';
     </div>
   </div>
 </header>
+
+<nav class="mobile-dock md:hidden" aria-label={lang === 'sv' ? 'Mobil meny' : 'Mobile menu'}>
+  <ul class="mobile-dock-list">
+    {mobileNavItems.map((item) => (
+      <li>
+        <a
+          href={item.href}
+          class={`mobile-dock-link ${isPathActive(item.href) ? 'is-active' : ''}`}
+          aria-current={isPathActive(item.href) ? 'page' : undefined}
+        >
+          <span class="mobile-dock-dot" aria-hidden="true"></span>
+          <span>{item.label}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>

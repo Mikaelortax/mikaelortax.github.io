@@ -1,4 +1,4 @@
----
+﻿---
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import { buildI18nSeo } from '../lib/seo';
@@ -16,9 +16,7 @@ const pathname = Astro.url.pathname || '/';
 const siteBase = Astro.site?.toString() ?? process.env.SITE_URL;
 
 if (!siteBase) {
-  throw new Error(
-    'Missing site URL. Set `site` in astro.config.mjs or define SITE_URL.'
-  );
+  throw new Error('Missing site URL. Set `site` in astro.config.mjs or define SITE_URL.');
 }
 
 const seo = buildI18nSeo(siteBase, pathname);
@@ -51,14 +49,66 @@ const twitterCard = ogImageUrl ? 'summary_large_image' : 'summary';
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+    <script is:inline>
+      (() => {
+        const stored = localStorage.getItem('theme');
+        const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+        const theme = stored === 'light' || stored === 'dark' ? stored : prefersLight ? 'light' : 'dark';
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
   </head>
-  <body class="bg-neutral-950 text-white">
+  <body>
     <Header lang={seo.lang} path={pathname} />
-    <main class="w-full">
+    <main class="w-full pb-[6.25rem] md:pb-0">
       <slot />
     </main>
-    <footer class="border-t border-neutral-800 py-6 text-center text-sm text-neutral-400">
-      Mikael Johansson
+    <footer class="site-footer pb-[5.5rem] md:pb-0">
+      <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p class="site-footer-title text-lg font-semibold tracking-tight">Mikael Johansson</p>
+          <p class="site-footer-text mt-2 max-w-xl text-sm">
+            SEO/Growth engineering, webbutveckling och automation i en och samma leverans.
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3 text-sm">
+          <a class="btn-secondary px-4 py-2" href="mailto:hello@example.com">Email</a>
+          <a class="btn-secondary px-4 py-2" href="https://www.linkedin.com/in/your-profile">LinkedIn</a>
+        </div>
+      </div>
+      <div class="site-footer-divider border-t">
+        <div class="site-footer-meta mx-auto w-full max-w-6xl px-6 py-4 text-xs">
+          &copy; {new Date().getFullYear()} Mikael Johansson.
+        </div>
+      </div>
     </footer>
+    <script is:inline>
+      (() => {
+        const button = document.getElementById('theme-toggle');
+        if (!button) return;
+
+        const icon = button.querySelector('.theme-toggle-icon');
+        const label = button.querySelector('.theme-toggle-text');
+        const darkLabel = button.getAttribute('data-label-dark') || 'Dark';
+        const lightLabel = button.getAttribute('data-label-light') || 'Light';
+
+        const syncButton = () => {
+          const current = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+          button.setAttribute('aria-pressed', current === 'light' ? 'true' : 'false');
+          if (icon) icon.textContent = current === 'light' ? 'L' : 'D';
+          if (label) label.textContent = current === 'light' ? lightLabel : darkLabel;
+        };
+
+        syncButton();
+
+        button.addEventListener('click', () => {
+          const current = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+          const next = current === 'light' ? 'dark' : 'light';
+          document.documentElement.dataset.theme = next;
+          localStorage.setItem('theme', next);
+          syncButton();
+        });
+      })();
+    </script>
   </body>
 </html>

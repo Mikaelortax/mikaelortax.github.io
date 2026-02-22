@@ -8,90 +8,114 @@ const isEn = lang === 'en';
 
 const content = isEn
   ? {
-      title: 'Featured projects',
+      kicker: 'Portfolio Highlights',
+      title: 'Projects I am proud of',
       intro:
-        'Three projects showing how I build systems that increase growth capacity and reduce operational friction.',
+        'Three projects that represent how I think, build, and improve over time in real production environments.',
       cards: [
         {
+          id: '01',
           title: 'Tungportalen',
-          text: 'Platform for heavy operational workflows with clear process control.',
-          problem: 'Business-critical processes were fragmented and difficult to quality-assure.',
-          solution: 'Unified portal with robust architecture, clear role boundaries, and a reliable release loop.',
-          impact: 'Faster handling and better operational control.',
-          href: '/en/projects',
+          text: 'A platform for heavy operational workflows and clearer process ownership.',
+          role: 'Role: Product-minded fullstack lead',
+          built: 'Built: Information architecture, robust release flow, and role-based workflows.',
+          result: 'Result: Faster handling and higher confidence in daily operations.',
+          href: '/en/projects/tungportalen',
         },
         {
+          id: '02',
           title: 'Fairless Security',
-          text: 'Membership system with onboarding, permissions, and clear access logic.',
-          problem: 'The member flow was unclear and required excessive manual handling.',
-          solution: 'Structured member journey with automated assignments and status handling.',
-          impact: 'More predictable operations and a stronger member experience.',
-          href: '/en/projects',
+          text: 'Membership system with onboarding, permissions, and predictable lifecycle states.',
+          role: 'Role: System and UX implementation',
+          built: 'Built: Structured member journey with automation across access and status transitions.',
+          result: 'Result: Less manual overhead and a smoother experience for members.',
+          href: '/en/projects/fairless-security',
         },
         {
+          id: '03',
           title: 'n8n Lead Automation',
-          text: 'Automated pipelines for lead qualification and follow-up.',
-          problem: 'Leads dropped between forms, inboxes, CRM, and internal handoff.',
-          solution: 'n8n workflows with validation, scoring, and notifications at each key step.',
-          impact: 'More qualified conversations and shorter time to first contact.',
-          href: '/en/projects',
+          text: 'Automated lead pipelines from form input to first qualified conversation.',
+          role: 'Role: Automation architect',
+          built: 'Built: Validation, scoring, and notifications across form, inbox, CRM, and handoff.',
+          result: 'Result: Better lead quality and shorter time to first contact.',
+          href: '/en/projects/n8n-lead-automation',
         },
       ],
-      readMore: 'Read more',
-      solutionLabel: 'Solution',
+      readMore: 'View case',
     }
   : {
-      title: 'Utvalda projekt',
+      kicker: 'Portfolio i urval',
+      title: 'Projekt jag är stolt över',
       intro:
-        'Tre projekt som visar hur jag bygger system som driver tillvaxt och minskar operativ friktion.',
+        'Tre projekt som visar hur jag tänker, bygger och förbättrar över tid i verklig produktion.',
       cards: [
         {
+          id: '01',
           title: 'Tungportalen',
-          text: 'Plattform for tunga verksamhetsfloden med tydligt operativt fokus.',
-          problem: 'Kritiska processer var utspridda och svara att kvalitetssakra.',
-          solution: 'Samlad portal med stabil arkitektur, tydliga roller och effektiv release-rutin.',
-          impact: 'Snabbare handlaggning och battre kontroll i vardagen.',
-          href: '/projekt',
+          text: 'En plattform för tunga verksamhetsflöden med tydligare processägarskap.',
+          role: 'Roll: Produktnära fullstack-lead',
+          built: 'Byggde: Informationsarkitektur, stabil releaseprocess och rollstyrda arbetsflöden.',
+          result: 'Resultat: Snabbare handläggning och högre trygghet i den dagliga driften.',
+          href: '/projekt/tungportalen',
         },
         {
+          id: '02',
           title: 'Fairless Security',
-          text: 'Medlemssystem med onboarding, behorighet och tydlig accesslogik.',
-          problem: 'Medlemsflodet var otydligt och kravde mycket manuellt arbete.',
-          solution: 'Struktur for medlemsresa med automatiska tilldelningar och statushantering.',
-          impact: 'Mer forutsagbar drift och battre upplevelse for medlemmar.',
-          href: '/projekt',
+          text: 'Medlemssystem med onboarding, behörigheter och förutsägbara livscykelsteg.',
+          role: 'Roll: System- och UX-implementation',
+          built: 'Byggde: Strukturerad medlemsresa med automation kring access och statusflöden.',
+          result: 'Resultat: Mindre manuell administration och bättre upplevelse för medlemmar.',
+          href: '/projekt/fairless-security',
         },
         {
+          id: '03',
           title: 'n8n Lead Automation',
-          text: 'Automatiserade pipelines for leadkvalificering och uppfoljning.',
-          problem: 'Leads tappades mellan formular, inbox, CRM och intern handoff.',
-          solution: 'n8n-workflows med validering, scoring och notifieringar i ratt steg.',
-          impact: 'Fler kvalificerade dialoger och kortare tid till forsta kontakt.',
-          href: '/projekt',
+          text: 'Automatiserade leadflöden från formulär till första kvalificerade dialog.',
+          role: 'Roll: Automationsarkitekt',
+          built: 'Byggde: Validering, scoring och notifieringar mellan formulär, inbox, CRM och handoff.',
+          result: 'Resultat: Högre leadkvalitet och kortare väg till första kontakt.',
+          href: '/projekt/n8n-lead-automation',
         },
       ],
-      readMore: 'Las mer',
-      solutionLabel: 'Losning',
+      readMore: 'Läs case',
     };
 ---
 
 <section id="work" class="band band--surface" aria-labelledby="work-title">
-  <h2 id="work-title" class="text-2xl font-semibold tracking-tight text-white md:text-3xl">{content.title}</h2>
-  <p class="mt-3 max-w-2xl text-neutral-300">{content.intro}</p>
+  <header class="section-head reveal-block">
+    <p class="section-kicker">{content.kicker}</p>
+    <h2 id="work-title" class="section-title">{content.title}</h2>
+    <p class="section-lead">{content.intro}</p>
+  </header>
 
-  <div class="mt-8 grid gap-4 lg:grid-cols-3">
-    {content.cards.map((card) => (
-      <article class="ui-card ui-card--interactive p-6" tabindex="0">
-        <h3 class="text-xl font-semibold text-white">{card.title}</h3>
-        <p class="mt-2 text-sm text-neutral-300">{card.text}</p>
-        <ul class="mt-4 space-y-2 text-sm text-neutral-200">
-          <li><span class="font-semibold text-white">Problem:</span> {card.problem}</li>
-          <li><span class="font-semibold text-white">{content.solutionLabel}:</span> {card.solution}</li>
+  <div class="mt-10 grid gap-6 lg:grid-cols-3">
+    {content.cards.map((card, index) => (
+      <article
+        class="ui-card ui-card--interactive portfolio-card reveal-card p-6 text-left"
+        style={`animation-delay: ${index * 90}ms;`}
+        tabindex="0"
+      >
+        <div class="card-id mb-4 inline-flex rounded-full border border-cyan-300/25 bg-cyan-300/10 px-2.5 py-1 text-[11px] font-semibold tracking-[0.16em] text-cyan-200">
+          {card.id}
+        </div>
+
+        <h3 class="text-2xl font-semibold leading-tight text-white">{card.title}</h3>
+        <p class="mt-3 text-sm text-neutral-300">{card.text}</p>
+
+        <ul class="mt-5 space-y-3 text-sm text-neutral-200">
+          <li class="card-meta">{card.role}</li>
+          <li class="card-meta">{card.built}</li>
+          <li class="card-meta">{card.result}</li>
         </ul>
-        <p class="mt-4 text-sm text-neutral-300"><span class="font-semibold text-white">Impact:</span> {card.impact}</p>
-        <a href={card.href} class="mt-5 inline-flex text-sm font-semibold text-cyan-300 hover:text-cyan-200">{content.readMore}</a>
+
+        <a
+          href={card.href}
+          class="mt-6 inline-flex items-center text-sm font-semibold text-cyan-300 transition hover:text-cyan-200"
+        >
+          {content.readMore}
+          <span aria-hidden="true" class="ml-1">-&gt;</span>
+        </a>
       </article>
     ))}
   </div>
 </section>
-

@@ -1,19 +1,50 @@
-﻿<section class="band band--surface" aria-label="Proof points">
-  <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-    <li class="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-neutral-200">
-      Hoghastighetsleverans med tydliga sprintar
-    </li>
-    <li class="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-neutral-200">
-      Drift och releases med forutsagbarhet
-    </li>
-    <li class="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-neutral-200">
-      SEO-first i layout, routing och innehall
-    </li>
-    <li class="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-neutral-200">
-      Automationsdisciplin i varje handoff
-    </li>
-    <li class="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-neutral-200">
-      Performance mindset fran design till deploy
-    </li>
+﻿---
+const proofItems = [
+  {
+    id: '01',
+    title: 'Snabb leverans',
+    text: 'Hög takt med tydliga sprintmål och kort väg från beslut till release.',
+  },
+  {
+    id: '02',
+    title: 'Förutsägbar drift',
+    text: 'Struktur i releaseflödet som minskar överraskningar och håller kvaliteten jämn.',
+  },
+  {
+    id: '03',
+    title: 'SEO i grunden',
+    text: 'SEO-first i informationsarkitektur, routing och innehåll från första sprinten.',
+  },
+  {
+    id: '04',
+    title: 'Automation i handoff',
+    text: 'Mindre manuellt arbete mellan team och tydligare flöden genom hela leveransen.',
+  },
+  {
+    id: '05',
+    title: 'Performance mindset',
+    text: 'Fokus på fart och stabilitet från designbeslut till deploy i produktion.',
+  },
+];
+---
+
+<section class="band band--surface" aria-labelledby="proof-title">
+  <header class="section-head reveal-block">
+    <p class="section-kicker">Leveranssignal</p>
+    <h2 id="proof-title" class="section-title">Så här jobbar jag i praktiken</h2>
+    <p class="section-lead">
+      Fem principer som håller leveransen snabb, robust och mätbar i vardagen.
+    </p>
+  </header>
+
+  <ul class="mt-9 grid gap-4 sm:grid-cols-2 xl:grid-cols-5" aria-label="Leveransprinciper">
+    {proofItems.map((item) => (
+      <li class="ui-card ui-card--interactive proof-card reveal-card p-5 text-left" tabindex="0">
+        <div class="proof-topline" aria-hidden="true"></div>
+        <p class="proof-index">{item.id}</p>
+        <h3 class="mt-2 text-lg font-semibold text-white">{item.title}</h3>
+        <p class="mt-2 text-sm text-neutral-300">{item.text}</p>
+      </li>
+    ))}
   </ul>
 </section>
