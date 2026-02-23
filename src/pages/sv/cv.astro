@@ -1,10 +1,247 @@
 ﻿---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const profileHighlights = [
+  { label: 'Erfarenhet', value: '12+ år', text: 'SEO, webbutveckling och digital tillväxt sedan 2012.' },
+  { label: 'Rollbredd', value: 'Specialist → Chef', text: 'Från operativ implementation till ledning och byrådrift.' },
+  { label: 'Fokus idag', value: 'SEO + Web + Automation', text: 'Teknisk precision, snabb leverans och hållbar vidareutveckling.' },
+];
+
+const keyStrengths = [
+  'Teknisk SEO med tydlig koppling till affärsresultat',
+  'Produktnära webbutveckling med hög prestanda och ren struktur',
+  'Automation av arbetsflöden mellan formulär, CRM, inbox och team',
+  'AI-stödd produktion för snabbare iteration och kvalitetssäkring',
+  'Stabil leveransmodell från analys till release och uppföljning',
+];
+
+const recentExperience = [
+  {
+    role: 'Ägare & Byråchef',
+    company: 'Imba SEO',
+    period: 'Juli 2022 - Dec 2024',
+    summary:
+      'Grundare och byråchef med strategiskt och operativt ansvar för technical SEO, content, länkstrategi och AI-stödda arbetsflöden.',
+  },
+  {
+    role: 'Head of SEO',
+    company: 'SEO Byrå',
+    period: 'Okt 2021 - Juni 2022',
+    summary:
+      'Ledde SEO-arbetet med fokus på teknisk kvalitet, on-page/off-page, analys och lead-generering för högre synlighet och konvertering.',
+  },
+  {
+    role: 'Digital Marketing Specialist',
+    company: 'Empire Web',
+    period: 'Apr 2020 - Juli 2021',
+    summary:
+      'Arbetade med SEO, SEM, CRO, copy och webbplatsutveckling för att öka både trafik och affärsvärde.',
+  },
+  {
+    role: 'Frilansande CTO/Growth Hacker',
+    company: 'AdNIKA',
+    period: 'Maj 2020 - Okt 2020',
+    summary:
+      'Byggde webbplatser och arbetade med SEO, digital marknadsföring och CRM-processer i kundprojekt.',
+  },
+];
+
+const earlierExperience = [
+  {
+    role: 'Gymnasielärare i yrkesämnen',
+    company: 'Thorén Innovation School',
+    period: 'Feb 2021 - Sep 2021',
+  },
+  {
+    role: 'Frilansande E-commerce Director',
+    company: 'Green Little Heart',
+    period: 'Maj 2020 - Apr 2021',
+  },
+  {
+    role: 'Webbansvarig',
+    company: 'VVS I SYD AB',
+    period: 'Mar 2019 - Aug 2019',
+  },
+  {
+    role: 'SEO/SEM Ansvarig',
+    company: 'Nilson Group AB',
+    period: 'Sep 2017 - Aug 2018',
+  },
+  {
+    role: 'Produktägare / SEO Specialist',
+    company: 'NA-KD',
+    period: 'Aug 2016 - Feb 2017',
+  },
+  {
+    role: 'VD / Utvecklare / Delägare',
+    company: 'E-komet AB',
+    period: 'Maj 2015 - Maj 2016',
+  },
+  {
+    role: 'SEO-Specialist',
+    company: 'DoubleSearch AB',
+    period: 'Aug 2014 - Apr 2015',
+  },
+  {
+    role: 'Grundare',
+    company: 'Mijo Media',
+    period: 'Nov 2012 - Maj 2016',
+  },
+];
+
+const certifications = [
+  'SEMrush Certification for SEO',
+  'SEMrush Certification for PPC Specialists',
+  'SEMrush SEO Toolkit Exam (Advanced)',
+  'Google Analytics Individual Qualification',
+  'Google Ads Search Certification',
+  'HubSpot Inbound Marketing Certification',
+  'HubSpot Content Marketing Certification',
+];
+
+const skills = {
+  seo: ['Screaming Frog', 'Google Search Console', 'GA4', 'SEMrush', 'Ahrefs', 'Majestic'],
+  dev: ['JavaScript', 'TypeScript', 'PHP', 'HTML', 'CSS', 'SQL', 'React', 'Astro'],
+  automation: ['n8n', 'REST API', 'Webhookar', 'CRM-flöden', 'Datakvalitet'],
+  ai: ['OpenAI', 'ChatGPT API', 'Claude', 'Perplexity', 'Midjourney', 'Stable Diffusion'],
+  cms: ['WordPress', 'WooCommerce', 'OpenCart', 'Magento', 'Prestashop', 'Webflow'],
+};
 ---
 
-<BaseLayout title="CV" description="Portfoljosida pa svenska." lang="sv">
-  <h1>CV</h1>
-  <p>Platshallartext for den svenska CV-sidan.</p>
+<BaseLayout
+  title="CV | Mikael Johansson"
+  description="CV med erfarenhet, kärnkompetenser, teknisk profil och certifieringar inom SEO, webbutveckling och automation."
+  lang="sv"
+>
+  <div class="home-shell">
+    <section class="band band--mesh" aria-labelledby="cv-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">CV / Profil</p>
+        <h1 id="cv-title" class="section-title">Mikael Johansson - SEO, webbutveckling och automation</h1>
+        <p class="section-lead">
+          Ett koncentrerat men komplett CV som visar vad jag gjort, hur jag arbetar och vilken teknisk nivå jag levererar på.
+        </p>
+      </header>
+
+      <div class="mt-10 grid gap-5 md:grid-cols-3">
+        {profileHighlights.map((item) => (
+          <article class="ui-card ui-card--interactive reveal-card p-6 text-left" tabindex="0">
+            <p class="text-xs font-semibold tracking-[0.18em] text-cyan-300">{item.label}</p>
+            <p class="mt-3 text-2xl font-semibold text-white">{item.value}</p>
+            <p class="mt-2 text-sm text-neutral-300">{item.text}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="band band--surface" aria-labelledby="strengths-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Kärnprofil</p>
+        <h2 id="strengths-title" class="section-title">Det jag bidrar med i team och projekt</h2>
+      </header>
+
+      <ul class="mt-10 grid gap-4 md:grid-cols-2" aria-label="Kärnkompetenser i korthet">
+        {keyStrengths.map((item) => (
+          <li class="ui-card ui-card--interactive reveal-card p-5 text-left text-sm text-neutral-200" tabindex="0">{item}</li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="band band--surface" aria-labelledby="experience-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Arbetserfarenhet</p>
+        <h2 id="experience-title" class="section-title">Senaste roller</h2>
+        <p class="section-lead">Roller med tydligt ansvar för leverans, tillväxt och teknisk implementation.</p>
+      </header>
+
+      <div class="mt-10 grid gap-5">
+        {recentExperience.map((item) => (
+          <article class="ui-card ui-card--interactive reveal-card p-6 text-left" tabindex="0">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <h3 class="text-xl font-semibold text-white">{item.role} | {item.company}</h3>
+              <p class="text-xs font-semibold tracking-[0.16em] text-cyan-300">{item.period}</p>
+            </div>
+            <p class="mt-3 text-sm text-neutral-300">{item.summary}</p>
+          </article>
+        ))}
+      </div>
+
+      <div class="mt-10 ui-card reveal-card p-6 text-left" tabindex="0">
+        <h3 class="text-lg font-semibold text-white">Tidigare roller</h3>
+        <div class="mt-5 grid gap-3 md:grid-cols-2">
+          {earlierExperience.map((item) => (
+            <div class="rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3">
+              <p class="text-sm font-semibold text-neutral-100">{item.role}</p>
+              <p class="mt-1 text-xs text-neutral-300">{item.company}</p>
+              <p class="mt-1 text-xs font-medium tracking-[0.08em] text-cyan-300">{item.period}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="band band--mesh" aria-labelledby="skills-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Teknisk profil</p>
+        <h2 id="skills-title" class="section-title">Verktyg, stack och arbetsmiljö</h2>
+      </header>
+
+      <div class="mt-10 grid gap-5 md:grid-cols-2">
+        <article class="ui-card ui-card--interactive reveal-card p-6 text-left" tabindex="0">
+          <h3 class="text-lg font-semibold text-white">SEO & analys</h3>
+          <div class="mt-4 flex flex-wrap gap-2">{skills.seo.map((item) => <span class="capability-tag">{item}</span>)}</div>
+        </article>
+
+        <article class="ui-card ui-card--interactive reveal-card p-6 text-left" tabindex="0">
+          <h3 class="text-lg font-semibold text-white">Utveckling</h3>
+          <div class="mt-4 flex flex-wrap gap-2">{skills.dev.map((item) => <span class="capability-tag">{item}</span>)}</div>
+        </article>
+
+        <article class="ui-card ui-card--interactive reveal-card p-6 text-left" tabindex="0">
+          <h3 class="text-lg font-semibold text-white">Automation</h3>
+          <div class="mt-4 flex flex-wrap gap-2">{skills.automation.map((item) => <span class="capability-tag">{item}</span>)}</div>
+        </article>
+
+        <article class="ui-card ui-card--interactive reveal-card p-6 text-left" tabindex="0">
+          <h3 class="text-lg font-semibold text-white">AI-verktyg</h3>
+          <div class="mt-4 flex flex-wrap gap-2">{skills.ai.map((item) => <span class="capability-tag">{item}</span>)}</div>
+        </article>
+
+        <article class="ui-card ui-card--interactive reveal-card p-6 text-left md:col-span-2" tabindex="0">
+          <h3 class="text-lg font-semibold text-white">CMS & plattformar</h3>
+          <div class="mt-4 flex flex-wrap gap-2">{skills.cms.map((item) => <span class="capability-tag">{item}</span>)}</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="band band--surface" aria-labelledby="cert-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Certifieringar</p>
+        <h2 id="cert-title" class="section-title">Utvalda certifieringar</h2>
+      </header>
+
+      <ul class="mt-10 grid gap-4 md:grid-cols-2" aria-label="Certifieringar">
+        {certifications.map((item) => (
+          <li class="ui-card ui-card--interactive reveal-card p-5 text-left text-sm text-neutral-200" tabindex="0">{item}</li>
+        ))}
+      </ul>
+
+      <div class="mt-10 flex flex-wrap justify-center gap-3">
+        <a
+          href="/kontakt"
+          class="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+        >
+          Kontakta mig
+          <span aria-hidden="true">-&gt;</span>
+        </a>
+        <a
+          href="/projekt"
+          class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+        >
+          Se projekt
+          <span aria-hidden="true">-&gt;</span>
+        </a>
+      </div>
+    </section>
+  </div>
 </BaseLayout>
-
-

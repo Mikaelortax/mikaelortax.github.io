@@ -8,6 +8,9 @@ const projectSchema = z.object({
   role: z.string(),
   outcomes: z.array(z.string()),
   featured: z.boolean(),
+  liveUrl: z.string().url().optional(),
+  repoUrl: z.string().url().optional(),
+  caseImage: z.string().optional(),
 });
 
 const projects = defineCollection({

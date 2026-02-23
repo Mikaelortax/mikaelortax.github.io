@@ -4,20 +4,79 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 <BaseLayout
   title="Om | Mikael Johansson"
-  description="Om Mikael Johansson och arbetssattet bakom leveranserna."
+  description="Bakgrund, erfarenhet och inriktning inom SEO, webbutveckling, automation och AI-stödda arbetsflöden."
   lang="sv"
 >
-  <section class="band band--surface" aria-labelledby="om-title">
-    <h1 id="om-title" class="text-3xl font-semibold tracking-tight text-white md:text-4xl">Om</h1>
-    <p class="mt-4 max-w-3xl text-neutral-300">
-      Jag kombinerar SEO engineering, webbutveckling och automation for att skapa robusta losningar med affarsnytta.
-    </p>
+  <div class="home-shell">
+    <section class="band band--surface" aria-labelledby="om-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Profil</p>
+        <h1 id="om-title" class="section-title">Bakgrund och inriktning</h1>
+        <p class="section-lead">
+          Jag har arbetat med SEO och webbutveckling sedan 2012, i roller som specialist, produktägare,
+          byråchef och tekniskt ansvarig. Min styrka ligger i att kombinera strategi med implementation.
+        </p>
+      </header>
 
-    <div class="ui-card mt-8 p-6">
-      <p class="text-sm text-neutral-300">Vill du prata om ett konkret uppdrag?</p>
-      <a href="/kontakt" class="mt-4 inline-flex rounded-xl bg-cyan-300 px-4 py-2 text-sm font-semibold text-neutral-950 transition hover:bg-cyan-200">
-        Ga till kontakt
-      </a>
-    </div>
-  </section>
+      <div class="mt-10 grid gap-5 md:grid-cols-2">
+        <article class="ui-card ui-card--interactive reveal-card p-6 text-left" tabindex="0">
+          <h2 class="text-2xl font-semibold text-white">Kort sammanfattning</h2>
+          <p class="mt-3 text-sm text-neutral-300">
+            Jag har byggt och drivit SEO- och tillväxtarbete i både byrå och inhouse-miljöer,
+            samt utvecklat egna och kundspecifika lösningar inom e-handel, content och automation.
+          </p>
+          <p class="mt-2 text-sm text-neutral-300">
+            Genom åren har jag arbetat internationellt, lett team och processer, samt utvecklat
+            tekniska system som går att skala och vidareutveckla.
+          </p>
+        </article>
+
+        <article class="ui-card ui-card--interactive reveal-card p-6 text-left" tabindex="0">
+          <h2 class="text-2xl font-semibold text-white">Nuvarande fokus</h2>
+          <p class="mt-3 text-sm text-neutral-300">
+            Technical SEO, informationsarkitektur, web engineering och automation mellan system.
+          </p>
+          <p class="mt-2 text-sm text-neutral-300">
+            Jag arbetar även aktivt med AI-verktyg och prompt design för att effektivisera analys,
+            produktion och operativa arbetsflöden.
+          </p>
+        </article>
+      </div>
+
+      <div class="mt-10 grid gap-5 md:grid-cols-3">
+        <article class="ui-card ui-card--interactive reveal-card p-5 text-left" tabindex="0">
+          <p class="text-xs font-semibold tracking-[0.18em] text-cyan-300">2012 - nu</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">SEO & webbutveckling</h3>
+          <p class="mt-2 text-sm text-neutral-300">Kontinuerlig erfarenhet av praktiskt SEO-arbete och teknisk implementation.</p>
+        </article>
+        <article class="ui-card ui-card--interactive reveal-card p-5 text-left" tabindex="0">
+          <p class="text-xs font-semibold tracking-[0.18em] text-cyan-300">Byrå + Inhouse</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">Bred rollbakgrund</h3>
+          <p class="mt-2 text-sm text-neutral-300">Erfarenhet från specialistroller till ledning, produkt och eget bolag.</p>
+        </article>
+        <article class="ui-card ui-card--interactive reveal-card p-5 text-left" tabindex="0">
+          <p class="text-xs font-semibold tracking-[0.18em] text-cyan-300">AI + Automation</p>
+          <h3 class="mt-2 text-lg font-semibold text-white">Modern leveransmodell</h3>
+          <p class="mt-2 text-sm text-neutral-300">AI-stöd, automation och mätbar uppföljning i samma arbetsflöde.</p>
+        </article>
+      </div>
+
+      <div class="mt-10 flex flex-wrap justify-center gap-3">
+        <a
+          href="/sv/cv"
+          class="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+        >
+          Öppna fullständigt CV
+          <span aria-hidden="true">-&gt;</span>
+        </a>
+        <a
+          href="/projekt"
+          class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+        >
+          Se projekt
+          <span aria-hidden="true">-&gt;</span>
+        </a>
+      </div>
+    </section>
+  </div>
 </BaseLayout>

@@ -63,15 +63,15 @@ const desktopNavItems =
     ? [
         { label: 'Projekt', href: '/projekt' },
         { label: 'Kompetens', href: '/kompetens' },
-        { label: 'Process', href: '/#process' },
         { label: 'Om', href: '/om' },
+        { label: 'CV', href: '/sv/cv' },
         { label: 'Kontakt', href: '/kontakt' },
       ]
     : [
         { label: 'Projects', href: '/en/projects' },
         { label: 'Capabilities', href: '/en/capabilities' },
-        { label: 'Process', href: '/en/#process' },
         { label: 'About', href: '/en/about' },
+        { label: 'CV', href: '/en/cv' },
         { label: 'Contact', href: '/en/contact' },
       ];
 
@@ -81,14 +81,14 @@ const mobileNavItems =
         { label: 'Hem', href: '/' },
         { label: 'Projekt', href: '/projekt' },
         { label: 'Kompetens', href: '/kompetens' },
-        { label: 'Om', href: '/om' },
+        { label: 'CV', href: '/sv/cv' },
         { label: 'Kontakt', href: '/kontakt' },
       ]
     : [
         { label: 'Home', href: '/en' },
         { label: 'Projects', href: '/en/projects' },
         { label: 'Skills', href: '/en/capabilities' },
-        { label: 'About', href: '/en/about' },
+        { label: 'CV', href: '/en/cv' },
         { label: 'Contact', href: '/en/contact' },
       ];
 
@@ -97,10 +97,6 @@ const isEnActive = lang === 'en';
 
 const isPathActive = (href: string) => {
   const basePath = normalizePath((href || '/').split('#')[0] || '/');
-
-  if (href.includes('#process')) {
-    return currentPath === homeHref;
-  }
 
   if (basePath === '/' || basePath === '/en') {
     return currentPath === basePath;
@@ -147,11 +143,11 @@ const isPathActive = (href: string) => {
         class="theme-toggle inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold tracking-wide"
         aria-label={lang === 'sv' ? 'Byt tema' : 'Switch theme'}
         aria-pressed="false"
-        data-label-dark={lang === 'sv' ? 'Mork' : 'Dark'}
+        data-label-dark={lang === 'sv' ? 'Mörk' : 'Dark'}
         data-label-light={lang === 'sv' ? 'Ljus' : 'Light'}
       >
-        <span aria-hidden="true" class="theme-toggle-icon">D</span>
-        <span class="theme-toggle-text">{lang === 'sv' ? 'Mork' : 'Dark'}</span>
+        <span aria-hidden="true" class="theme-toggle-icon">☾</span>
+        <span class="theme-toggle-text">{lang === 'sv' ? 'Mörk' : 'Dark'}</span>
       </button>
 
       <nav class="language-switch inline-flex items-center gap-1 rounded-full p-1" aria-label="Language switcher">

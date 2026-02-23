@@ -1,4 +1,4 @@
----
+﻿---
 interface Props {
   lang?: 'sv' | 'en';
 }
@@ -12,20 +12,28 @@ const aboutHref = isEn ? '/en/about' : '/om';
 <section class="band band--mesh overflow-hidden" aria-labelledby="hero-title">
   <div class="hero-content">
     <p class="section-kicker reveal-block">
-      {isEn ? 'HYBRID PROFILE: SEO + WEB + AUTOMATION' : 'HYBRID PROFIL: SEO + WEB + AUTOMATION'}
+      {isEn ? 'PROFILE: SEO + WEB + AUTOMATION' : 'PROFIL: SEO + WEB + AUTOMATION'}
     </p>
 
     <h1 id="hero-title" class="reveal-block reveal-delay-1 mx-auto mt-6 max-w-[56rem] text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl">
-      {isEn ? 'I build practical ' : 'Jag bygger praktiska '}
-      <span class="hero-accent">{isEn ? 'digital systems' : 'digitala system'}</span>
-      {isEn ? ' with SEO, web engineering, and automation.' : ' med SEO, webbutveckling och automation.'}
+      {
+        isEn ? (
+          <>
+            I build durable <span class="hero-accent">growth systems</span> across search, web engineering, and automation.
+          </>
+        ) : (
+          <>
+            Jag bygger hållbara <span class="hero-accent">tillväxtsystem</span> inom sök, webbutveckling och automation.
+          </>
+        )
+      }
     </h1>
 
     <p class="reveal-block reveal-delay-2 mx-auto mt-7 max-w-[46rem] text-lg leading-relaxed text-neutral-300 sm:text-xl">
       {
         isEn
-          ? 'This site is a portfolio of how I think, build, and iterate in real projects. Clear structure, measurable outcomes, and long-term maintainability.'
-          : 'Det här är en portfolio över hur jag tänker, bygger och förbättrar i riktiga projekt. Tydlig struktur, mätbar effekt och hållbar drift över tid.'
+          ? 'I have worked hands-on since 2012 in specialist, lead, and founder roles. This portfolio shows how I turn strategy into shipped systems that perform over time.'
+          : 'Sedan 2012 har jag arbetat hands-on i roller som specialist, lead och grundare. Den här portfolion visar hur jag går från strategi till leverans av system som håller över tid.'
       }
     </p>
 
@@ -34,7 +42,7 @@ const aboutHref = isEn ? '/en/about' : '/om';
         href={aboutHref}
         class="btn-primary px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
       >
-        {isEn ? 'How I work' : 'Så arbetar jag'}
+        {isEn ? 'Read profile' : 'Läs mer om mig'}
       </a>
       <a
         href={projectsHref}
@@ -44,19 +52,19 @@ const aboutHref = isEn ? '/en/about' : '/om';
       </a>
     </div>
 
-    <ul class="mx-auto mt-9 grid max-w-[56rem] gap-3 text-sm text-neutral-200 sm:grid-cols-2 lg:grid-cols-4" aria-label={isEn ? 'Capabilities chips' : 'Kompetenschips'}>
+    <ul class="mx-auto mt-9 grid max-w-[56rem] gap-3 text-sm text-neutral-200 sm:grid-cols-2 lg:grid-cols-4" aria-label={isEn ? 'Capability highlights' : 'Kompetenshöjdpunkter'}>
       <li class="pill-chip reveal-card px-4 py-3">Technical SEO / AEO</li>
-      <li class="pill-chip reveal-card px-4 py-3">Astro / React</li>
-      <li class="pill-chip reveal-card px-4 py-3">Automation (n8n)</li>
-      <li class="pill-chip reveal-card px-4 py-3">Laravel / Wave</li>
+      <li class="pill-chip reveal-card px-4 py-3">{isEn ? 'E-commerce growth' : 'E-handelsdriven tillväxt'}</li>
+      <li class="pill-chip reveal-card px-4 py-3">Automation (n8n / APIs)</li>
+      <li class="pill-chip reveal-card px-4 py-3">{isEn ? 'Product-oriented web engineering' : 'Produktnära web engineering'}</li>
     </ul>
 
     <p class="mx-auto mt-8 max-w-[56rem] text-sm text-neutral-400">
       <span class="font-semibold text-neutral-200">{isEn ? 'Now:' : 'Nu:'}</span>
       {
         isEn
-          ? ' I am building an SEO-driven content workflow between CMS, Search Console, and CRM.'
-          : ' bygger jag ett SEO-drivet innehållsflöde mellan CMS, Search Console och CRM.'
+          ? ' Building AI-assisted SEO workflows, release-ready automation, and high-performance interfaces.'
+          : ' Bygger AI-stödda SEO-flöden, releaseklara automationer och högpresterande gränssnitt.'
       }
     </p>
   </div>

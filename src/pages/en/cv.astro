@@ -2,9 +2,21 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="CV" description="Portfolio page in English." lang="en">
-  <h1>CV</h1>
-  <p>Placeholder content for the English CV page.</p>
+<BaseLayout
+  title="CV | Mikael Johansson"
+  description="English CV overview and background."
+  lang="en"
+>
+  <section class="band band--surface" aria-labelledby="cv-title">
+    <h1 id="cv-title" class="section-title">CV</h1>
+    <p class="section-lead">
+      A full English CV page is being prepared. For now, you can view the complete Swedish version.
+    </p>
+    <div class="mt-8 flex justify-center">
+      <a href="/sv/cv" class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm">
+        View Swedish CV
+        <span aria-hidden="true">-&gt;</span>
+      </a>
+    </div>
+  </section>
 </BaseLayout>
-
-

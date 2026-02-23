@@ -2,9 +2,21 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Guides" description="Portfolio page in English." lang="en">
-  <h1>Guides</h1>
-  <p>Placeholder content for the English guides page.</p>
+<BaseLayout
+  title="Guides | Mikael Johansson"
+  description="English guides on SEO, web engineering, and automation."
+  lang="en"
+>
+  <section class="band band--surface" aria-labelledby="guides-title">
+    <h1 id="guides-title" class="section-title">Guides</h1>
+    <p class="section-lead">
+      This section will include practical frameworks and implementation notes from real projects.
+    </p>
+    <div class="mt-8 flex justify-center">
+      <a href="/en/contact" class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm">
+        Suggest a topic
+        <span aria-hidden="true">-&gt;</span>
+      </a>
+    </div>
+  </section>
 </BaseLayout>
-
-

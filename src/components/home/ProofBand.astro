@@ -1,44 +1,44 @@
 ﻿---
-const proofItems = [
+const experienceHighlights = [
   {
     id: '01',
-    title: 'Snabb leverans',
-    text: 'Hög takt med tydliga sprintmål och kort väg från beslut till release.',
+    title: '12+ år i SEO & web',
+    text: 'Praktisk erfarenhet sedan 2012 inom sök, webbutveckling, e-handel och tillväxt.',
   },
   {
     id: '02',
-    title: 'Förutsägbar drift',
-    text: 'Struktur i releaseflödet som minskar överraskningar och håller kvaliteten jämn.',
+    title: 'Byrå + inhouse + eget',
+    text: 'Roller från specialist till Head of SEO, byråchef, produktägare och grundare.',
   },
   {
     id: '03',
-    title: 'SEO i grunden',
-    text: 'SEO-first i informationsarkitektur, routing och innehåll från första sprinten.',
+    title: 'Internationell leverans',
+    text: 'Leveranser mot flera marknader och tvärfunktionella team i tillväxtmiljöer.',
   },
   {
     id: '04',
-    title: 'Automation i handoff',
-    text: 'Mindre manuellt arbete mellan team och tydligare flöden genom hela leveransen.',
+    title: 'AI & automation',
+    text: 'Bygger AI-stödda SEO- och automationsflöden med fokus på kvalitet och skalbarhet.',
   },
   {
     id: '05',
-    title: 'Performance mindset',
-    text: 'Fokus på fart och stabilitet från designbeslut till deploy i produktion.',
+    title: 'Från strategi till drift',
+    text: 'Kombinerar strategi, implementation och uppföljning i samma leveransmodell.',
   },
 ];
 ---
 
 <section class="band band--surface" aria-labelledby="proof-title">
   <header class="section-head reveal-block">
-    <p class="section-kicker">Leveranssignal</p>
-    <h2 id="proof-title" class="section-title">Så här jobbar jag i praktiken</h2>
+    <p class="section-kicker">Erfarenhet i korthet</p>
+    <h2 id="proof-title" class="section-title">Erfarenhet som formar leveransen</h2>
     <p class="section-lead">
-      Fem principer som håller leveransen snabb, robust och mätbar i vardagen.
+      Ett koncentrat av roller och uppdrag som visar varför mitt arbetssätt fungerar i praktiken.
     </p>
   </header>
 
-  <ul class="mt-9 grid gap-4 sm:grid-cols-2 xl:grid-cols-5" aria-label="Leveransprinciper">
-    {proofItems.map((item) => (
+  <ul class="mt-9 grid gap-4 sm:grid-cols-2 xl:grid-cols-5" aria-label="Erfarenhetshöjdpunkter">
+    {experienceHighlights.map((item) => (
       <li class="ui-card ui-card--interactive proof-card reveal-card p-5 text-left" tabindex="0">
         <div class="proof-topline" aria-hidden="true"></div>
         <p class="proof-index">{item.id}</p>
@@ -47,4 +47,14 @@ const proofItems = [
       </li>
     ))}
   </ul>
+
+  <div class="mt-8 flex justify-center">
+    <a
+      href="/sv/cv"
+      class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+    >
+      Se fullständigt CV
+      <span aria-hidden="true">-&gt;</span>
+    </a>
+  </div>
 </section>

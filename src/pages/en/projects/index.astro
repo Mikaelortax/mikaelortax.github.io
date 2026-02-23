@@ -40,9 +40,21 @@ const projects = (await getCollection('projects-en')).sort((a, b) => {
 
           <p class="mt-4 text-xs uppercase tracking-[0.14em] text-neutral-400">{project.data.role}</p>
 
-          <a href={`/en/projects/${project.slug}`} class="mt-6 inline-flex text-sm font-semibold text-cyan-300 transition hover:text-cyan-200">
-            Read project
-          </a>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a href={`/en/projects/${project.slug}`} class="inline-flex text-sm font-semibold text-cyan-300 transition hover:text-cyan-200">
+              Read project
+            </a>
+            {project.data.liveUrl && (
+              <a
+                href={project.data.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex text-sm font-semibold text-cyan-300 transition hover:text-cyan-200"
+              >
+                Visit site ↗
+              </a>
+            )}
+          </div>
         </article>
       ))}
     </div>

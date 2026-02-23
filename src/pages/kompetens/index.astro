@@ -1,23 +1,273 @@
 ﻿---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const capabilities = [
+  {
+    title: 'Teknisk SEO & indexeringskontroll',
+    focus: 'Säkrar att rätt sidor hittas, förstås och prioriteras i sök.',
+    execution: 'Arbetar med renderingsstrategi, internlänkning, metadata, schema och tekniska QA-rutiner.',
+    value: 'Ger stabil organisk grund och minskar osynliga tapp i trafikflödet.',
+  },
+  {
+    title: 'Informationsdesign & contentstruktur',
+    focus: 'Bygger sidlogik som gör innehåll lätt att navigera och vidareutveckla.',
+    execution: 'Definierar sidtyper, hierarchy, taxonomier och publiceringsprocesser.',
+    value: 'Skapar bättre användarflöde och snabbare redaktionell leverans.',
+  },
+  {
+    title: 'Webbutveckling för tillväxtsajter',
+    focus: 'Utvecklar snabba gränssnitt med fokus på kvalitet och lång livslängd.',
+    execution: 'Komponentdriven implementation i Astro/React med tydlig kodstruktur och releasekontroll.',
+    value: 'Kortare ledtid till produktion och färre regressionsproblem.',
+  },
+  {
+    title: 'Automation av operativa flöden',
+    focus: 'Tar bort manuella steg mellan verktyg, team och processer.',
+    execution: 'Bygger workflow-automation med n8n, webhookar, API-kopplingar och statuslogik.',
+    value: 'Minskar handpåläggning och ökar förutsägbarheten i leveransen.',
+  },
+  {
+    title: 'AI-stödd produktion',
+    focus: 'Använder AI där den ger faktisk hastighet och högre precision.',
+    execution: 'Sätter upp styrda flöden för analys, kodstöd, dokumentation och intern kvalitetssäkring.',
+    value: 'Snabbare iteration utan att kompromissa med standard eller kontroll.',
+  },
+  {
+    title: 'Mätning, effekt & prioritering',
+    focus: 'Kopplar insats till resultat så nästa beslut blir tydligt.',
+    execution: 'KPI-ramverk, GA4/Search Console-analys och uppföljning per leveransspår.',
+    value: 'Bättre styrning, tydligare ROI och mindre gissning i backlog-prioritering.',
+  },
+];
+
+const workModel = [
+  {
+    id: '01',
+    title: 'Inventera',
+    text: 'Kartlägger nuläge, tekniska beroenden och var friktion uppstår i kedjan.',
+  },
+  {
+    id: '02',
+    title: 'Designa plan',
+    text: 'Sätter en prioriterad plan med tydlig ordning, ansvar och mätbara delmål.',
+  },
+  {
+    id: '03',
+    title: 'Exekvera',
+    text: 'Implementerar med tydliga releasepunkter och kvalitetssäkring i varje steg.',
+  },
+  {
+    id: '04',
+    title: 'Optimera',
+    text: 'Följer upp resultat, identifierar nästa flaskhals och itererar snabbt.',
+  },
+];
+
+const toolsets = [
+  {
+    title: 'Utveckling',
+    items: ['Astro', 'React', 'Tailwind', 'TypeScript'],
+  },
+  {
+    title: 'SEO & analys',
+    items: ['Search Console', 'GA4', 'CWV', 'Strukturerad data'],
+  },
+  {
+    title: 'Automation',
+    items: ['n8n', 'REST API', 'Webhookar', 'CRM-flöden'],
+  },
+  {
+    title: 'Leverans',
+    items: ['GitHub', 'CI/CD', 'Release notes', 'Teknisk dokumentation'],
+  },
+];
+
+const references = [
+  {
+    title: 'Hotell Hötorget',
+    text: 'Webbplatsutveckling av hotelhotorget.se med prestanda- och SEO-fokus.',
+    href: '/projekt/hotell-hotorget',
+  },
+  {
+    title: 'Hotel at Old Town',
+    text: 'Webbplatsutveckling med fokus på prestanda, struktur och teknisk SEO-kvalitet.',
+    href: '/projekt/hotel-at-old-town',
+  },
+  {
+    title: 'Ringheims',
+    text: 'Modern webbplats med konverteringsfokuserat informationsflöde och stabil teknisk grund.',
+    href: '/projekt/ringheims',
+  },
+  {
+    title: 'Fairless Security',
+    text: 'Webbplats + medlemssystem med behörighet, statuslogik och onboardingstöd.',
+    href: '/projekt/fairless-security',
+  },
+  {
+    title: 'n8n Lead Automation',
+    text: 'Automatiserad kvalificering från formulär till första dialog.',
+    href: '/projekt/n8n-lead-automation',
+  },
+  {
+    title: 'n8n Instagram/TikTok Video Automation',
+    text: 'Automatiserad videopublicering med metadata, schemaläggning och notifieringar.',
+    href: '/projekt/n8n-instagram-tiktok-video-automation',
+  },
+  {
+    title: 'n8n Instagram Story Automation',
+    text: 'Automatiserat Story-flöde med tydlig timing och repeterbar operativ struktur.',
+    href: '/projekt/n8n-instagram-story-automation',
+  },
+  {
+    title: 'n8n CRM Process Automation',
+    text: 'CRM-automation där stora delar av manuellt arbete ersattes av stabila arbetsflöden.',
+    href: '/projekt/n8n-crm-process-automation',
+  },
+  {
+    title: 'SwedRentals',
+    text: 'Webbplatsutveckling och SEO-implementation för bättre organisk synlighet.',
+    href: '/projekt/swedrentals',
+  },
+  {
+    title: 'Wise Solutions',
+    text: 'Webbplatsutveckling med SEO-fokus på struktur, tydlighet och konverteringsstöd.',
+    href: '/projekt/wise-solutions',
+  },
+];
+
+const outputs = [
+  'Prioriterad teknisk åtgärdsplan för SEO och prestanda',
+  'Strukturell blueprint för navigation, sidtyper och innehållsflöde',
+  'Implementation av komponenter och templates i produktion',
+  'Automationer mellan formulär, CRM, inbox och uppföljning',
+  'Mätmodell för uppföljning av förändring och effekt',
+  'Release- och QA-ram för stabil vidareutveckling',
+];
 ---
 
 <BaseLayout
   title="Kompetens | Mikael Johansson"
-  description="Kompetenser inom SEO, webbutveckling och automation."
+  description="Portfolioöversikt av kompetensområden, arbetsmodell, stack och konkreta leverabler."
   lang="sv"
 >
-  <section class="band band--surface" aria-labelledby="kompetens-title">
-    <h1 id="kompetens-title" class="text-3xl font-semibold tracking-tight text-white md:text-4xl">Kompetens</h1>
-    <p class="mt-4 max-w-3xl text-neutral-300">
-      Jag bygger tekniska system med fokus pa prestanda, tydlighet och skalbar tillvaxt over tid.
-    </p>
+  <div class="home-shell">
+    <section class="band band--mesh" aria-labelledby="kompetens-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Kompetensöversikt</p>
+        <h1 id="kompetens-title" class="section-title">Kompetens som går från analys till produktion</h1>
+        <p class="section-lead">
+          Detta är en fördjupad presentationssida över hur jag arbetar tekniskt och operativt:
+          fokusområden, arbetssätt och vad jag faktiskt bygger i projekt.
+        </p>
+      </header>
+    </section>
 
-    <div class="ui-card mt-8 p-6">
-      <p class="text-sm text-neutral-300">Redo att diskutera nasta steg for ditt team?</p>
-      <a href="/kontakt" class="mt-4 inline-flex rounded-xl bg-cyan-300 px-4 py-2 text-sm font-semibold text-neutral-950 transition hover:bg-cyan-200">
-        Kontakta mig
-      </a>
-    </div>
-  </section>
+    <section class="band band--surface" aria-labelledby="capabilities-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Kompetensområden</p>
+        <h2 id="capabilities-title" class="section-title">Fokusområden i praktisk leverans</h2>
+      </header>
+
+      <div class="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {capabilities.map((item) => (
+          <article class="ui-card ui-card--interactive capability-card reveal-card p-6 text-left" tabindex="0">
+            <div class="capability-topline" aria-hidden="true"></div>
+            <h3 class="text-xl font-semibold text-white">{item.title}</h3>
+            <p class="mt-3 text-sm text-neutral-300"><span class="font-semibold text-neutral-200">Fokus:</span> {item.focus}</p>
+            <p class="mt-2 text-sm text-neutral-300"><span class="font-semibold text-neutral-200">Genomförande:</span> {item.execution}</p>
+            <p class="mt-2 text-sm text-neutral-300"><span class="font-semibold text-neutral-200">Värde:</span> {item.value}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="band band--mesh" aria-labelledby="workflow-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Arbetsflöde</p>
+        <h2 id="workflow-title" class="section-title">Arbetssätt från nuläge till förbättring</h2>
+      </header>
+
+      <ol class="mt-10 grid gap-5 md:grid-cols-2">
+        {workModel.map((step) => (
+          <li class="ui-card ui-card--interactive process-card reveal-card p-6 text-left" tabindex="0">
+            <div class="process-topline" aria-hidden="true"></div>
+            <p class="process-index">{step.id}</p>
+            <h3 class="mt-2 text-2xl font-semibold text-white">{step.title}</h3>
+            <p class="mt-3 text-sm text-neutral-300">{step.text}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section class="band band--surface" aria-labelledby="stack-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Verktyg</p>
+        <h2 id="stack-title" class="section-title">Stack och arbetsmiljö</h2>
+      </header>
+
+      <div class="mt-10 grid gap-5 md:grid-cols-2">
+        {toolsets.map((group) => (
+          <article class="ui-card ui-card--interactive reveal-card p-6 text-left" tabindex="0">
+            <h3 class="text-xl font-semibold text-white">{group.title}</h3>
+            <div class="mt-4 flex flex-wrap gap-2">
+              {group.items.map((item) => (
+                <span class="capability-tag">{item}</span>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="band band--surface" aria-labelledby="references-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Referenser</p>
+        <h2 id="references-title" class="section-title">Projekt där kompetensen används</h2>
+      </header>
+
+      <div class="mt-10 grid gap-5 md:grid-cols-3">
+        {references.map((item, index) => (
+          <article class="ui-card ui-card--interactive proof-card reveal-card p-6 text-left" tabindex="0">
+            <div class="proof-topline" aria-hidden="true"></div>
+            <p class="proof-index">{String(index + 1).padStart(2, '0')}</p>
+            <h3 class="mt-2 text-xl font-semibold text-white">{item.title}</h3>
+            <p class="mt-3 text-sm text-neutral-300">{item.text}</p>
+            <a href={item.href} class="mt-4 inline-flex text-sm font-semibold text-cyan-300 transition hover:text-cyan-200">
+              Öppna case
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="band band--dot" aria-labelledby="deliverables-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Leverabler</p>
+        <h2 id="deliverables-title" class="section-title">Detta visar hur jag arbetar i praktiken</h2>
+      </header>
+
+      <ul class="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3" aria-label="Typiska leverabler">
+        {outputs.map((item) => (
+          <li class="ui-card ui-card--interactive reveal-card p-5 text-left text-sm text-neutral-200">{item}</li>
+        ))}
+      </ul>
+
+      <div class="mt-10 flex flex-wrap justify-center gap-3">
+        <a
+          href="/projekt"
+          class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+        >
+          Se utvalda projekt
+          <span aria-hidden="true">-&gt;</span>
+        </a>
+        <a
+          href="/sv/cv"
+          class="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+        >
+          Öppna CV
+          <span aria-hidden="true">-&gt;</span>
+        </a>
+      </div>
+    </section>
+  </div>
 </BaseLayout>

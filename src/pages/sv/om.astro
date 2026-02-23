@@ -2,9 +2,21 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Om" description="Portfoljosida pa svenska." lang="sv">
-  <h1>Om</h1>
-  <p>Platshallartext for den svenska om-sidan.</p>
+<BaseLayout
+  title="Om | Mikael Johansson"
+  description="Svensk profilsida med bakgrund, arbetssätt och fokusområden."
+  lang="sv"
+>
+  <section class="band band--surface" aria-labelledby="om-title">
+    <h1 id="om-title" class="section-title">Om</h1>
+    <p class="section-lead">
+      Jag arbetar i skärningen mellan SEO, webbutveckling och automation med fokus på hållbar leverans.
+    </p>
+    <div class="mt-8 flex justify-center">
+      <a href="/om" class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm">
+        Gå till full profil
+        <span aria-hidden="true">-&gt;</span>
+      </a>
+    </div>
+  </section>
 </BaseLayout>
-
-

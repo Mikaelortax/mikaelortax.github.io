@@ -18,12 +18,16 @@ const { Content } = await render(project);
 
 <BaseLayout title={`${project.data.title} | Project`} description={project.data.excerpt} lang="en">
   <ProjectDetail
+    lang="en"
     title={project.data.title}
     excerpt={project.data.excerpt}
     role={project.data.role}
     stack={project.data.stack}
     tags={project.data.tags}
     outcomes={project.data.outcomes}
+    liveUrl={project.data.liveUrl}
+    repoUrl={project.data.repoUrl}
+    caseImage={project.data.caseImage}
     backHref="/en/projects"
     backLabel="<- Back to projects"
     contactHref="/en/contact"

@@ -68,12 +68,12 @@ const twitterCard = ogImageUrl ? 'summary_large_image' : 'summary';
         <div>
           <p class="site-footer-title text-lg font-semibold tracking-tight">Mikael Johansson</p>
           <p class="site-footer-text mt-2 max-w-xl text-sm">
-            SEO/Growth engineering, webbutveckling och automation i en och samma leverans.
+            Portfolio inom SEO/Growth engineering, webbutveckling och automation.
           </p>
         </div>
         <div class="flex flex-wrap items-center gap-3 text-sm">
-          <a class="btn-secondary px-4 py-2" href="mailto:hello@example.com">Email</a>
-          <a class="btn-secondary px-4 py-2" href="https://www.linkedin.com/in/your-profile">LinkedIn</a>
+          <a class="btn-secondary px-4 py-2" href="/kontakt">Kontakt</a>
+          <a class="btn-secondary px-4 py-2" href="/sv/cv">CV</a>
         </div>
       </div>
       <div class="site-footer-divider border-t">
@@ -95,7 +95,7 @@ const twitterCard = ogImageUrl ? 'summary_large_image' : 'summary';
         const syncButton = () => {
           const current = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
           button.setAttribute('aria-pressed', current === 'light' ? 'true' : 'false');
-          if (icon) icon.textContent = current === 'light' ? 'L' : 'D';
+          if (icon) icon.textContent = current === 'light' ? '☀' : '☾';
           if (label) label.textContent = current === 'light' ? lightLabel : darkLabel;
         };
 
@@ -107,6 +107,34 @@ const twitterCard = ogImageUrl ? 'summary_large_image' : 'summary';
           document.documentElement.dataset.theme = next;
           localStorage.setItem('theme', next);
           syncButton();
+        });
+      })();
+    </script>
+    <script is:inline>
+      (() => {
+        const anchors = document.querySelectorAll('a[href]');
+        const { origin } = window.location;
+
+        const isExternalHttp = (href) => {
+          try {
+            const url = new URL(href, origin);
+            return (url.protocol === 'http:' || url.protocol === 'https:') && url.origin !== origin;
+          } catch {
+            return false;
+          }
+        };
+
+        anchors.forEach((anchor) => {
+          const href = anchor.getAttribute('href');
+          if (!href || !isExternalHttp(href)) return;
+
+          anchor.setAttribute('target', '_blank');
+
+          const rel = new Set((anchor.getAttribute('rel') || '').split(/\s+/).filter(Boolean));
+          rel.add('nofollow');
+          rel.add('noopener');
+          rel.add('noreferrer');
+          anchor.setAttribute('rel', Array.from(rel).join(' '));
         });
       })();
     </script>

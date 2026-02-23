@@ -2,9 +2,21 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Projekt" description="Portfoljosida pa svenska." lang="sv">
-  <h1>Projekt</h1>
-  <p>Platshallartext for den svenska projektsidan.</p>
+<BaseLayout
+  title="Projekt | Mikael Johansson"
+  description="Svensk projektingång med utvalda case inom SEO, webbutveckling och automation."
+  lang="sv"
+>
+  <section class="band band--surface" aria-labelledby="projekt-title">
+    <h1 id="projekt-title" class="section-title">Projekt</h1>
+    <p class="section-lead">
+      Här hittar du case som visar hur jag går från strategi till teknisk implementation i verkliga miljöer.
+    </p>
+    <div class="mt-8 flex justify-center">
+      <a href="/projekt" class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm">
+        Se alla projekt
+        <span aria-hidden="true">-&gt;</span>
+      </a>
+    </div>
+  </section>
 </BaseLayout>
-
-

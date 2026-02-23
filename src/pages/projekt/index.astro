@@ -18,7 +18,7 @@ const projects = (await getCollection('projects')).sort((a, b) => {
   <section class="band band--surface" aria-labelledby="projekt-title">
     <h1 id="projekt-title" class="text-3xl font-semibold tracking-tight text-white md:text-4xl">Projekt</h1>
     <p class="mt-4 max-w-3xl text-neutral-300">
-      Urvalet nedan visar projekt dar teknik, informationsarkitektur och leveransdisciplin byggts som ett sammanhallet system.
+      Urvalet nedan visar projekt där teknik, informationsarkitektur och leveransdisciplin har byggts som ett sammanhållet system.
     </p>
 
     <div class="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -40,9 +40,21 @@ const projects = (await getCollection('projects')).sort((a, b) => {
 
           <p class="mt-4 text-xs uppercase tracking-[0.14em] text-neutral-400">{project.data.role}</p>
 
-          <a href={`/projekt/${project.slug}`} class="mt-6 inline-flex text-sm font-semibold text-cyan-300 transition hover:text-cyan-200">
-            Las projekt
-          </a>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a href={`/projekt/${project.slug}`} class="inline-flex text-sm font-semibold text-cyan-300 transition hover:text-cyan-200">
+              Läs projekt
+            </a>
+            {project.data.liveUrl && (
+              <a
+                href={project.data.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex text-sm font-semibold text-cyan-300 transition hover:text-cyan-200"
+              >
+                Besök sajt ↗
+              </a>
+            )}
+          </div>
         </article>
       ))}
     </div>

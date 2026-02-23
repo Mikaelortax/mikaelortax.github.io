@@ -2,8 +2,21 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Start | Mikael Johansson" description="Portfoljosida pa svenska." lang="sv">
-  <h1>Start</h1>
-  <p>Välkommen.</p>
+<BaseLayout
+  title="Start | Mikael Johansson"
+  description="Svensk startsida för portfolion med fokus på SEO, webbutveckling och automation."
+  lang="sv"
+>
+  <section class="band band--surface" aria-labelledby="start-title">
+    <h1 id="start-title" class="section-title">Start</h1>
+    <p class="section-lead">
+      Detta är den svenska startpunkten för portfolion. Härifrån kan du utforska projekt, kompetenser och CV.
+    </p>
+    <div class="mt-8 flex justify-center">
+      <a href="/" class="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm">
+        Öppna huvudsidan
+        <span aria-hidden="true">-&gt;</span>
+      </a>
+    </div>
+  </section>
 </BaseLayout>
-

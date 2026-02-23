@@ -2,9 +2,21 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Kontakt" description="Portfoljosida pa svenska." lang="sv">
-  <h1>Kontakt</h1>
-  <p>Platshallartext for den svenska kontaktsidan.</p>
+<BaseLayout
+  title="Kontakt | Mikael Johansson"
+  description="Kontaktväg för projekt, roller och samarbete."
+  lang="sv"
+>
+  <section class="band band--surface" aria-labelledby="kontakt-title">
+    <h1 id="kontakt-title" class="section-title">Kontakt</h1>
+    <p class="section-lead">
+      Hör av dig om du vill diskutera ett konkret uppdrag, en roll eller ett samarbete.
+    </p>
+    <div class="mt-8 flex justify-center">
+      <a href="/kontakt" class="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm">
+        Öppna kontaktsidan
+        <span aria-hidden="true">-&gt;</span>
+      </a>
+    </div>
+  </section>
 </BaseLayout>
-
-

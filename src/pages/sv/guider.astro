@@ -2,9 +2,21 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Guider" description="Portfoljosida pa svenska." lang="sv">
-  <h1>Guider</h1>
-  <p>Platshallartext for den svenska guidesidan.</p>
+<BaseLayout
+  title="Guider | Mikael Johansson"
+  description="Svenska guider om SEO, webbutveckling och automation i praktiken."
+  lang="sv"
+>
+  <section class="band band--surface" aria-labelledby="guider-title">
+    <h1 id="guider-title" class="section-title">Guider</h1>
+    <p class="section-lead">
+      Guidesidan byggs ut löpande med praktiska ramverk, arbetsmetoder och tekniska lärdomar.
+    </p>
+    <div class="mt-8 flex justify-center">
+      <a href="/kontakt" class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm">
+        Föreslå ett ämne
+        <span aria-hidden="true">-&gt;</span>
+      </a>
+    </div>
+  </section>
 </BaseLayout>
-
-
