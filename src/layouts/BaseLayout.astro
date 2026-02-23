@@ -24,6 +24,23 @@ const siteUrl = new URL(siteBase);
 const ogImageUrl = ogImage ? new URL(ogImage, siteUrl).toString() : undefined;
 const ogLocale = seo.lang === 'sv' ? 'sv_SE' : 'en_US';
 const twitterCard = ogImageUrl ? 'summary_large_image' : 'summary';
+const linkedInHref = 'https://www.linkedin.com/in/mikael-johansson-5084515b/';
+const availability =
+  seo.lang === 'sv'
+    ? {
+        text: 'Öppen för anställning inom IT och som yrkesförare.',
+        contactHref: '/kontakt',
+        contactLabel: 'Kontakta mig',
+        cvHref: '/sv/cv',
+        cvLabel: 'Se CV',
+      }
+    : {
+        text: 'Open to employment in IT and professional driving.',
+        contactHref: '/en/contact',
+        contactLabel: 'Contact me',
+        cvHref: '/en/cv',
+        cvLabel: 'View CV',
+      };
 ---
 
 <!DOCTYPE html>
@@ -60,6 +77,22 @@ const twitterCard = ogImageUrl ? 'summary_large_image' : 'summary';
   </head>
   <body>
     <Header lang={seo.lang} path={pathname} />
+    <div class="availability-strip-wrap">
+      <div class="availability-strip mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-3 sm:px-6 md:flex-row md:items-center md:justify-between">
+        <p class="availability-text text-sm">
+          <span class="availability-dot" aria-hidden="true"></span>
+          {availability.text}
+        </p>
+        <div class="flex flex-wrap items-center gap-2">
+          <a class="availability-link availability-link--primary px-4 py-2 text-xs font-semibold" href={availability.contactHref}>
+            {availability.contactLabel}
+          </a>
+          <a class="availability-link px-4 py-2 text-xs font-semibold" href={availability.cvHref}>
+            {availability.cvLabel}
+          </a>
+        </div>
+      </div>
+    </div>
     <main class="w-full pb-[6.25rem] md:pb-0">
       <slot />
     </main>
@@ -68,12 +101,15 @@ const twitterCard = ogImageUrl ? 'summary_large_image' : 'summary';
         <div>
           <p class="site-footer-title text-lg font-semibold tracking-tight">Mikael Johansson</p>
           <p class="site-footer-text mt-2 max-w-xl text-sm">
-            Portfolio inom SEO/Growth engineering, webbutveckling och automation.
+            {seo.lang === 'sv'
+              ? 'Profil inom IT (SEO/Growth engineering, webbutveckling, automation) och yrkeskörning.'
+              : 'Profile across IT (SEO/Growth engineering, web engineering, automation) and professional driving.'}
           </p>
         </div>
         <div class="flex flex-wrap items-center gap-3 text-sm">
           <a class="btn-secondary px-4 py-2" href="/kontakt">Kontakt</a>
           <a class="btn-secondary px-4 py-2" href="/sv/cv">CV</a>
+          <a class="btn-secondary px-4 py-2" href={linkedInHref}>LinkedIn</a>
         </div>
       </div>
       <div class="site-footer-divider border-t">

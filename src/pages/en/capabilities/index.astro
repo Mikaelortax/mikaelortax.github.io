@@ -1,23 +1,273 @@
-﻿---
+---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+const capabilities = [
+  {
+    title: 'Technical SEO & indexation control',
+    focus: 'Ensures the right pages are discovered, understood, and prioritized in search.',
+    execution: 'Works with rendering strategy, internal linking, metadata, schema, and technical QA routines.',
+    value: 'Creates a stable organic foundation and reduces hidden traffic losses.',
+  },
+  {
+    title: 'Information design & content structure',
+    focus: 'Builds page logic that keeps content easy to navigate and scale.',
+    execution: 'Defines page types, hierarchy, taxonomies, and publishing workflows.',
+    value: 'Improves user flow and accelerates editorial delivery.',
+  },
+  {
+    title: 'Web engineering for growth sites',
+    focus: 'Builds fast interfaces with focus on quality and long lifespan.',
+    execution: 'Component-driven implementation in Astro/React with clear code structure and release control.',
+    value: 'Shorter lead time to production and fewer regression issues.',
+  },
+  {
+    title: 'Automation of operational workflows',
+    focus: 'Removes manual steps between tools, teams, and processes.',
+    execution: 'Builds workflow automation with n8n, webhooks, API connections, and status logic.',
+    value: 'Reduces manual handling and improves delivery predictability.',
+  },
+  {
+    title: 'AI-assisted production',
+    focus: 'Uses AI where it provides real speed and higher precision.',
+    execution: 'Sets up controlled flows for analysis, coding support, documentation, and internal QA.',
+    value: 'Faster iteration without compromising standards or control.',
+  },
+  {
+    title: 'Measurement, impact & prioritization',
+    focus: 'Connects effort to outcome so the next decision is clear.',
+    execution: 'KPI frameworks, GA4/Search Console analysis, and follow-up per delivery stream.',
+    value: 'Better steering, clearer ROI, and less guesswork in backlog prioritization.',
+  },
+];
+
+const workModel = [
+  {
+    id: '01',
+    title: 'Audit',
+    text: 'Maps current state, technical dependencies, and where friction appears in the chain.',
+  },
+  {
+    id: '02',
+    title: 'Design plan',
+    text: 'Sets a prioritized plan with clear order, ownership, and measurable milestones.',
+  },
+  {
+    id: '03',
+    title: 'Execute',
+    text: 'Implements with clear release checkpoints and quality assurance in every step.',
+  },
+  {
+    id: '04',
+    title: 'Optimize',
+    text: 'Follows up results, identifies the next bottleneck, and iterates quickly.',
+  },
+];
+
+const toolsets = [
+  {
+    title: 'Development',
+    items: ['Astro', 'React', 'Tailwind', 'TypeScript'],
+  },
+  {
+    title: 'SEO & analytics',
+    items: ['Search Console', 'GA4', 'CWV', 'Structured data'],
+  },
+  {
+    title: 'Automation',
+    items: ['n8n', 'REST API', 'Webhooks', 'CRM workflows'],
+  },
+  {
+    title: 'Delivery',
+    items: ['GitHub', 'CI/CD', 'Release notes', 'Technical documentation'],
+  },
+];
+
+const references = [
+  {
+    title: 'Hotell Hötorget',
+    text: 'Website development for hotelhotorget.se with performance and SEO focus.',
+    href: '/en/projects/hotell-hotorget',
+  },
+  {
+    title: 'Hotel at Old Town',
+    text: 'Website development focused on performance, structure, and technical SEO quality.',
+    href: '/en/projects/hotel-at-old-town',
+  },
+  {
+    title: 'Ringheims',
+    text: 'Modern website with conversion-focused information flow and strong technical foundation.',
+    href: '/en/projects/ringheims',
+  },
+  {
+    title: 'Fairless Security',
+    text: 'Website and member system with authorization, status logic, and onboarding support.',
+    href: '/en/projects/fairless-security',
+  },
+  {
+    title: 'n8n Lead Automation',
+    text: 'Automated qualification from form to first dialogue.',
+    href: '/en/projects/n8n-lead-automation',
+  },
+  {
+    title: 'n8n Instagram/TikTok Video Automation',
+    text: 'Automated video publishing with metadata, scheduling, and notifications.',
+    href: '/en/projects/n8n-instagram-tiktok-video-automation',
+  },
+  {
+    title: 'n8n Instagram Story Automation',
+    text: 'Automated story workflow with clear timing and repeatable operations.',
+    href: '/en/projects/n8n-instagram-story-automation',
+  },
+  {
+    title: 'n8n CRM Process Automation',
+    text: 'CRM automation where large parts of manual work were replaced by stable workflows.',
+    href: '/en/projects/n8n-crm-process-automation',
+  },
+  {
+    title: 'SwedRentals',
+    text: 'Website development and SEO implementation for improved organic visibility.',
+    href: '/en/projects/swedrentals',
+  },
+  {
+    title: 'Wise Solutions',
+    text: 'Website development with SEO focus on structure, clarity, and conversion support.',
+    href: '/en/projects/wise-solutions',
+  },
+];
+
+const outputs = [
+  'Prioritized technical action plan for SEO and performance',
+  'Structural blueprint for navigation, page types, and content flow',
+  'Implementation of components and templates in production',
+  'Automations between forms, CRM, inbox, and follow-up',
+  'Measurement model for tracking change and impact',
+  'Release and QA framework for stable long-term development',
+];
 ---
 
 <BaseLayout
   title="Capabilities | Mikael Johansson"
-  description="Core capabilities across technical SEO, web engineering, and automation systems."
+  description="Portfolio overview of capability areas, delivery model, stack, and concrete deliverables."
   lang="en"
 >
-  <section class="band band--surface" aria-labelledby="capabilities-title">
-    <h1 id="capabilities-title" class="text-3xl font-semibold tracking-tight text-white md:text-4xl">Capabilities</h1>
-    <p class="mt-4 max-w-3xl text-neutral-300">
-      I build high-clarity systems across technical SEO, frontend engineering, and automation workflows.
-    </p>
+  <div class="home-shell">
+    <section class="band band--mesh" aria-labelledby="capabilities-overview-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Capability overview</p>
+        <h1 id="capabilities-overview-title" class="section-title">Capabilities from analysis to production</h1>
+        <p class="section-lead">
+          This page presents how I work technically and operationally: focus areas, delivery model,
+          and what I actually build in projects.
+        </p>
+      </header>
+    </section>
 
-    <div class="ui-card mt-8 p-6">
-      <p class="text-sm text-neutral-300">The focus is always the same: reliable delivery, measurable outcomes, and maintainable systems.</p>
-      <a href="/en/projects" class="mt-4 inline-flex rounded-xl bg-cyan-300 px-4 py-2 text-sm font-semibold text-neutral-950 transition hover:bg-cyan-200">
-        See proof in projects
-      </a>
-    </div>
-  </section>
+    <section class="band band--surface" aria-labelledby="capabilities-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Capability areas</p>
+        <h2 id="capabilities-title" class="section-title">Focus areas in practical delivery</h2>
+      </header>
+
+      <div class="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {capabilities.map((item) => (
+          <article class="ui-card ui-card--interactive capability-card reveal-card p-6 text-left" tabindex="0">
+            <div class="capability-topline" aria-hidden="true"></div>
+            <h3 class="text-xl font-semibold text-white">{item.title}</h3>
+            <p class="mt-3 text-sm text-neutral-300"><span class="font-semibold text-neutral-200">Focus:</span> {item.focus}</p>
+            <p class="mt-2 text-sm text-neutral-300"><span class="font-semibold text-neutral-200">Execution:</span> {item.execution}</p>
+            <p class="mt-2 text-sm text-neutral-300"><span class="font-semibold text-neutral-200">Value:</span> {item.value}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="band band--mesh" aria-labelledby="workflow-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Workflow</p>
+        <h2 id="workflow-title" class="section-title">Working model from current state to improvement</h2>
+      </header>
+
+      <ol class="mt-10 grid gap-5 md:grid-cols-2">
+        {workModel.map((step) => (
+          <li class="ui-card ui-card--interactive process-card reveal-card p-6 text-left" tabindex="0">
+            <div class="process-topline" aria-hidden="true"></div>
+            <p class="process-index">{step.id}</p>
+            <h3 class="mt-2 text-2xl font-semibold text-white">{step.title}</h3>
+            <p class="mt-3 text-sm text-neutral-300">{step.text}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section class="band band--surface" aria-labelledby="stack-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Tools</p>
+        <h2 id="stack-title" class="section-title">Stack and work environment</h2>
+      </header>
+
+      <div class="mt-10 grid gap-5 md:grid-cols-2">
+        {toolsets.map((group) => (
+          <article class="ui-card ui-card--interactive reveal-card p-6 text-left" tabindex="0">
+            <h3 class="text-xl font-semibold text-white">{group.title}</h3>
+            <div class="mt-4 flex flex-wrap gap-2">
+              {group.items.map((item) => (
+                <span class="capability-tag">{item}</span>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="band band--surface" aria-labelledby="references-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">References</p>
+        <h2 id="references-title" class="section-title">Projects where these capabilities are applied</h2>
+      </header>
+
+      <div class="mt-10 grid gap-5 md:grid-cols-3">
+        {references.map((item, index) => (
+          <article class="ui-card ui-card--interactive proof-card reveal-card p-6 text-left" tabindex="0">
+            <div class="proof-topline" aria-hidden="true"></div>
+            <p class="proof-index">{String(index + 1).padStart(2, '0')}</p>
+            <h3 class="mt-2 text-xl font-semibold text-white">{item.title}</h3>
+            <p class="mt-3 text-sm text-neutral-300">{item.text}</p>
+            <a href={item.href} class="mt-4 inline-flex text-sm font-semibold text-cyan-300 transition hover:text-cyan-200">
+              Open case
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="band band--dot" aria-labelledby="deliverables-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Deliverables</p>
+        <h2 id="deliverables-title" class="section-title">What this looks like in practice</h2>
+      </header>
+
+      <ul class="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3" aria-label="Typical deliverables">
+        {outputs.map((item) => (
+          <li class="ui-card ui-card--interactive reveal-card p-5 text-left text-sm text-neutral-200">{item}</li>
+        ))}
+      </ul>
+
+      <div class="mt-10 flex flex-wrap justify-center gap-3">
+        <a
+          href="/en/projects"
+          class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+        >
+          View selected projects
+          <span aria-hidden="true">-&gt;</span>
+        </a>
+        <a
+          href="/en/cv"
+          class="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+        >
+          Open CV
+          <span aria-hidden="true">-&gt;</span>
+        </a>
+      </div>
+    </section>
+  </div>
 </BaseLayout>

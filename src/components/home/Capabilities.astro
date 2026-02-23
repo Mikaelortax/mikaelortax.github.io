@@ -1,59 +1,118 @@
-﻿---
-const capabilities = [
-  {
-    title: 'Technical SEO & CWV',
-    text: 'Teknisk SEO som förbättrar synlighet, laddtid och indexeringskontroll i verklig trafik.',
-    tags: ['Crawl', 'Core Web Vitals'],
-  },
-  {
-    title: 'Informationsarkitektur',
-    text: 'Sid- och innehållsstruktur som gör information lätt att hitta, förstå och vidareutveckla.',
-    tags: ['Sidtyper', 'Content ops'],
-  },
-  {
-    title: 'Web engineering',
-    text: 'Komponentdriven implementation i Astro/React med fokus på tempo, kvalitet och lång livslängd.',
-    tags: ['Astro', 'React'],
-  },
-  {
-    title: 'Automation',
-    text: 'Automatiserade flöden mellan formulär, inbox, CRM och interna handoffs där manuella moment ersätts av stabil processlogik.',
-    tags: ['n8n', 'API-flöden'],
-  },
-  {
-    title: 'AI-assisterad utveckling',
-    text: 'Praktiska AI-flöden för snabbare iteration, bättre dokumentation och säkrare leveranser.',
-    tags: ['OpenAI', 'Codex'],
-  },
-  {
-    title: 'Analytics & mätning',
-    text: 'Mätning som kopplar implementation till faktisk effekt så prioriteringar blir skarpa.',
-    tags: ['GA4', 'Search Console'],
-  },
-  {
-    title: 'Konverteringsfokus',
-    text: 'Skärpt copy och tydliga CTA-flöden som minskar friktion och höjer kvaliteten på inkommande leads.',
-    tags: ['UX copy', 'CRO'],
-  },
-  {
-    title: 'Systemkopplingar',
-    text: 'Integrationer som binder ihop verktyg så data flödar rätt utan manuella mellanled.',
-    tags: ['Integration', 'Datakvalitet'],
-  },
-  {
-    title: 'Drift & release',
-    text: 'Förutsägbara leveranser med testtänk, release-disciplin och stabil drift över tid.',
-    tags: ['Kvalitet', 'Release flow'],
-  },
-];
+---
+interface Props {
+  lang?: 'sv' | 'en';
+}
+
+const { lang = 'sv' } = Astro.props;
+const isEn = lang === 'en';
+
+const capabilities = isEn
+  ? [
+      {
+        title: 'Technical SEO & CWV',
+        text: 'Technical SEO that improves visibility, loading speed, and indexation control in real traffic conditions.',
+        tags: ['Crawl', 'Core Web Vitals'],
+      },
+      {
+        title: 'Information architecture',
+        text: 'Page and content structures that make information easier to find, understand, and scale over time.',
+        tags: ['Page types', 'Content ops'],
+      },
+      {
+        title: 'Web engineering',
+        text: 'Component-driven implementation in Astro/React with focus on speed, quality, and long-term maintainability.',
+        tags: ['Astro', 'React'],
+      },
+      {
+        title: 'Automation',
+        text: 'Automated flows between forms, inbox, CRM, and internal handoffs where manual steps are replaced by stable process logic.',
+        tags: ['n8n', 'API workflows'],
+      },
+      {
+        title: 'AI-assisted development',
+        text: 'Practical AI workflows for faster iteration, stronger documentation, and safer delivery quality.',
+        tags: ['OpenAI', 'Codex'],
+      },
+      {
+        title: 'Analytics & measurement',
+        text: 'Measurement that connects implementation to real outcomes so priorities become sharper.',
+        tags: ['GA4', 'Search Console'],
+      },
+      {
+        title: 'Conversion focus',
+        text: 'Sharper copy and clearer CTA paths that reduce friction and improve inbound lead quality.',
+        tags: ['UX copy', 'CRO'],
+      },
+      {
+        title: 'System integrations',
+        text: 'Integrations that connect tools so data moves correctly without manual middle steps.',
+        tags: ['Integration', 'Data quality'],
+      },
+      {
+        title: 'Operations & release',
+        text: 'Predictable delivery with test mindset, release discipline, and stable operations over time.',
+        tags: ['Quality', 'Release flow'],
+      },
+    ]
+  : [
+      {
+        title: 'Technical SEO & CWV',
+        text: 'Teknisk SEO som förbättrar synlighet, laddtid och indexeringskontroll i verklig trafik.',
+        tags: ['Crawl', 'Core Web Vitals'],
+      },
+      {
+        title: 'Informationsarkitektur',
+        text: 'Sid- och innehållsstruktur som gör information lätt att hitta, förstå och vidareutveckla.',
+        tags: ['Sidtyper', 'Content ops'],
+      },
+      {
+        title: 'Web engineering',
+        text: 'Komponentdriven implementation i Astro/React med fokus på tempo, kvalitet och lång livslängd.',
+        tags: ['Astro', 'React'],
+      },
+      {
+        title: 'Automation',
+        text: 'Automatiserade flöden mellan formulär, inbox, CRM och interna handoffs där manuella moment ersätts av stabil processlogik.',
+        tags: ['n8n', 'API-flöden'],
+      },
+      {
+        title: 'AI-assisterad utveckling',
+        text: 'Praktiska AI-flöden för snabbare iteration, bättre dokumentation och säkrare leveranser.',
+        tags: ['OpenAI', 'Codex'],
+      },
+      {
+        title: 'Analytics & mätning',
+        text: 'Mätning som kopplar implementation till faktisk effekt så prioriteringar blir skarpa.',
+        tags: ['GA4', 'Search Console'],
+      },
+      {
+        title: 'Konverteringsfokus',
+        text: 'Skärpt copy och tydliga CTA-flöden som minskar friktion och höjer kvaliteten på inkommande leads.',
+        tags: ['UX copy', 'CRO'],
+      },
+      {
+        title: 'Systemkopplingar',
+        text: 'Integrationer som binder ihop verktyg så data flödar rätt utan manuella mellanled.',
+        tags: ['Integration', 'Datakvalitet'],
+      },
+      {
+        title: 'Drift & release',
+        text: 'Förutsägbara leveranser med testtänk, release-disciplin och stabil drift över tid.',
+        tags: ['Kvalitet', 'Release flow'],
+      },
+    ];
 ---
 
 <section id="capabilities" class="band band--surface band--dot" aria-labelledby="capabilities-title">
   <header class="section-head reveal-block">
-    <p class="section-kicker">Kompetens</p>
-    <h2 id="capabilities-title" class="section-title">Kärnkompetenser</h2>
+    <p class="section-kicker">{isEn ? 'Capabilities' : 'Kompetens'}</p>
+    <h2 id="capabilities-title" class="section-title">{isEn ? 'Core capabilities' : 'Kärnkompetenser'}</h2>
     <p class="section-lead">
-      Områden där jag har längst operativ erfarenhet och där min kompetens skapar tydligast effekt i praktiken.
+      {
+        isEn
+          ? 'Areas where I have the strongest operational experience and where my capability creates the clearest practical impact.'
+          : 'Områden där jag har längst operativ erfarenhet och där min kompetens skapar tydligast effekt i praktiken.'
+      }
     </p>
   </header>
 
@@ -65,7 +124,7 @@ const capabilities = [
         <h3 class="mt-3 text-xl font-semibold text-white">{item.title}</h3>
         <p class="mt-3 text-sm text-neutral-300">{item.text}</p>
 
-        <div class="mt-5 flex flex-wrap gap-2" aria-label="Kompetensdetaljer">
+        <div class="mt-5 flex flex-wrap gap-2" aria-label={isEn ? 'Capability details' : 'Kompetensdetaljer'}>
           {item.tags.map((tag) => (
             <span class="capability-tag">{tag}</span>
           ))}
@@ -76,10 +135,10 @@ const capabilities = [
 
   <div class="mt-10 flex justify-center">
     <a
-      href="/kompetens"
+      href={isEn ? '/en/capabilities' : '/kompetens'}
       class="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
     >
-      Utforska hela kompetenssidan
+      {isEn ? 'Explore full capabilities page' : 'Utforska hela kompetenssidan'}
       <span aria-hidden="true">-&gt;</span>
     </a>
   </div>

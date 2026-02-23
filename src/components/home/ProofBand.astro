@@ -1,43 +1,92 @@
-﻿---
-const experienceHighlights = [
-  {
-    id: '01',
-    title: '12+ år i SEO & web',
-    text: 'Praktisk erfarenhet sedan 2012 inom sök, webbutveckling, e-handel och tillväxt.',
-  },
-  {
-    id: '02',
-    title: 'Byrå + inhouse + eget',
-    text: 'Roller från specialist till Head of SEO, byråchef, produktägare och grundare.',
-  },
-  {
-    id: '03',
-    title: 'Internationell leverans',
-    text: 'Leveranser mot flera marknader och tvärfunktionella team i tillväxtmiljöer.',
-  },
-  {
-    id: '04',
-    title: 'AI & automation',
-    text: 'Bygger AI-stödda SEO- och automationsflöden med fokus på kvalitet och skalbarhet.',
-  },
-  {
-    id: '05',
-    title: 'Från strategi till drift',
-    text: 'Kombinerar strategi, implementation och uppföljning i samma leveransmodell.',
-  },
-];
+---
+interface Props {
+  lang?: 'sv' | 'en';
+}
+
+const { lang = 'sv' } = Astro.props;
+const isEn = lang === 'en';
+
+const experienceHighlights = isEn
+  ? [
+      {
+        id: '01',
+        title: '20+ years in SEO & web',
+        text: 'Hands-on experience since 2003 across search, web engineering, e-commerce, and growth.',
+      },
+      {
+        id: '02',
+        title: 'Agency + in-house + founder',
+        text: 'Roles from specialist to Head of SEO, agency lead, product owner, and founder.',
+      },
+      {
+        id: '03',
+        title: 'Professional driver track',
+        text: 'Actively training as a professional truck driver with licenses and safety certifications in progress.',
+      },
+      {
+        id: '04',
+        title: 'International delivery',
+        text: 'Deliveries across multiple markets and cross-functional teams in growth environments.',
+      },
+      {
+        id: '05',
+        title: 'AI & automation',
+        text: 'Builds AI-assisted SEO and automation workflows with focus on quality and scalability.',
+      },
+      {
+        id: '06',
+        title: 'From strategy to operations',
+        text: 'Combines strategy, implementation, and follow-up in one delivery model.',
+      },
+    ]
+  : [
+      {
+        id: '01',
+        title: '20+ år i SEO & web',
+        text: 'Praktisk erfarenhet sedan 2003 inom sök, webbutveckling, e-handel och tillväxt.',
+      },
+      {
+        id: '02',
+        title: 'Byrå + inhouse + eget',
+        text: 'Roller från specialist till Head of SEO, byråchef, produktägare och grundare.',
+      },
+      {
+        id: '03',
+        title: 'Yrkesförarspår',
+        text: 'Utbildar mig aktivt till yrkesförare för lastbil med relevanta behörigheter och säkerhetsmoment.',
+      },
+      {
+        id: '04',
+        title: 'Internationell leverans',
+        text: 'Leveranser mot flera marknader och tvärfunktionella team i tillväxtmiljöer.',
+      },
+      {
+        id: '05',
+        title: 'AI & automation',
+        text: 'Bygger AI-stödda SEO- och automationsflöden med fokus på kvalitet och skalbarhet.',
+      },
+      {
+        id: '06',
+        title: 'Från strategi till drift',
+        text: 'Kombinerar strategi, implementation och uppföljning i samma leveransmodell.',
+      },
+    ];
 ---
 
 <section class="band band--surface" aria-labelledby="proof-title">
   <header class="section-head reveal-block">
-    <p class="section-kicker">Erfarenhet i korthet</p>
-    <h2 id="proof-title" class="section-title">Erfarenhet som formar leveransen</h2>
+    <p class="section-kicker">{isEn ? 'Experience at a glance' : 'Erfarenhet i korthet'}</p>
+    <h2 id="proof-title" class="section-title">{isEn ? 'Experience that shapes delivery' : 'Erfarenhet som formar leveransen'}</h2>
     <p class="section-lead">
-      Ett koncentrat av roller och uppdrag som visar varför mitt arbetssätt fungerar i praktiken.
+      {
+        isEn
+          ? 'A concentrated snapshot of roles and assignments showing why this delivery model works in practice.'
+          : 'Ett koncentrat av roller och uppdrag som visar varför mitt arbetssätt fungerar i praktiken.'
+      }
     </p>
   </header>
 
-  <ul class="mt-9 grid gap-4 sm:grid-cols-2 xl:grid-cols-5" aria-label="Erfarenhetshöjdpunkter">
+  <ul class="mt-9 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label={isEn ? 'Experience highlights' : 'Erfarenhetshöjdpunkter'}>
     {experienceHighlights.map((item) => (
       <li class="ui-card ui-card--interactive proof-card reveal-card p-5 text-left" tabindex="0">
         <div class="proof-topline" aria-hidden="true"></div>
@@ -50,10 +99,10 @@ const experienceHighlights = [
 
   <div class="mt-8 flex justify-center">
     <a
-      href="/sv/cv"
+      href={isEn ? '/en/cv' : '/sv/cv'}
       class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
     >
-      Se fullständigt CV
+      {isEn ? 'View full CV' : 'Se fullständigt CV'}
       <span aria-hidden="true">-&gt;</span>
     </a>
   </div>

@@ -1,46 +1,88 @@
-﻿---
-const steps = [
-  {
-    id: '01',
-    title: 'Kartlägg',
-    text: 'Jag identifierar flaskhalsar i struktur, innehåll, teknik och överlämningar mellan team.',
-    extra: 'Resultatet blir en tydlig nulägesbild av vad som bromsar tempo, kvalitet och synlighet.',
-    tag: 'Diagnos',
-  },
-  {
-    id: '02',
-    title: 'Prioritera',
-    text: 'Vi väljer rätt ordning utifrån effekt, risk och vad som går att leverera utan onödig komplexitet.',
-    extra: 'Fokus hamnar på insatser som ger nytta tidigt, utan att bygga in teknisk skuld.',
-    tag: 'Beslut',
-  },
-  {
-    id: '03',
-    title: 'Implementera',
-    text: 'Jag implementerar med tydlig struktur och robust releaseprocess så lösningen håller över tid.',
-    extra: 'Kod, innehåll och automation kopplas ihop till en leverans som är både snabb och stabil.',
-    tag: 'Bygg',
-  },
-  {
-    id: '04',
-    title: 'Följ upp',
-    text: 'Jag mäter vad som fungerar och itererar på det som ger mätbar effekt.',
-    extra: 'Med kontinuerlig uppföljning blir nästa förbättring tydlig, prioriterad och genomförbar.',
-    tag: 'Iteration',
-  },
-];
+---
+interface Props {
+  lang?: 'sv' | 'en';
+}
+
+const { lang = 'sv' } = Astro.props;
+const isEn = lang === 'en';
+
+const steps = isEn
+  ? [
+      {
+        id: '01',
+        title: 'Map',
+        text: 'I identify bottlenecks in structure, content, technology, and handoffs between teams.',
+        extra: 'The result is a clear baseline of what slows down speed, quality, and visibility.',
+        tag: 'Diagnosis',
+      },
+      {
+        id: '02',
+        title: 'Prioritize',
+        text: 'We choose the right order based on impact, risk, and what can be delivered without unnecessary complexity.',
+        extra: 'Focus stays on initiatives that deliver value early without creating technical debt.',
+        tag: 'Decision',
+      },
+      {
+        id: '03',
+        title: 'Implement',
+        text: 'I implement with clear structure and robust release routines so the solution holds over time.',
+        extra: 'Code, content, and automation are connected into one delivery that is both fast and stable.',
+        tag: 'Build',
+      },
+      {
+        id: '04',
+        title: 'Follow up',
+        text: 'I measure what works and iterate on what creates measurable impact.',
+        extra: 'Continuous follow-up makes the next improvement clear, prioritized, and feasible.',
+        tag: 'Iteration',
+      },
+    ]
+  : [
+      {
+        id: '01',
+        title: 'Kartlägg',
+        text: 'Jag identifierar flaskhalsar i struktur, innehåll, teknik och överlämningar mellan team.',
+        extra: 'Resultatet blir en tydlig nulägesbild av vad som bromsar tempo, kvalitet och synlighet.',
+        tag: 'Diagnos',
+      },
+      {
+        id: '02',
+        title: 'Prioritera',
+        text: 'Vi väljer rätt ordning utifrån effekt, risk och vad som går att leverera utan onödig komplexitet.',
+        extra: 'Fokus hamnar på insatser som ger nytta tidigt, utan att bygga in teknisk skuld.',
+        tag: 'Beslut',
+      },
+      {
+        id: '03',
+        title: 'Implementera',
+        text: 'Jag implementerar med tydlig struktur och robust releaseprocess så lösningen håller över tid.',
+        extra: 'Kod, innehåll och automation kopplas ihop till en leverans som är både snabb och stabil.',
+        tag: 'Bygg',
+      },
+      {
+        id: '04',
+        title: 'Följ upp',
+        text: 'Jag mäter vad som fungerar och itererar på det som ger mätbar effekt.',
+        extra: 'Med kontinuerlig uppföljning blir nästa förbättring tydlig, prioriterad och genomförbar.',
+        tag: 'Iteration',
+      },
+    ];
 ---
 
 <section id="process" class="band band--mesh" aria-labelledby="process-title">
   <header class="section-head reveal-block">
-    <p class="section-kicker">Arbetssätt</p>
-    <h2 id="process-title" class="section-title">Så arbetar jag i praktiken</h2>
+    <p class="section-kicker">{isEn ? 'Method' : 'Arbetssätt'}</p>
+    <h2 id="process-title" class="section-title">{isEn ? 'How I work in practice' : 'Så arbetar jag i praktiken'}</h2>
     <p class="section-lead">
-      En repeterbar leveransmodell från nuläge till förbättring. Mindre brus, bättre tempo och högre träffsäkerhet.
+      {
+        isEn
+          ? 'A repeatable delivery model from current state to improvement. Less noise, better pace, and higher precision.'
+          : 'En repeterbar leveransmodell från nuläge till förbättring. Mindre brus, bättre tempo och högre träffsäkerhet.'
+      }
     </p>
   </header>
 
-  <ol class="process-grid mt-10 grid gap-5 md:grid-cols-2" aria-label="Arbetsprocess i fyra steg">
+  <ol class="process-grid mt-10 grid gap-5 md:grid-cols-2" aria-label={isEn ? 'Four-step work process' : 'Arbetsprocess i fyra steg'}>
     {steps.map((step) => (
       <li class="ui-card ui-card--interactive process-card reveal-card p-6 text-left" tabindex="0">
         <div class="process-topline" aria-hidden="true"></div>

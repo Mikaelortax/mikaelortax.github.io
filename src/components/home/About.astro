@@ -1,38 +1,69 @@
-﻿<section id="about" class="band band--surface" aria-labelledby="about-title">
+---
+interface Props {
+  lang?: 'sv' | 'en';
+}
+
+const { lang = 'sv' } = Astro.props;
+const isEn = lang === 'en';
+---
+
+<section id="about" class="band band--surface" aria-labelledby="about-title">
   <header class="section-head reveal-block">
-    <p class="section-kicker">Profil</p>
-    <h2 id="about-title" class="section-title">Om mig</h2>
+    <p class="section-kicker">{isEn ? 'Profile' : 'Profil'}</p>
+    <h2 id="about-title" class="section-title">{isEn ? 'About me' : 'Om mig'}</h2>
     <p class="section-lead">
-      Jag heter Mikael Johansson och har arbetat med SEO, webbutveckling och digital tillväxt sedan 2012.
-      Min bakgrund sträcker sig från specialistroller till byråchef, produktägare och tekniskt ansvarig i e-handel.
+      {
+        isEn
+          ? 'My name is Mikael Johansson and I have worked with SEO, web engineering, and digital growth since 2003. In parallel, I am training to work as a professional truck driver. My background spans specialist roles, agency leadership, product ownership, and technical responsibility in e-commerce.'
+          : 'Jag heter Mikael Johansson och har arbetat med SEO, webbutveckling och digital tillväxt sedan 2003. Parallellt utbildar jag mig för att arbeta som yrkesförare för lastbil. Min bakgrund sträcker sig från specialistroller till byråchef, produktägare och tekniskt ansvarig i e-handel.'
+      }
     </p>
   </header>
 
-  <article class="ui-card about-panel reveal-card mt-8 p-7 text-left" tabindex="0" aria-label="Kort profil">
+  <article class="ui-card about-panel reveal-card mt-8 p-7 text-left" tabindex="0" aria-label={isEn ? 'Short profile' : 'Kort profil'}>
     <div class="about-panel-topline" aria-hidden="true"></div>
-    <p class="about-panel-kicker">Nuvarande fokus</p>
+    <p class="about-panel-kicker">{isEn ? 'Current focus' : 'Nuvarande fokus'}</p>
     <p class="mt-3 text-base leading-relaxed text-neutral-200">
-      De senaste åren har jag drivit eget via Imba SEO och levererat strategiska och operativa lösningar inom technical SEO,
-      content, AI-stödda arbetsflöden och automation.
+      {
+        isEn
+          ? 'In recent years I have run my own company through Imba SEO and delivered strategic and operational solutions in technical SEO, content, AI-assisted workflows, and automation.'
+          : 'De senaste åren har jag drivit eget via Imba SEO och levererat strategiska och operativa lösningar inom technical SEO, content, AI-stödda arbetsflöden och automation.'
+      }
     </p>
     <p class="mt-3 text-sm leading-relaxed text-neutral-300">
-      På den här sidan samlar jag projekt, kompetenser och erfarenheter som visar hur jag arbetar:
-      från nulägesanalys till implementation, uppföljning och vidareutveckling.
+      {
+        isEn
+          ? 'At the same time, I am building practical transport competence through professional driver training and certifications in heavy vehicle handling and safety.'
+          : 'Samtidigt bygger jag praktisk transportkompetens genom yrkesförarutbildning och certifieringar inom tung körning och säkerhet.'
+      }
+    </p>
+    <p class="mt-3 text-sm leading-relaxed text-neutral-300">
+      {
+        isEn
+          ? 'This site brings together projects, capabilities, and experience that show how I work: from current-state analysis to implementation, follow-up, and continuous improvement.'
+          : 'På den här sidan samlar jag projekt, kompetenser och erfarenheter som visar hur jag arbetar: från nulägesanalys till implementation, uppföljning och vidareutveckling.'
+      }
     </p>
   </article>
 
-  <ul class="mt-8 grid gap-4 text-sm text-neutral-200 md:grid-cols-3" aria-label="Arbetsprinciper">
+  <ul class="mt-8 grid gap-4 text-sm text-neutral-200 md:grid-cols-3" aria-label={isEn ? 'Work principles' : 'Arbetsprinciper'}>
     <li class="ui-card ui-card--interactive about-principle reveal-card p-4">
-      <p class="about-principle-title">Teknik med affärsfokus</p>
-      <p class="mt-1 text-xs text-neutral-300">Varje implementation ska stödja tydliga mål, mätbar effekt och hållbar drift.</p>
+      <p class="about-principle-title">{isEn ? 'Technology with business focus' : 'Teknik med affärsfokus'}</p>
+      <p class="mt-1 text-xs text-neutral-300">
+        {isEn ? 'Every implementation should support clear goals, measurable impact, and sustainable operations.' : 'Varje implementation ska stödja tydliga mål, mätbar effekt och hållbar drift.'}
+      </p>
     </li>
     <li class="ui-card ui-card--interactive about-principle reveal-card p-4">
-      <p class="about-principle-title">Bygg för lång livslängd</p>
-      <p class="mt-1 text-xs text-neutral-300">Robust struktur, stabil release och tydlig dokumentation över tid.</p>
+      <p class="about-principle-title">{isEn ? 'Build for long lifespan' : 'Bygg för lång livslängd'}</p>
+      <p class="mt-1 text-xs text-neutral-300">
+        {isEn ? 'Robust structure, stable release flow, and clear documentation over time.' : 'Robust struktur, stabil release och tydlig dokumentation över tid.'}
+      </p>
     </li>
     <li class="ui-card ui-card--interactive about-principle reveal-card p-4">
-      <p class="about-principle-title">Iterera med data</p>
-      <p class="mt-1 text-xs text-neutral-300">Analys, uppföljning och förbättring är en integrerad del av leveransen.</p>
+      <p class="about-principle-title">{isEn ? 'Iterate with data' : 'Iterera med data'}</p>
+      <p class="mt-1 text-xs text-neutral-300">
+        {isEn ? 'Analysis, follow-up, and improvement are integrated into delivery.' : 'Analys, uppföljning och förbättring är en integrerad del av leveransen.'}
+      </p>
     </li>
   </ul>
 </section>

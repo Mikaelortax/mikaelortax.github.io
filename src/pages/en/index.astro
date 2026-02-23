@@ -1,7 +1,12 @@
-﻿---
+---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Hero from '../../components/home/Hero.astro';
 import FeaturedWork from '../../components/home/FeaturedWork.astro';
+import Capabilities from '../../components/home/Capabilities.astro';
+import OperatingSystem from '../../components/home/OperatingSystem.astro';
+import ProofBand from '../../components/home/ProofBand.astro';
+import About from '../../components/home/About.astro';
+import FinalCTA from '../../components/home/FinalCTA.astro';
 ---
 
 <BaseLayout
@@ -9,8 +14,13 @@ import FeaturedWork from '../../components/home/FeaturedWork.astro';
   description="Portfolio for a hybrid profile across SEO engineering, web development, and automation."
   lang="en"
 >
-  <div class="space-y-10 md:space-y-14">
+  <div class="home-shell">
     <Hero lang="en" />
     <FeaturedWork lang="en" />
+    <Capabilities lang="en" />
+    <OperatingSystem lang="en" />
+    <ProofBand lang="en" />
+    <About lang="en" />
+    <FinalCTA lang="en" />
   </div>
 </BaseLayout>

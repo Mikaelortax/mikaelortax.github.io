@@ -1,23 +1,113 @@
-﻿---
+---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const contactEmail = 'joha.micke@gmail.com';
+const linkedInHref = 'https://www.linkedin.com/in/mikael-johansson-5084515b/';
+const primaryMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('Förfrågan från portfolio')}&body=${encodeURIComponent('Hej Mikael,%0D%0A%0D%0AKort bakgrund:%0D%0A')}`;
+const projectMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('Projektförfrågan')}`;
+const roleMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('Roll eller samarbete')}`;
+const transportRoleMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('Tjänst som yrkesförare')}`;
 ---
 
 <BaseLayout
   title="Kontakt | Mikael Johansson"
-  description="Kontaktinformation och nästa steg för projekt, roll eller samarbete."
+  description="Kontaktinformation och tydliga nästa steg för IT-roller, yrkesförarroller, projekt eller samarbete."
   lang="sv"
 >
   <section class="band band--surface" aria-labelledby="kontakt-title">
-    <h1 id="kontakt-title" class="text-3xl font-semibold tracking-tight text-white md:text-4xl">Kontakt</h1>
-    <p class="mt-4 max-w-3xl text-neutral-300">
-      Ett kort intro räcker för att ringa in nuläge, prioriteringar och ett realistiskt nästa steg.
-    </p>
+    <div class="section-head reveal-block">
+      <p class="section-kicker">Kontakt</p>
+      <h1 id="kontakt-title" class="section-title">Ta kontakt med ett tydligt nästa steg</h1>
+      <p class="section-lead">
+        Beskriv kort nuläge, mål och tidplan. Jag svarar med en konkret rekommendation för IT-leverans eller yrkesföraruppdrag.
+      </p>
+    </div>
 
-    <div class="ui-card mt-8 p-6">
-      <p class="text-sm text-neutral-300">Du får en tydlig rekommendation och ett konkret förslag på upplägg.</p>
-      <a href="mailto:hello@example.com" class="mt-4 inline-flex rounded-xl bg-cyan-300 px-4 py-2 text-sm font-semibold text-neutral-950 transition hover:bg-cyan-200">
-        Skicka e-post
-      </a>
+    <div class="mt-10 grid max-w-6xl gap-5 md:grid-cols-5">
+      <article class="ui-card ui-card--interactive reveal-card p-6 text-left md:col-span-3">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">Direktkontakt</p>
+        <h2 class="mt-3 text-2xl font-semibold tracking-tight text-white">joha.micke@gmail.com</h2>
+        <p class="mt-3 text-sm text-neutral-300">
+          E-post är snabbaste vägen in. Du får normalt svar inom 1-2 arbetsdagar.
+        </p>
+
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href={primaryMailHref} class="btn-primary inline-flex items-center gap-2 px-5 py-3 text-sm">
+            Skicka e-post
+            <span aria-hidden="true">↗</span>
+          </a>
+          <button
+            type="button"
+            class="btn-secondary inline-flex items-center gap-2 px-5 py-3 text-sm"
+            data-copy-email
+            data-email={contactEmail}
+          >
+            Kopiera adress
+          </button>
+        </div>
+
+        <p data-copy-status class="mt-3 text-xs text-neutral-400" aria-live="polite"></p>
+      </article>
+
+      <aside class="ui-card reveal-card p-6 text-left md:col-span-2">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">Snabbvägar</p>
+        <div class="mt-4 grid gap-3">
+          <a href={projectMailHref} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
+            Projektförfrågan
+          </a>
+          <a href={roleMailHref} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
+            IT-roll eller samarbete
+          </a>
+          <a href={transportRoleMailHref} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
+            Yrkesföraruppdrag
+          </a>
+          <a href="/sv/cv" class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
+            Se CV
+          </a>
+          <a href={linkedInHref} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
+            LinkedIn-profil
+          </a>
+        </div>
+      </aside>
+    </div>
+
+    <div class="mt-8 grid max-w-6xl gap-4 md:grid-cols-3">
+      <article class="ui-card reveal-card p-5 text-left">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">01</p>
+        <h3 class="mt-2 text-base font-semibold text-white">Projekt med tydlig leverans</h3>
+        <p class="mt-2 text-sm text-neutral-300">Webbutveckling, automation eller SEO/Growth med fokus på faktisk effekt.</p>
+      </article>
+      <article class="ui-card reveal-card p-5 text-left">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">02</p>
+        <h3 class="mt-2 text-base font-semibold text-white">Löpande tekniskt ansvar</h3>
+        <p class="mt-2 text-sm text-neutral-300">Förbättringar i sprintar med tydliga prioriteringar och uppföljning.</p>
+      </article>
+      <article class="ui-card reveal-card p-5 text-left">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">03</p>
+        <h3 class="mt-2 text-base font-semibold text-white">Yrkesförare och transport</h3>
+        <p class="mt-2 text-sm text-neutral-300">Tillgänglig för roller som yrkesförare med fokus på säkerhet, ansvar och struktur.</p>
+      </article>
     </div>
   </section>
 </BaseLayout>
+
+<script>
+  const copyButton = document.querySelector('[data-copy-email]');
+  const copyStatus = document.querySelector('[data-copy-status]');
+
+  if (copyButton instanceof HTMLButtonElement && copyStatus instanceof HTMLElement) {
+    copyButton.addEventListener('click', async () => {
+      const email = copyButton.dataset.email;
+      if (!email) return;
+
+      try {
+        await navigator.clipboard.writeText(email);
+        copyStatus.textContent = 'E-postadressen är kopierad.';
+        copyStatus.className = 'mt-3 text-xs text-emerald-300';
+      } catch {
+        copyStatus.textContent = 'Kunde inte kopiera automatiskt. Markera adressen och kopiera manuellt.';
+        copyStatus.className = 'mt-3 text-xs text-amber-300';
+      }
+    });
+  }
+</script>

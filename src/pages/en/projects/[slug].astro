@@ -1,4 +1,4 @@
-﻿---
+---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import ProjectDetail from '../../../components/projects/ProjectDetail.astro';
@@ -31,9 +31,9 @@ const { Content } = await render(project);
     backHref="/en/projects"
     backLabel="<- Back to projects"
     contactHref="/en/contact"
-    contactLabel="Book contact"
+    contactLabel="Contact me"
     ctaTitle="Want to build a similar system?"
-    ctaText="Book a short intro and we can map your current setup, priorities, and next delivery steps."
+    ctaText="Share your current setup and I will reply with a practical plan and clear next steps."
   >
     <Content />
   </ProjectDetail>

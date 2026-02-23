@@ -2,15 +2,16 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const profileHighlights = [
-  { label: 'Erfarenhet', value: '12+ år', text: 'SEO, webbutveckling och digital tillväxt sedan 2012.' },
+  { label: 'Erfarenhet', value: '20+ år', text: 'SEO, webbutveckling och digital tillväxt sedan 2003.' },
   { label: 'Rollbredd', value: 'Specialist → Chef', text: 'Från operativ implementation till ledning och byrådrift.' },
-  { label: 'Fokus idag', value: 'SEO + Web + Automation', text: 'Teknisk precision, snabb leverans och hållbar vidareutveckling.' },
+  { label: 'Parallell kompetens', value: 'Yrkesförare under utbildning', text: 'Bygger transportkompetens med C-behörighet, säkerhetsmoment och truckbehörigheter.' },
 ];
 
 const keyStrengths = [
   'Teknisk SEO med tydlig koppling till affärsresultat',
   'Produktnära webbutveckling med hög prestanda och ren struktur',
   'Automation av arbetsflöden mellan formulär, CRM, inbox och team',
+  'Yrkesförarkompetens i utveckling med fokus på säker tung körning och operativt ansvar',
   'AI-stödd produktion för snabbare iteration och kvalitetssäkring',
   'Stabil leveransmodell från analys till release och uppföljning',
 ];
@@ -99,6 +100,48 @@ const certifications = [
   'HubSpot Content Marketing Certification',
 ];
 
+const transportQualifications = [
+  { label: 'Körkort', value: 'B och C' },
+  { label: 'Arbete På Väg', value: '1.1, 1.2, 1.3' },
+  { label: 'Truckkort', value: 'A2, A2, A4, B1, D' },
+  { label: 'ADR', value: 'Grund och explosivt' },
+];
+
+const education = [
+  {
+    title: 'Yrkesförarutbildning',
+    school: 'Transportutbildning',
+    period: 'September 2025 - Nu',
+    details: [
+      'Lastsäkring',
+      'YKB',
+      'C-behörighet',
+      'Truckbehörigheter',
+      'Praktiska moment inom säker transport och yrkeskörning',
+    ],
+  },
+  {
+    title: 'Medieteknik (inriktning interaktiva system)',
+    school: 'Blekinge Tekniska Högskola, Karlshamn',
+    period: '1 Sep 2008 - 15 Juni 2010',
+    details: [
+      'Programmering: PHP, XHTML, CSS, Java, JavaScript och MySQL',
+      'Sociala medier och digital kommunikation',
+      'Tekniska och interaktiva system i mediemiljö',
+    ],
+  },
+  {
+    title: 'IT-Media',
+    school: 'Johnbauer Gymnasiet, Karlshamn',
+    period: '1 Sep 2005 - 15 Juni 2008',
+    details: [
+      'Grundkurser inom mediebranschen',
+      'Mediekommunikation',
+      'Mediekunskap',
+    ],
+  },
+];
+
 const skills = {
   seo: ['Screaming Frog', 'Google Search Console', 'GA4', 'SEMrush', 'Ahrefs', 'Majestic'],
   dev: ['JavaScript', 'TypeScript', 'PHP', 'HTML', 'CSS', 'SQL', 'React', 'Astro'],
@@ -119,7 +162,7 @@ const skills = {
         <p class="section-kicker">CV / Profil</p>
         <h1 id="cv-title" class="section-title">Mikael Johansson - SEO, webbutveckling och automation</h1>
         <p class="section-lead">
-          Ett koncentrerat men komplett CV som visar vad jag gjort, hur jag arbetar och vilken teknisk nivå jag levererar på.
+          Ett koncentrerat men komplett CV som visar både min IT-profil och min pågående kompetensutveckling mot yrkesförare för lastbil.
         </p>
       </header>
 
@@ -241,6 +284,47 @@ const skills = {
           Se projekt
           <span aria-hidden="true">-&gt;</span>
         </a>
+      </div>
+    </section>
+
+    <section class="band band--mesh" aria-labelledby="transport-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Transport & behörigheter</p>
+        <h2 id="transport-title" class="section-title">Körkort och certifikat</h2>
+        <p class="section-lead">Kompletterande kvalifikationer för roller inom transport, logistik och yrkeskörning.</p>
+      </header>
+
+      <div class="mt-10 grid gap-4 md:grid-cols-2">
+        {transportQualifications.map((item) => (
+          <article class="ui-card ui-card--interactive reveal-card p-5 text-left" tabindex="0">
+            <p class="text-xs font-semibold tracking-[0.16em] text-cyan-300">{item.label}</p>
+            <p class="mt-2 text-base font-semibold text-white">{item.value}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="band band--surface" aria-labelledby="education-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Utbildning</p>
+        <h2 id="education-title" class="section-title">Aktuell utbildning</h2>
+      </header>
+
+      <div class="mt-10 grid gap-5">
+        {education.map((item) => (
+          <article class="ui-card ui-card--interactive reveal-card p-6 text-left" tabindex="0">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <h3 class="text-xl font-semibold text-white">{item.title}</h3>
+              <p class="text-xs font-semibold tracking-[0.16em] text-cyan-300">{item.period}</p>
+            </div>
+            <p class="mt-2 text-sm text-neutral-300">{item.school}</p>
+            <ul class="mt-4 grid gap-2 md:grid-cols-2">
+              {item.details.map((detail) => (
+                <li class="rounded-xl border border-white/10 bg-white/[0.02] px-4 py-2 text-sm text-neutral-200">{detail}</li>
+              ))}
+            </ul>
+          </article>
+        ))}
       </div>
     </section>
   </div>
