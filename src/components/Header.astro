@@ -11,40 +11,40 @@ const currentPath = normalizePath(path);
 const svHref = toSwedishPath(currentPath);
 const enHref = toEnglishPath(currentPath);
 
-const homeHref = lang === 'sv' ? '/' : '/en';
+const homeHref = lang === 'sv' ? '/' : '/en/';
 
 const desktopNavItems =
   lang === 'sv'
     ? [
-        { label: 'Projekt', href: '/projekt' },
-        { label: 'Kompetens', href: '/kompetens' },
-        { label: 'Om', href: '/om' },
-        { label: 'CV', href: '/sv/cv' },
-        { label: 'Kontakt', href: '/kontakt' },
+        { label: 'Projekt', href: '/projekt/' },
+        { label: 'Kompetens', href: '/kompetens/' },
+        { label: 'Om', href: '/om/' },
+        { label: 'CV', href: '/sv/cv/' },
+        { label: 'Kontakt', href: '/kontakt/' },
       ]
     : [
-        { label: 'Projects', href: '/en/projects' },
-        { label: 'Capabilities', href: '/en/capabilities' },
-        { label: 'About', href: '/en/about' },
-        { label: 'CV', href: '/en/cv' },
-        { label: 'Contact', href: '/en/contact' },
+        { label: 'Projects', href: '/en/projects/' },
+        { label: 'Capabilities', href: '/en/capabilities/' },
+        { label: 'About', href: '/en/about/' },
+        { label: 'CV', href: '/en/cv/' },
+        { label: 'Contact', href: '/en/contact/' },
       ];
 
 const mobileNavItems =
   lang === 'sv'
     ? [
         { label: 'Hem', href: '/' },
-        { label: 'Projekt', href: '/projekt' },
-        { label: 'Kompetens', href: '/kompetens' },
-        { label: 'CV', href: '/sv/cv' },
-        { label: 'Kontakt', href: '/kontakt' },
+        { label: 'Projekt', href: '/projekt/' },
+        { label: 'Kompetens', href: '/kompetens/' },
+        { label: 'CV', href: '/sv/cv/' },
+        { label: 'Kontakt', href: '/kontakt/' },
       ]
     : [
-        { label: 'Home', href: '/en' },
-        { label: 'Projects', href: '/en/projects' },
-        { label: 'Skills', href: '/en/capabilities' },
-        { label: 'CV', href: '/en/cv' },
-        { label: 'Contact', href: '/en/contact' },
+        { label: 'Home', href: '/en/' },
+        { label: 'Projects', href: '/en/projects/' },
+        { label: 'Skills', href: '/en/capabilities/' },
+        { label: 'CV', href: '/en/cv/' },
+        { label: 'Contact', href: '/en/contact/' },
       ];
 
 const isSvActive = lang === 'sv';

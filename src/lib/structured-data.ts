@@ -1,4 +1,4 @@
-import type { Locale } from './i18n';
+import { type Locale, toTrailingSlashPath } from './i18n';
 import { siteName, toAbsoluteUrl } from './seo';
 
 export interface BreadcrumbItem {
@@ -77,7 +77,7 @@ export function buildStructuredData({
   const baseSite = new URL(site);
   const websiteId = `${baseSite.origin}/#website`;
   const personId = `${baseSite.origin}/#mikael-johansson`;
-  const homeUrl = toAbsoluteUrl(baseSite, lang === 'en' ? '/en' : '/');
+  const homeUrl = toAbsoluteUrl(baseSite, toTrailingSlashPath(lang === 'en' ? '/en' : '/'));
   const schemas: Array<Record<string, unknown>> = [];
 
   if (config.includeWebsite) {
@@ -147,7 +147,7 @@ export function buildStructuredData({
         '@type': 'ListItem',
         position: index + 1,
         name: item.name,
-        item: toAbsoluteUrl(baseSite, item.path),
+        item: toAbsoluteUrl(baseSite, toTrailingSlashPath(item.path)),
       })),
     });
   }

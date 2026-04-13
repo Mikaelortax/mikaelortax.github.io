@@ -18,8 +18,8 @@ const { Content } = await render(project);
 const ogImage = resolveExistingPublicAsset(project.data.caseImage);
 const breadcrumbs = [
   { name: 'Hem', path: '/' },
-  { name: 'Projekt', path: '/projekt' },
-  { name: project.data.title, path: `/projekt/${project.slug}` },
+  { name: 'Projekt', path: '/projekt/' },
+  { name: project.data.title, path: `/projekt/${project.slug}/` },
 ];
 ---
 
@@ -41,10 +41,10 @@ const breadcrumbs = [
     outcomes={project.data.outcomes}
     liveUrl={project.data.liveUrl}
     repoUrl={project.data.repoUrl}
-    caseImage={project.data.caseImage}
-    backHref="/projekt"
+    caseImage={ogImage}
+    backHref="/projekt/"
     backLabel="<- Tillbaka till projekt"
-    contactHref="/kontakt"
+    contactHref="/kontakt/"
     contactLabel="Kontakta mig"
     ctaTitle="Vill du bygga ett liknande system?"
     ctaText="Beskriv ditt nuläge så återkommer jag med rekommenderad plan och tydliga nästa steg."

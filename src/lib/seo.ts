@@ -1,4 +1,4 @@
-import { enToSvMap, normalizePath, svToEnMap, toEnglishPath, toSwedishPath } from './i18n';
+import { enToSvMap, normalizePath, svToEnMap, toEnglishPath, toSwedishPath, toTrailingSlashPath } from './i18n';
 
 export type SeoLang = 'sv' | 'en';
 
@@ -52,8 +52,9 @@ export function buildI18nSeo(site: string, pathname: string): I18nSeo {
   const normalizedPath = normalizePath(pathname);
   const lang: SeoLang = hasEnPrefix(normalizedPath) ? 'en' : 'sv';
 
-  const svPath = lang === 'en' ? toSwedishPath(normalizedPath) : normalizedPath;
-  const enPath = toEnglishPath(svPath);
+  const sourceSvPath = lang === 'en' ? toSwedishPath(normalizedPath) : normalizedPath;
+  const svPath = toTrailingSlashPath(sourceSvPath);
+  const enPath = lang === 'en' ? toTrailingSlashPath(normalizedPath) : toEnglishPath(sourceSvPath);
   const canonicalPath = lang === 'en' ? enPath : svPath;
 
   const svHref = toAbsoluteUrl(baseSite, svPath);
