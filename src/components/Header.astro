@@ -1,60 +1,13 @@
-﻿---
+---
+import { normalizePath, toEnglishPath, toSwedishPath } from '../lib/i18n';
+
 interface Props {
   lang: 'sv' | 'en';
   path: string;
 }
 
 const { lang, path } = Astro.props;
-
-const normalizePath = (value: string) => {
-  if (!value) return '/';
-  const withLeadingSlash = value.startsWith('/') ? value : `/${value}`;
-  const collapsed = withLeadingSlash.replace(/\/{2,}/g, '/');
-  const withoutTrailing = collapsed.length > 1 ? collapsed.replace(/\/+$/g, '') : collapsed;
-  return withoutTrailing || '/';
-};
-
 const currentPath = normalizePath(path);
-
-const svToEnMap: Record<string, string> = {
-  '/': '/en',
-  '/it': '/en/it',
-  '/yrkesforare': '/en/professional-driver',
-  '/projekt': '/en/projects',
-  '/kompetens': '/en/capabilities',
-  '/om': '/en/about',
-  '/kontakt': '/en/contact',
-  '/sv': '/en',
-  '/sv/projekt': '/en/projects',
-  '/sv/guider': '/en/guides',
-  '/sv/om': '/en/about',
-  '/sv/cv': '/en/cv',
-  '/sv/kontakt': '/en/contact',
-};
-
-const enToSvMap: Record<string, string> = Object.fromEntries(
-  Object.entries(svToEnMap).map(([svPath, enPath]) => [enPath, svPath.startsWith('/sv') ? svPath.replace(/^\/sv/, '') || '/' : svPath])
-);
-
-const toEnglishPath = (pathname: string) => {
-  const normalized = normalizePath(pathname);
-  if (svToEnMap[normalized]) return svToEnMap[normalized];
-  if (normalized.startsWith('/projekt/')) return `/en/projects/${normalized.slice('/projekt/'.length)}`;
-  if (normalized.startsWith('/sv/projekt/')) return `/en/projects/${normalized.slice('/sv/projekt/'.length)}`;
-  if (normalized.startsWith('/en')) return normalized;
-  return '/en';
-};
-
-const toSwedishPath = (pathname: string) => {
-  const normalized = normalizePath(pathname);
-  if (enToSvMap[normalized]) return enToSvMap[normalized];
-  if (normalized.startsWith('/en/projects/')) return `/projekt/${normalized.slice('/en/projects/'.length)}`;
-  if (normalized.startsWith('/en/')) return `/${normalized.slice('/en/'.length)}`;
-  if (normalized === '/en') return '/';
-  if (normalized.startsWith('/sv/')) return `/${normalized.slice('/sv/'.length)}`;
-  return '/';
-};
-
 const svHref = toSwedishPath(currentPath);
 const enHref = toEnglishPath(currentPath);
 

@@ -1,36 +1,36 @@
 ---
-const items = [
-  {
-    question: 'Hur lång tid tar ett projekt?',
-    answer: 'En första version tar ofta 2-4 veckor beroende på omfattning och tillgängligt material.',
-  },
-  {
-    question: 'Jobbar du med befintliga kodbaser?',
-    answer: 'Ja. Jag kan gå in i befintliga Astro-projekt och förbättra struktur, SEO och prestanda.',
-  },
-  {
-    question: 'Kan du hjälpa med innehållsstruktur?',
-    answer: 'Absolut. Jag hjälper gärna till att strukturera navigering, rubriker och sidtyper.',
-  },
-  {
-    question: 'Hur hanteras SEO i två språk?',
-    answer: 'Jag sätter canonical + hreflang korrekt och säkrar symmetri mellan språkversionerna.',
-  },
-  {
-    question: 'Erbjuder du löpande förbättring?',
-    answer: 'Ja, jag erbjuder iterativt stöd efter lansering med mätning och förbättring i sprintar.',
-  },
-];
+import { itFaqItems } from '../../lib/profile';
+
+interface Props {
+  lang?: 'sv' | 'en';
+}
+
+const { lang = 'sv' } = Astro.props;
+const isEn = lang === 'en';
+const items = itFaqItems[lang];
 ---
 
-<section aria-labelledby="faq" class="mt-16">
-  <h2 id="faq" class="text-2xl font-semibold tracking-tight text-white">Vanliga frågor</h2>
-  <div class="mt-6 space-y-3">
+<section class="band band--surface" aria-labelledby="faq-title">
+  <header class="section-head reveal-block">
+    <p class="section-kicker">{isEn ? 'AEO / FAQ' : 'AEO / FAQ'}</p>
+    <h2 id="faq-title" class="section-title">
+      {isEn ? 'What employers and clients usually want to know' : 'Det här brukar arbetsgivare och uppdragsgivare vilja veta'}
+    </h2>
+    <p class="section-lead">
+      {
+        isEn
+          ? 'A compact overview of who I am, what I build, and how I work from analysis to implementation.'
+          : 'En kompakt översikt över vem jag är, vad jag bygger och hur jag arbetar från analys till implementation.'
+      }
+    </p>
+  </header>
+
+  <div class="mt-10 grid gap-4 md:grid-cols-2">
     {items.map((item) => (
-      <details class="rounded-xl border border-white/10 bg-white/[0.03] p-4 open:bg-white/[0.05]">
-        <summary class="cursor-pointer list-none font-semibold text-white">{item.question}</summary>
-        <p class="mt-3 text-sm text-neutral-300">{item.answer}</p>
-      </details>
+      <article class="ui-card ui-card--interactive reveal-card p-5 text-left" tabindex="0">
+        <h3 class="text-lg font-semibold text-white">{item.question}</h3>
+        <p class="mt-3 text-sm leading-relaxed text-neutral-300">{item.answer}</p>
+      </article>
     ))}
   </div>
 </section>

@@ -9,12 +9,17 @@ const projectMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('Pr
 const roleMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('IT-roll eller samarbete')}`;
 const paths = getProfilePaths('sv');
 const cvPdfLinkProps = getCvPdfLinkProps('sv');
+const breadcrumbs = [
+  { name: 'Hem', path: '/' },
+  { name: 'Kontakt', path: '/kontakt' },
+];
 ---
 
 <BaseLayout
   title="Kontakt | Mikael Johansson"
   description="Kontaktinformation och tydliga nästa steg för IT-roller, projekt eller samarbete, med separat länk till transportprofilen."
   lang="sv"
+  structuredData={{ breadcrumbs }}
 >
   <section class="band band--surface" aria-labelledby="kontakt-title">
     <div class="section-head reveal-block">

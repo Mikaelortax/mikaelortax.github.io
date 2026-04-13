@@ -40,36 +40,44 @@ const {
 const labels =
   lang === 'en'
     ? {
+        goal: 'Project goal',
         role: 'Role',
+        responsibility: 'My responsibility',
         stack: 'Stack',
         tags: 'Tags',
+        improvements: 'What improved',
         outcomes: 'Outcomes',
         preview: 'Case Preview',
         previewHint: 'Add `caseImage` in project frontmatter to show a real screenshot.',
         visit: 'Visit live site',
         source: 'View source',
         contextTitle: 'Project context',
-        contextP1: `In this project I worked as ${role.toLowerCase()} and focused on turning requirements into a stable, production-ready solution.`,
+        contextP1: `The project goal was to improve clarity, delivery reliability, and long-term maintainability without adding unnecessary operational overhead.`,
         contextP2: `The delivery combined ${stack.join(', ')} with focus areas such as ${tags.join(', ').toLowerCase()} to create a solution that is both maintainable and scalable over time.`,
         approachTitle: 'Implementation approach',
         approachText:
           'The work followed a practical flow: define structure, implement core functionality, automate repetitive steps, and continuously validate quality before release.',
+        improvementsText: outcomes.join(' · '),
       }
     : {
+        goal: 'Projektmål',
         role: 'Roll',
+        responsibility: 'Mitt ansvar',
         stack: 'Stack',
         tags: 'Taggar',
+        improvements: 'Det som förbättrades',
         outcomes: 'Resultat',
         preview: 'Case Preview',
         previewHint: 'Lägg till `caseImage` i projektets frontmatter för att visa riktig skärmbild.',
         visit: 'Besök live-sajt',
         source: 'Visa källkod',
         contextTitle: 'Projektkontext',
-        contextP1: `I det här projektet arbetade jag som ${role.toLowerCase()} med fokus på att omsätta krav till en stabil, produktionsklar lösning.`,
+        contextP1: 'Projektmålet var att förbättra tydlighet, leveranssäkerhet och långsiktig förvaltning utan att skapa onödig operativ friktion.',
         contextP2: `Leveransen kombinerade ${stack.join(', ')} med fokusområden som ${tags.join(', ').toLowerCase()} för att skapa en lösning som är både hållbar och skalbar över tid.`,
         approachTitle: 'Arbetssätt i implementationen',
         approachText:
           'Arbetet följde ett praktiskt flöde: definiera struktur, bygga kärnfunktionalitet, automatisera repetitiva moment och kvalitetssäkra kontinuerligt inför release.',
+        improvementsText: outcomes.join(' · '),
       };
 
 const fallbackImage = caseImage
@@ -142,9 +150,20 @@ const fallbackImage = caseImage
 
       <div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
         <div class="ui-card p-5">
-          <p class="text-xs uppercase tracking-[0.16em] text-cyan-300">{labels.role}</p>
+          <p class="text-xs uppercase tracking-[0.16em] text-cyan-300">{labels.goal}</p>
+          <p class="mt-3 text-sm text-neutral-200">{excerpt}</p>
+        </div>
+        <div class="ui-card p-5">
+          <p class="text-xs uppercase tracking-[0.16em] text-cyan-300">{labels.responsibility}</p>
           <p class="mt-3 text-sm text-neutral-200">{role}</p>
         </div>
+        <div class="ui-card p-5">
+          <p class="text-xs uppercase tracking-[0.16em] text-cyan-300">{labels.improvements}</p>
+          <p class="mt-3 text-sm text-neutral-200">{labels.improvementsText}</p>
+        </div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
         <div class="ui-card p-5">
           <p class="text-xs uppercase tracking-[0.16em] text-cyan-300">{labels.stack}</p>
           <p class="mt-3 text-sm text-neutral-200">{stack.join(' · ')}</p>

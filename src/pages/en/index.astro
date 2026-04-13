@@ -1,12 +1,15 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ITLanding from '../../components/profiles/ITLanding.astro';
+import { itFaqItems } from '../../lib/profile';
 ---
 
 <BaseLayout
   title="Mikael Johansson | SEO, Web, and Automation"
   description="Portfolio focused on SEO, web engineering, automation, AI-assisted workflows, and digital growth."
   lang="en"
+  ogType="profile"
+  structuredData={{ includePerson: true, includeProfilePage: true, faqItems: itFaqItems.en }}
 >
   <ITLanding lang="en" />
 </BaseLayout>

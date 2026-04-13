@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProjectDetail from '../../components/projects/ProjectDetail.astro';
+import { resolveExistingPublicAsset } from '../../lib/public-assets';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
@@ -14,9 +15,22 @@ export async function getStaticPaths() {
 
 const { project } = Astro.props;
 const { Content } = await render(project);
+const ogImage = resolveExistingPublicAsset(project.data.caseImage);
+const breadcrumbs = [
+  { name: 'Hem', path: '/' },
+  { name: 'Projekt', path: '/projekt' },
+  { name: project.data.title, path: `/projekt/${project.slug}` },
+];
 ---
 
-<BaseLayout title={`${project.data.title} | Projekt`} description={project.data.excerpt} lang="sv">
+<BaseLayout
+  title={`${project.data.title} | Projekt`}
+  description={project.data.excerpt}
+  lang="sv"
+  ogType="article"
+  ogImage={ogImage}
+  structuredData={{ breadcrumbs }}
+>
   <ProjectDetail
     lang="sv"
     title={project.data.title}

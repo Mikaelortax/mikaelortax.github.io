@@ -23,7 +23,7 @@ export const enToSvMap: Record<string, string> = Object.fromEntries(
   ])
 );
 
-const normalizePath = (path: string) => {
+export const normalizePath = (path: string) => {
   if (!path || path === '/') return '/';
   const withLeadingSlash = path.startsWith('/') ? path : `/${path}`;
   const collapsed = withLeadingSlash.replace(/\/{2,}/g, '/');
@@ -36,23 +36,23 @@ export const getLocale = (pathname: string): Locale => {
   return 'sv';
 };
 
-const toEnglishPath = (pathname: string) => {
+export const toEnglishPath = (pathname: string) => {
   const path = normalizePath(pathname);
   if (svToEnMap[path]) return svToEnMap[path];
   if (path.startsWith('/projekt/')) return `/en/projects/${path.slice('/projekt/'.length)}`;
   if (path.startsWith('/sv/projekt/')) return `/en/projects/${path.slice('/sv/projekt/'.length)}`;
   if (path.startsWith('/en')) return path;
-  return '/en';
+  return path === '/' ? '/en' : `/en${path}`;
 };
 
-const toSwedishPath = (pathname: string) => {
+export const toSwedishPath = (pathname: string) => {
   const path = normalizePath(pathname);
   if (enToSvMap[path]) return enToSvMap[path];
   if (path.startsWith('/en/projects/')) return `/projekt/${path.slice('/en/projects/'.length)}`;
   if (path.startsWith('/en/')) return `/${path.slice('/en/'.length)}`;
   if (path === '/en') return '/';
   if (path.startsWith('/sv/')) return `/${path.slice('/sv/'.length)}`;
-  return '/';
+  return path;
 };
 
 export const localizePath = (path: string, locale: Locale): string => {

@@ -1,7 +1,9 @@
-﻿---
+---
 import '../styles/global.css';
 import Header from '../components/Header.astro';
-import { buildI18nSeo } from '../lib/seo';
+import { buildI18nSeo, formatSeoTitle, siteName } from '../lib/seo';
+import type { StructuredDataConfig } from '../lib/structured-data';
+import { buildStructuredData, serializeJsonLd } from '../lib/structured-data';
 import { getCrossProfileHref, getCvPdfLinkProps, getProfilePaths, type SiteProfile } from '../lib/profile';
 
 interface Props {
@@ -11,9 +13,20 @@ interface Props {
   ogImage?: string;
   lang?: 'sv' | 'en';
   profile?: SiteProfile;
+  ogType?: 'website' | 'profile' | 'article';
+  structuredData?: StructuredDataConfig;
 }
 
-const { title, description, noindex = false, ogImage, profile = 'it' } = Astro.props;
+const {
+  title,
+  description,
+  noindex = false,
+  ogImage,
+  profile = 'it',
+  ogType = 'website',
+  structuredData,
+} = Astro.props;
+
 const pathname = Astro.url.pathname || '/';
 const siteBase = Astro.site?.toString() ?? process.env.SITE_URL;
 
@@ -23,6 +36,7 @@ if (!siteBase) {
 
 const seo = buildI18nSeo(siteBase, pathname);
 const siteUrl = new URL(siteBase);
+const seoTitle = formatSeoTitle(title);
 const ogImageUrl = ogImage ? new URL(ogImage, siteUrl).toString() : undefined;
 const ogLocale = seo.lang === 'sv' ? 'sv_SE' : 'en_US';
 const twitterCard = ogImageUrl ? 'summary_large_image' : 'summary';
@@ -30,6 +44,18 @@ const linkedInHref = 'https://www.linkedin.com/in/mikael-johansson-5084515b/';
 const profilePaths = getProfilePaths(seo.lang);
 const crossProfileHref = getCrossProfileHref(seo.lang, profile);
 const cvPdfLinkProps = getCvPdfLinkProps(seo.lang);
+const schemaBlocks = buildStructuredData({
+  site: siteBase,
+  lang: seo.lang,
+  canonical: seo.canonical,
+  title: seoTitle,
+  description,
+  ogImageUrl,
+  config: {
+    includeWebsite: true,
+    ...(structuredData ?? {}),
+  },
+});
 
 const availability =
   seo.lang === 'sv'
@@ -82,24 +108,38 @@ const availability =
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
+    <title>{seoTitle}</title>
     <meta name="description" content={description} />
+    <meta name="author" content={siteName} />
+    <meta name="application-name" content={siteName} />
+    <meta name="apple-mobile-web-app-title" content={siteName} />
+    <meta name="theme-color" content="#0a0a0f" />
     {noindex && <meta name="robots" content="noindex,nofollow" />}
     {noindex && <meta name="googlebot" content="noindex,nofollow" />}
     <link rel="canonical" href={seo.canonical} />
     {seo.alternates.map((alternate) => (
       <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />
     ))}
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-48x48.png" sizes="48x48" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={seoTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={seo.canonical} />
     <meta property="og:locale" content={ogLocale} />
     {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    {ogImageUrl && <meta property="og:image:alt" content={description} />}
     <meta name="twitter:card" content={twitterCard} />
-    <meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={seoTitle} />
     <meta name="twitter:description" content={description} />
     {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+    {schemaBlocks.map((item) => (
+      <script type="application/ld+json" set:html={serializeJsonLd(item)} />
+    ))}
     <script is:inline>
       (() => {
         const stored = localStorage.getItem('theme');
@@ -133,7 +173,7 @@ const availability =
     <footer class="site-footer pb-[5.5rem] md:pb-0">
       <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10 md:flex-row md:items-end md:justify-between">
         <div>
-          <p class="site-footer-title text-lg font-semibold tracking-tight">Mikael Johansson</p>
+          <p class="site-footer-title text-lg font-semibold tracking-tight">{siteName}</p>
           <p class="site-footer-text mt-2 max-w-xl text-sm">{availability.footerText}</p>
           <p class="site-footer-text mt-3 max-w-xl text-sm text-neutral-400">
             {availability.footerSwitchIntro}{' '}
@@ -153,7 +193,7 @@ const availability =
       </div>
       <div class="site-footer-divider border-t">
         <div class="site-footer-meta mx-auto w-full max-w-6xl px-6 py-4 text-xs">
-          &copy; {new Date().getFullYear()} Mikael Johansson.
+          &copy; {new Date().getFullYear()} {siteName}.
         </div>
       </div>
     </footer>

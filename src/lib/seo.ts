@@ -1,4 +1,6 @@
-﻿export type SeoLang = 'sv' | 'en';
+import { enToSvMap, normalizePath, svToEnMap, toEnglishPath, toSwedishPath } from './i18n';
+
+export type SeoLang = 'sv' | 'en';
 
 export interface SeoAlternate {
   hreflang: 'sv' | 'en' | 'x-default';
@@ -11,68 +13,43 @@ export interface I18nSeo {
   alternates: [SeoAlternate, SeoAlternate, SeoAlternate];
 }
 
-const collapseSlashes = (value: string): string => value.replace(/\/{2,}/g, '/');
-
-const normalizePathname = (pathname: string): string => {
-  const raw = (pathname || '/').trim();
-  const withoutQuery = raw.split('?')[0].split('#')[0];
-  const withLeadingSlash = withoutQuery.startsWith('/')
-    ? withoutQuery
-    : `/${withoutQuery}`;
-  const collapsed = collapseSlashes(withLeadingSlash);
-  const withoutTrailing =
-    collapsed.length > 1 ? collapsed.replace(/\/+$/g, '') : collapsed;
-  return withoutTrailing || '/';
-};
+export const siteName = 'Mikael Johansson';
 
 const hasEnPrefix = (pathname: string): boolean => /^\/en(?:\/|$)/.test(pathname);
-
-const svToEnExact: Record<string, string> = {
-  '/': '/en',
-  '/it': '/en/it',
-  '/yrkesforare': '/en/professional-driver',
-  '/projekt': '/en/projects',
-  '/kompetens': '/en/capabilities',
-  '/om': '/en/about',
-  '/kontakt': '/en/contact',
-};
-
-const enToSvExact: Record<string, string> = Object.fromEntries(
-  Object.entries(svToEnExact).map(([svPath, enPath]) => [enPath, svPath])
-);
-
-const toEnglishPath = (swedishPath: string): string => {
-  const path = normalizePathname(swedishPath);
-  if (svToEnExact[path]) return svToEnExact[path];
-  if (path.startsWith('/projekt/')) return `/en/projects/${path.slice('/projekt/'.length)}`;
-  if (path.startsWith('/en')) return path;
-  return path === '/' ? '/en' : `/en${path}`;
-};
-
-const toSwedishPath = (pathname: string): string => {
-  const path = normalizePathname(pathname);
-  if (enToSvExact[path]) return enToSvExact[path];
-  if (path.startsWith('/en/projects/')) return `/projekt/${path.slice('/en/projects/'.length)}`;
-  if (path === '/en') return '/';
-  if (path.startsWith('/en/')) return `/${path.slice('/en/'.length)}`;
-  return path;
-};
 
 const normalizeSite = (site: string): URL => {
   const url = new URL(site);
   return new URL(url.origin);
 };
 
-const toAbsoluteUrl = (site: URL, path: string): string => {
+export const toAbsoluteUrl = (site: URL, path: string): string => {
   const url = new URL(path, site);
   return url.pathname === '/'
     ? url.origin
     : `${url.origin}${url.pathname}${url.search}${url.hash}`;
 };
 
+export const formatSeoTitle = (rawTitle: string, brand: string = siteName): string => {
+  const normalized = (rawTitle || '').trim().replace(/\s+/g, ' ');
+  if (!normalized) return brand;
+
+  const parts = normalized
+    .split('|')
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .filter((part) => part !== brand);
+
+  return parts.length ? [...parts, brand].join(' | ') : brand;
+};
+
+export const isKnownLocalizedPath = (pathname: string): boolean => {
+  const path = normalizePath(pathname);
+  return Boolean(svToEnMap[path] || enToSvMap[path]);
+};
+
 export function buildI18nSeo(site: string, pathname: string): I18nSeo {
   const baseSite = normalizeSite(site);
-  const normalizedPath = normalizePathname(pathname);
+  const normalizedPath = normalizePath(pathname);
   const lang: SeoLang = hasEnPrefix(normalizedPath) ? 'en' : 'sv';
 
   const svPath = lang === 'en' ? toSwedishPath(normalizedPath) : normalizedPath;

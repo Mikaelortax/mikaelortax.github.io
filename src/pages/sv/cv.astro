@@ -4,6 +4,10 @@ import { getCvPdfLinkProps, getProfilePaths } from '../../lib/profile';
 
 const paths = getProfilePaths('sv');
 const cvPdfLinkProps = getCvPdfLinkProps('sv');
+const breadcrumbs = [
+  { name: 'Hem', path: '/' },
+  { name: 'CV', path: '/sv/cv' },
+];
 
 const profileHighlights = [
   { label: 'Erfarenhet', value: '20+ år', text: 'SEO, webbutveckling och digital tillväxt sedan 2003.' },
@@ -104,6 +108,7 @@ const skills = {
   title="CV | Mikael Johansson"
   description="IT-fokuserat CV med erfarenhet, kärnkompetenser, teknisk profil och certifieringar inom SEO, webbutveckling och automation."
   lang="sv"
+  structuredData={{ breadcrumbs }}
 >
   <div class="home-shell">
     <section class="band band--mesh" aria-labelledby="cv-title">

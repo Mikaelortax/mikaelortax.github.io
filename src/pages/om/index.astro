@@ -1,11 +1,17 @@
 ﻿---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const breadcrumbs = [
+  { name: 'Hem', path: '/' },
+  { name: 'Om', path: '/om' },
+];
 ---
 
 <BaseLayout
   title="Om | Mikael Johansson"
   description="Bakgrund, erfarenhet och inriktning inom SEO, webbutveckling, automation och AI-stödda arbetsflöden."
   lang="sv"
+  structuredData={{ breadcrumbs }}
 >
   <div class="home-shell">
     <section class="band band--surface" aria-labelledby="om-title">

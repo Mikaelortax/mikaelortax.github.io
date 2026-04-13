@@ -8,12 +8,18 @@ const projects = (await getCollection('projects')).sort((a, b) => {
   }
   return a.data.title.localeCompare(b.data.title, 'sv');
 });
+
+const breadcrumbs = [
+  { name: 'Hem', path: '/' },
+  { name: 'Projekt', path: '/projekt' },
+];
 ---
 
 <BaseLayout
   title="Projekt | Mikael Johansson"
   description="Ett urval av projekt inom SEO, webbutveckling och automation."
   lang="sv"
+  structuredData={{ breadcrumbs }}
 >
   <section class="band band--surface" aria-labelledby="projekt-title">
     <h1 id="projekt-title" class="text-3xl font-semibold tracking-tight text-white md:text-4xl">Projekt</h1>
