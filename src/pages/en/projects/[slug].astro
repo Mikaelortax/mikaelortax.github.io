@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import ProjectDetail from '../../../components/projects/ProjectDetail.astro';
 import { resolveExistingPublicAsset } from '../../../lib/public-assets';
+import { buildProjectSeoTitle } from '../../../lib/seo';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects-en');
@@ -24,7 +25,13 @@ const breadcrumbs = [
 ---
 
 <BaseLayout
-  title={`${project.data.title} | Project`}
+  title={buildProjectSeoTitle({
+    lang: 'en',
+    slug: project.slug,
+    title: project.data.title,
+    role: project.data.role,
+    tags: project.data.tags,
+  })}
   description={project.data.excerpt}
   lang="en"
   ogType="article"

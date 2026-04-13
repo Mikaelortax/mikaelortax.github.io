@@ -33,6 +33,10 @@ export const formatSeoTitle = (rawTitle: string, brand: string = siteName): stri
   const normalized = (rawTitle || '').trim().replace(/\s+/g, ' ');
   if (!normalized) return brand;
 
+  if (!normalized.includes('|') && normalized.toLowerCase().includes(brand.toLowerCase())) {
+    return normalized;
+  }
+
   const parts = normalized
     .split('|')
     .map((part) => part.trim())
@@ -40,6 +44,64 @@ export const formatSeoTitle = (rawTitle: string, brand: string = siteName): stri
     .filter((part) => part !== brand);
 
   return parts.length ? [...parts, brand].join(' | ') : brand;
+};
+
+interface ProjectSeoTitleInput {
+  lang: SeoLang;
+  slug: string;
+  title: string;
+  role?: string;
+  tags?: string[];
+}
+
+const projectTitleTypeLabels = {
+  sv: {
+    website: 'Webbplats och SEO',
+    webProject: 'Webbprojekt och SEO',
+    automation: 'Automationsprojekt',
+    membership: 'Medlemssystem och webb',
+  },
+  en: {
+    website: 'Website and SEO',
+    webProject: 'Web Project and SEO',
+    automation: 'Automation Project',
+    membership: 'Membership Platform and Web',
+  },
+} as const;
+
+export const buildProjectSeoTitle = ({ lang, slug, title, role = '', tags = [] }: ProjectSeoTitleInput): string => {
+  const labels = projectTitleTypeLabels[lang];
+  const fingerprint = `${slug} ${role} ${tags.join(' ')}`.toLowerCase();
+
+  if (
+    fingerprint.includes('medlemssystem') ||
+    fingerprint.includes('membership') ||
+    fingerprint.includes('fullstack') ||
+    fingerprint.includes('systemarkitekt') ||
+    fingerprint.includes('system architect')
+  ) {
+    return `${title} – ${labels.membership}`;
+  }
+
+  if (
+    fingerprint.includes('automation') ||
+    fingerprint.includes('n8n') ||
+    fingerprint.includes('crm') ||
+    fingerprint.includes('integration') ||
+    fingerprint.includes('integrering')
+  ) {
+    return `${title} – ${labels.automation}`;
+  }
+
+  if (
+    fingerprint.includes('growth engineer') ||
+    fingerprint.includes('konvertering') ||
+    fingerprint.includes('conversion')
+  ) {
+    return `${title} – ${labels.webProject}`;
+  }
+
+  return `${title} – ${labels.website}`;
 };
 
 export const isKnownLocalizedPath = (pathname: string): boolean => {
