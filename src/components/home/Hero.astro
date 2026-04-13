@@ -1,12 +1,13 @@
-﻿---
+---
+import { cvPdfHref, getProfilePaths } from '../../lib/profile';
+
 interface Props {
   lang?: 'sv' | 'en';
 }
 
 const { lang = 'sv' } = Astro.props;
 const isEn = lang === 'en';
-const projectsHref = isEn ? '/en/projects' : '/projekt';
-const aboutHref = isEn ? '/en/about' : '/om';
+const paths = getProfilePaths(lang);
 ---
 
 <section class="band band--mesh overflow-hidden" aria-labelledby="hero-title">
@@ -32,25 +33,39 @@ const aboutHref = isEn ? '/en/about' : '/om';
     <p class="reveal-block reveal-delay-2 mx-auto mt-7 max-w-[46rem] text-lg leading-relaxed text-neutral-300 sm:text-xl">
       {
         isEn
-          ? 'I have worked hands-on since 2003 in specialist, lead, and founder roles. Alongside IT work, I am also training as a professional truck driver. This portfolio shows how I turn strategy into shipped systems that perform over time.'
-          : 'Sedan 2003 har jag arbetat hands-on i roller som specialist, lead och grundare. Parallellt med IT arbetar jag också med utbildning till yrkesförare för lastbil. Den här portfolion visar hur jag går från strategi till leverans av system som håller över tid.'
+          ? 'Since 2003 I have worked hands-on in roles such as specialist, lead, product-oriented developer, and founder. This portfolio shows how I move from analysis and strategy to implementation, release, and continued improvement of solutions that hold up over time.'
+          : 'Sedan 2003 har jag arbetat hands-on i roller som specialist, lead, produktnära utvecklare och grundare. Den här portfolion visar hur jag går från analys och strategi till implementation, release och vidare förbättring av lösningar som håller över tid.'
       }
     </p>
 
     <div class="reveal-block reveal-delay-3 mt-9 flex flex-wrap justify-center gap-3">
       <a
-        href={aboutHref}
+        href={paths.about}
         class="btn-primary px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
       >
         {isEn ? 'Read profile' : 'Läs mer om mig'}
       </a>
       <a
-        href={projectsHref}
+        href={paths.projects}
         class="btn-secondary px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
       >
         {isEn ? 'View projects' : 'Se projekt'}
       </a>
+      <a
+        href={cvPdfHref}
+        class="btn-secondary px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+      >
+        {isEn ? 'Download CV (PDF)' : 'Ladda ner CV (PDF)'}
+      </a>
     </div>
+
+    <p class="mx-auto mt-5 max-w-[46rem] text-sm text-neutral-400">
+      {isEn ? 'Looking for my transport and professional driver profile?' : 'Söker du min profil för transport/yrkesförarroller?'}{' '}
+      <a href={paths.transport} class="font-semibold text-cyan-300 transition hover:text-cyan-200">
+        {isEn ? 'View it here' : 'Se den här'}
+      </a>
+      .
+    </p>
 
     <ul class="mx-auto mt-9 grid max-w-[56rem] gap-3 text-sm text-neutral-200 sm:grid-cols-2 lg:grid-cols-4" aria-label={isEn ? 'Capability highlights' : 'Kompetenshöjdpunkter'}>
       <li class="pill-chip reveal-card px-4 py-3">Technical SEO / AEO</li>
@@ -63,14 +78,14 @@ const aboutHref = isEn ? '/en/about' : '/om';
       <span class="font-semibold text-neutral-200">{isEn ? 'Now:' : 'Nu:'}</span>
       {
         isEn
-          ? ' Building AI-assisted SEO workflows, release-ready automation, and high-performance interfaces, while completing professional driver training.'
-          : ' Bygger AI-stödda SEO-flöden, releaseklara automationer och högpresterande gränssnitt, samtidigt som jag utbildar mig till yrkesförare.'
+          ? ' Building AI-assisted SEO workflows, release-ready automation, and high-performance interfaces with focus on sustainable delivery, clear structure, and measurable impact.'
+          : ' Bygger AI-stödda SEO-flöden, releaseklara automationer och högpresterande gränssnitt med fokus på hållbar leverans, tydlig struktur och mätbar effekt.'
       }
     </p>
 
     <p class="mx-auto mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-300/10 px-4 py-2 text-xs font-semibold tracking-[0.04em] text-emerald-200">
       <span class="h-1.5 w-1.5 rounded-full bg-emerald-300" aria-hidden="true"></span>
-      {isEn ? 'Open to IT and professional driving roles' : 'Öppen för IT-roller och jobb som yrkesförare'}
+      {isEn ? 'Available for roles in SEO, web engineering, growth, and automation' : 'Tillgänglig för roller inom SEO, webbutveckling, growth och automation.'}
     </p>
   </div>
 </section>

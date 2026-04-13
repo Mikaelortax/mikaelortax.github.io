@@ -1,0 +1,195 @@
+---
+import { getProfilePaths, transportEducation, transportQualifications } from '../../lib/profile';
+
+interface Props {
+  lang?: 'sv' | 'en';
+}
+
+const { lang = 'sv' } = Astro.props;
+const isEn = lang === 'en';
+const paths = getProfilePaths(lang);
+const contactEmail = 'joha.micke@gmail.com';
+const mailSubject = isEn ? 'Professional driver role' : 'Roll inom transport eller yrkeskörning';
+const mailHref = `mailto:${contactEmail}?subject=${encodeURIComponent(mailSubject)}`;
+const qualifications = transportQualifications[lang];
+const education = transportEducation[lang];
+
+const content = isEn
+  ? {
+      kicker: 'Transport profile',
+      title: 'Professional driver with completed training and focus on responsibility, safety, and stable delivery.',
+      intro:
+        'I have completed professional truck driver training and I am open to roles in transport, driving, and operational delivery. This page collects relevant information for employers looking for a serious and dependable driver.',
+      aboutTitle: 'About me',
+      aboutText:
+        'Alongside my background in IT and structure-driven work, I have also completed professional truck driver training. It has given me practical and safety-oriented competence that complements my habit of working with responsibility, clarity, and routines.',
+      strengths: [
+        'Completed professional truck driver training with practical modules in safety and heavy vehicle handling',
+        'Structured working style with focus on responsibility, routines, and predictable delivery',
+        'Used to working independently while staying clear in communication and follow-through',
+      ],
+      qualificationsKicker: 'Licenses and qualifications',
+      qualificationsTitle: 'Relevant qualifications for transport roles',
+      qualificationsLead:
+        'Information that is directly relevant for employers looking for a professional driver profile.',
+      educationKicker: 'Education',
+      educationTitle: 'Completed transport training',
+      ctaKicker: 'Contact',
+      ctaTitle: 'Looking for a serious and responsible driver?',
+      ctaText:
+        'Get in touch if you want to discuss a driving role, transport work, or an operational delivery position.',
+      contactLabel: 'Open contact page',
+      emailLabel: 'Send email',
+      switchText: 'Looking for my IT profile for SEO, web engineering, automation, and digital growth?',
+      switchLabel: 'View it here',
+    }
+  : {
+      kicker: 'Transportprofil',
+      title: 'Yrkesförare med genomförd utbildning och fokus på ansvar, säkerhet och stabil leverans.',
+      intro:
+        'Jag har genomfört yrkesförarutbildning för lastbil och är öppen för roller inom transport, körning och operativ leverans. Här samlar jag relevant information för arbetsgivare som söker en seriös och ansvarstagande förare.',
+      aboutTitle: 'Kort om mig',
+      aboutText:
+        'Utöver min bakgrund inom IT och strukturdrivet arbete har jag även genomfört yrkesförarutbildning för lastbil. Det har gett mig en praktisk och säkerhetsorienterad kompetens som kompletterar min vana att arbeta med ansvar, tydlighet och rutiner.',
+      strengths: [
+        'Genomförd yrkesförarutbildning med praktiska moment inom säkerhet och tung körning',
+        'Strukturerat arbetssätt med fokus på ansvar, rutiner och stabil leverans',
+        'Van att arbeta självständigt med tydlig kommunikation och pålitlig uppföljning',
+      ],
+      qualificationsKicker: 'Behörigheter och certifikat',
+      qualificationsTitle: 'Relevant information för transportroller',
+      qualificationsLead:
+        'Samlad information som är direkt relevant för arbetsgivare inom transport, körning och operativ leverans.',
+      educationKicker: 'Utbildning',
+      educationTitle: 'Genomförd transportutbildning',
+      ctaKicker: 'Kontakt',
+      ctaTitle: 'Söker du en seriös och ansvarstagande förare?',
+      ctaText:
+        'Hör av dig om du vill diskutera en roll inom transport, körning eller operativ leverans.',
+      contactLabel: 'Öppna kontaktsidan',
+      emailLabel: 'Skicka e-post',
+      switchText: 'Söker du min IT-profil för SEO, webbutveckling, automation och digital tillväxt?',
+      switchLabel: 'Se den här',
+    };
+---
+
+<div class="home-shell">
+  <section class="band band--mesh overflow-hidden" aria-labelledby="transport-hero-title">
+    <div class="hero-content">
+      <p class="section-kicker reveal-block">{content.kicker}</p>
+      <h1
+        id="transport-hero-title"
+        class="reveal-block reveal-delay-1 mx-auto mt-6 max-w-[58rem] text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl"
+      >
+        {content.title}
+      </h1>
+      <p class="reveal-block reveal-delay-2 mx-auto mt-7 max-w-[48rem] text-lg leading-relaxed text-neutral-300 sm:text-xl">
+        {content.intro}
+      </p>
+
+      <div class="reveal-block reveal-delay-3 mt-9 flex flex-wrap justify-center gap-3">
+        <a
+          href={paths.contact}
+          class="btn-primary px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+        >
+          {content.contactLabel}
+        </a>
+        <a
+          href={mailHref}
+          class="btn-secondary px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+        >
+          {content.emailLabel}
+        </a>
+      </div>
+
+      <p class="mx-auto mt-8 max-w-[48rem] text-sm text-neutral-400">
+        {content.switchText}{' '}
+        <a href={paths.itDirect} class="font-semibold text-cyan-300 transition hover:text-cyan-200">
+          {content.switchLabel}
+        </a>
+        .
+      </p>
+    </div>
+  </section>
+
+  <section class="band band--surface" aria-labelledby="transport-about-title">
+    <header class="section-head reveal-block">
+      <p class="section-kicker">{content.kicker}</p>
+      <h2 id="transport-about-title" class="section-title">{content.aboutTitle}</h2>
+      <p class="section-lead">{content.aboutText}</p>
+    </header>
+
+    <div class="mt-10 grid gap-5 md:grid-cols-3">
+      {content.strengths.map((item, index) => (
+        <article class="ui-card ui-card--interactive reveal-card p-6 text-left" tabindex="0">
+          <h3 class="text-lg font-semibold text-white">{isEn ? `Strength ${String(index + 1).padStart(2, '0')}` : `Styrka ${String(index + 1).padStart(2, '0')}`}</h3>
+          <p class="mt-3 text-sm text-neutral-300">{item}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="band band--surface" aria-labelledby="transport-qualifications-title">
+    <header class="section-head reveal-block">
+      <p class="section-kicker">{content.qualificationsKicker}</p>
+      <h2 id="transport-qualifications-title" class="section-title">{content.qualificationsTitle}</h2>
+      <p class="section-lead">{content.qualificationsLead}</p>
+    </header>
+
+    <div class="mt-10 grid gap-4 md:grid-cols-2">
+      {qualifications.map((item) => (
+        <article class="ui-card ui-card--interactive reveal-card p-5 text-left" tabindex="0">
+          <p class="text-xs font-semibold tracking-[0.16em] text-cyan-300">{item.label}</p>
+          <p class="mt-2 text-base font-semibold text-white">{item.value}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="band band--mesh" aria-labelledby="transport-education-title">
+    <header class="section-head reveal-block">
+      <p class="section-kicker">{content.educationKicker}</p>
+      <h2 id="transport-education-title" class="section-title">{content.educationTitle}</h2>
+    </header>
+
+    <div class="mt-10 grid gap-5">
+      {education.map((item) => (
+        <article class="ui-card ui-card--interactive reveal-card p-6 text-left" tabindex="0">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <h3 class="text-xl font-semibold text-white">{item.title}</h3>
+            <p class="text-xs font-semibold tracking-[0.16em] text-cyan-300">{item.period}</p>
+          </div>
+          <p class="mt-2 text-sm text-neutral-300">{item.school}</p>
+          <ul class="mt-4 grid gap-2 md:grid-cols-2">
+            {item.details.map((detail) => (
+              <li class="rounded-xl border border-white/10 bg-white/[0.02] px-4 py-2 text-sm text-neutral-200">{detail}</li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="band band--surface seam-top" aria-labelledby="transport-contact-title">
+    <header class="section-head reveal-block">
+      <p class="section-kicker">{content.ctaKicker}</p>
+      <h2 id="transport-contact-title" class="section-title">{content.ctaTitle}</h2>
+      <p class="section-lead">{content.ctaText}</p>
+    </header>
+
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <a
+        href={paths.contact}
+        class="btn-primary px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+      >
+        {content.contactLabel}
+      </a>
+      <a
+        href={mailHref}
+        class="btn-secondary px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+      >
+        {contactEmail}
+      </a>
+    </div>
+  </section>
+</div>

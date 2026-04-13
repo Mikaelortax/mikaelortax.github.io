@@ -29,6 +29,8 @@ const hasEnPrefix = (pathname: string): boolean => /^\/en(?:\/|$)/.test(pathname
 
 const svToEnExact: Record<string, string> = {
   '/': '/en',
+  '/it': '/en/it',
+  '/yrkesforare': '/en/professional-driver',
   '/projekt': '/en/projects',
   '/kompetens': '/en/capabilities',
   '/om': '/en/about',

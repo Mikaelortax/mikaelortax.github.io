@@ -1,11 +1,13 @@
 ---
+import { getProfilePaths } from '../../lib/profile';
+
 interface Props {
   lang?: 'sv' | 'en';
 }
 
 const { lang = 'sv' } = Astro.props;
 const isEn = lang === 'en';
-const contactHref = isEn ? '/en/contact' : '/kontakt';
+const paths = getProfilePaths(lang);
 const linkedInHref = 'https://www.linkedin.com/in/mikael-johansson-5084515b/';
 ---
 
@@ -16,15 +18,15 @@ const linkedInHref = 'https://www.linkedin.com/in/mikael-johansson-5084515b/';
     <p class="section-lead">
       {
         isEn
-          ? 'Get in touch if you want to discuss an IT project, an employment role, or opportunities in professional driving.'
-          : 'Hör av dig om du vill diskutera IT-projekt, anställning eller möjligheter inom yrkeskörning.'
+          ? 'Get in touch if you want to discuss an IT role, a project, or a delivery setup across SEO, web engineering, automation, and growth.'
+          : 'Hör av dig om du vill diskutera en IT-roll, ett projekt eller en leverans inom SEO, webbutveckling, automation och digital tillväxt.'
       }
     </p>
   </header>
 
   <div class="mt-8 flex flex-wrap justify-center gap-3">
     <a
-      href={contactHref}
+      href={paths.contact}
       class="btn-primary px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
     >
       {isEn ? 'Open contact page' : 'Öppna kontaktsidan'}
@@ -39,5 +41,13 @@ const linkedInHref = 'https://www.linkedin.com/in/mikael-johansson-5084515b/';
 
   <p class="mt-4 text-sm text-neutral-400">
     {isEn ? 'Typical response time: 1-2 business days.' : 'Jag svarar normalt inom 1-2 arbetsdagar med ett tydligt nästa steg.'}
+  </p>
+
+  <p class="mt-3 text-sm text-neutral-400">
+    {isEn ? 'Looking for my transport and professional driver profile?' : 'Söker du min profil för transport/yrkesförarroller?'}{' '}
+    <a href={paths.transport} class="font-semibold text-cyan-300 transition hover:text-cyan-200">
+      {isEn ? 'View it here' : 'Se den här'}
+    </a>
+    .
   </p>
 </section>

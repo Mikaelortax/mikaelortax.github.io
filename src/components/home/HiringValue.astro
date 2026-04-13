@@ -1,0 +1,49 @@
+---
+interface Props {
+  lang?: 'sv' | 'en';
+}
+
+const { lang = 'sv' } = Astro.props;
+const isEn = lang === 'en';
+
+const content = isEn
+  ? {
+      kicker: 'Hiring value',
+      title: 'What you get when you hire me',
+      text:
+        'I combine technical SEO, web engineering, and automation in the same delivery. That means I can move from analysis and prioritization to implementation and improvement without long handoffs between separate roles. The result is better pace, clearer structure, and solutions that work in practice.',
+      points: [
+        'Cross-functional delivery across SEO, structure, code, and automation',
+        'Shorter path from decision to release-ready implementation',
+        'Continuous improvement built into the delivery model',
+      ],
+    }
+  : {
+      kicker: 'Värde i praktiken',
+      title: 'Det här får du när du anställer mig',
+      text:
+        'Jag kombinerar teknisk SEO, webbutveckling och automation i samma leverans. Det gör att jag kan gå från analys och prioritering till implementation och förbättring utan långa handoffs mellan flera roller. Resultatet blir högre tempo, tydligare struktur och lösningar som fungerar i praktiken.',
+      points: [
+        'Tvärfunktionell leverans mellan SEO, struktur, kod och automation',
+        'Kortare väg från beslut till releaseklar implementation',
+        'Löpande förbättring som en del av själva leveransen',
+      ],
+    };
+---
+
+<section class="band band--surface" aria-labelledby="hiring-value-title">
+  <header class="section-head reveal-block">
+    <p class="section-kicker">{content.kicker}</p>
+    <h2 id="hiring-value-title" class="section-title">{content.title}</h2>
+  </header>
+
+  <article class="ui-card ui-card--interactive reveal-card mt-10 p-7 text-left" tabindex="0">
+    <p class="max-w-4xl text-base leading-relaxed text-neutral-200">{content.text}</p>
+
+    <ul class="mt-6 grid gap-4 md:grid-cols-3" aria-label={isEn ? 'Hiring value highlights' : 'Värde i praktiken'}>
+      {content.points.map((point) => (
+        <li class="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 text-sm text-neutral-200">{point}</li>
+      ))}
+    </ul>
+  </article>
+</section>

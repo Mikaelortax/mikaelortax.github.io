@@ -1,17 +1,18 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { cvPdfHref, getProfilePaths } from '../../../lib/profile';
 
 const contactEmail = 'joha.micke@gmail.com';
 const linkedInHref = 'https://www.linkedin.com/in/mikael-johansson-5084515b/';
 const primaryMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('Portfolio inquiry')}&body=${encodeURIComponent('Hi Mikael,%0D%0A%0D%0ABrief context:%0D%0A')}`;
 const projectMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('Project inquiry')}`;
 const roleMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('IT role or collaboration')}`;
-const transportRoleMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('Professional driver role')}`;
+const paths = getProfilePaths('en');
 ---
 
 <BaseLayout
   title="Contact | Mikael Johansson"
-  description="Contact details and clear next steps for IT roles, professional driving roles, projects, or collaboration."
+  description="Contact details and clear next steps for IT roles, projects, or collaboration, with a separate link to the transport profile."
   lang="en"
 >
   <section class="band band--surface" aria-labelledby="contact-title">
@@ -19,7 +20,11 @@ const transportRoleMailHref = `mailto:${contactEmail}?subject=${encodeURICompone
       <p class="section-kicker">Contact</p>
       <h1 id="contact-title" class="section-title">Reach out with a clear next step</h1>
       <p class="section-lead">
-        Share your setup, goal, and timeline. I will reply with a practical recommendation for IT delivery or professional driving work.
+        Share your setup, goal, and timeline. I will reply with a practical next step for SEO, web engineering, automation, or digital growth.
+      </p>
+      <p class="mt-4 text-sm text-neutral-400">
+        Looking for my transport or professional driver profile?{' '}
+        <a href={paths.transport} class="font-semibold text-cyan-300 transition hover:text-cyan-200">View it here</a>.
       </p>
     </div>
 
@@ -56,11 +61,11 @@ const transportRoleMailHref = `mailto:${contactEmail}?subject=${encodeURICompone
           <a href={roleMailHref} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
             IT role or collaboration
           </a>
-          <a href={transportRoleMailHref} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
-            Professional driver role
+          <a href={paths.transport} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
+            Professional driver profile
           </a>
-          <a href="/en/cv" class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
-            View CV
+          <a href={cvPdfHref} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
+            Download CV (PDF)
           </a>
           <a href={linkedInHref} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
             LinkedIn profile
@@ -78,12 +83,14 @@ const transportRoleMailHref = `mailto:${contactEmail}?subject=${encodeURICompone
       <article class="ui-card reveal-card p-5 text-left">
         <p class="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">02</p>
         <h3 class="mt-2 text-base font-semibold text-white">Ongoing technical ownership</h3>
-        <p class="mt-2 text-sm text-neutral-300">Priority-driven implementation in short cycles with clear accountability.</p>
+        <p class="mt-2 text-sm text-neutral-300">Priority-driven implementation with clear release steps and follow-through.</p>
       </article>
       <article class="ui-card reveal-card p-5 text-left">
         <p class="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">03</p>
-        <h3 class="mt-2 text-base font-semibold text-white">Professional driving and transport</h3>
-        <p class="mt-2 text-sm text-neutral-300">Available for professional driver roles with focus on safety, responsibility, and structure.</p>
+        <h3 class="mt-2 text-base font-semibold text-white">Separate transport profile</h3>
+        <p class="mt-2 text-sm text-neutral-300">
+          For transport and professional driving roles I now keep a separate profile page to keep the message clear.
+        </p>
       </article>
     </div>
   </section>

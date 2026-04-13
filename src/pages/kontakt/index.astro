@@ -1,17 +1,18 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { cvPdfHref, getProfilePaths } from '../../lib/profile';
 
 const contactEmail = 'joha.micke@gmail.com';
 const linkedInHref = 'https://www.linkedin.com/in/mikael-johansson-5084515b/';
 const primaryMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('Förfrågan från portfolio')}&body=${encodeURIComponent('Hej Mikael,%0D%0A%0D%0AKort bakgrund:%0D%0A')}`;
 const projectMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('Projektförfrågan')}`;
-const roleMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('Roll eller samarbete')}`;
-const transportRoleMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('Tjänst som yrkesförare')}`;
+const roleMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('IT-roll eller samarbete')}`;
+const paths = getProfilePaths('sv');
 ---
 
 <BaseLayout
   title="Kontakt | Mikael Johansson"
-  description="Kontaktinformation och tydliga nästa steg för IT-roller, yrkesförarroller, projekt eller samarbete."
+  description="Kontaktinformation och tydliga nästa steg för IT-roller, projekt eller samarbete, med separat länk till transportprofilen."
   lang="sv"
 >
   <section class="band band--surface" aria-labelledby="kontakt-title">
@@ -19,7 +20,11 @@ const transportRoleMailHref = `mailto:${contactEmail}?subject=${encodeURICompone
       <p class="section-kicker">Kontakt</p>
       <h1 id="kontakt-title" class="section-title">Ta kontakt med ett tydligt nästa steg</h1>
       <p class="section-lead">
-        Beskriv kort nuläge, mål och tidplan. Jag svarar med en konkret rekommendation för IT-leverans eller yrkesföraruppdrag.
+        Beskriv kort nuläge, mål och tidplan. Jag svarar med ett konkret nästa steg för SEO, webbutveckling, automation eller digital tillväxt.
+      </p>
+      <p class="mt-4 text-sm text-neutral-400">
+        Söker du min profil för transport eller yrkesförarroller?{' '}
+        <a href={paths.transport} class="font-semibold text-cyan-300 transition hover:text-cyan-200">Se den här</a>.
       </p>
     </div>
 
@@ -58,11 +63,11 @@ const transportRoleMailHref = `mailto:${contactEmail}?subject=${encodeURICompone
           <a href={roleMailHref} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
             IT-roll eller samarbete
           </a>
-          <a href={transportRoleMailHref} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
-            Yrkesföraruppdrag
+          <a href={paths.transport} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
+            Yrkesförarprofil
           </a>
-          <a href="/sv/cv" class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
-            Se CV
+          <a href={cvPdfHref} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
+            Ladda ner CV (PDF)
           </a>
           <a href={linkedInHref} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
             LinkedIn-profil
@@ -80,12 +85,14 @@ const transportRoleMailHref = `mailto:${contactEmail}?subject=${encodeURICompone
       <article class="ui-card reveal-card p-5 text-left">
         <p class="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">02</p>
         <h3 class="mt-2 text-base font-semibold text-white">Löpande tekniskt ansvar</h3>
-        <p class="mt-2 text-sm text-neutral-300">Förbättringar i sprintar med tydliga prioriteringar och uppföljning.</p>
+        <p class="mt-2 text-sm text-neutral-300">Förbättringar i sprintar med tydliga prioriteringar, implementation och uppföljning.</p>
       </article>
       <article class="ui-card reveal-card p-5 text-left">
         <p class="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">03</p>
-        <h3 class="mt-2 text-base font-semibold text-white">Yrkesförare och transport</h3>
-        <p class="mt-2 text-sm text-neutral-300">Tillgänglig för roller som yrkesförare med fokus på säkerhet, ansvar och struktur.</p>
+        <h3 class="mt-2 text-base font-semibold text-white">Separat transportprofil</h3>
+        <p class="mt-2 text-sm text-neutral-300">
+          För transport- och yrkesförarroller har jag nu en separat profilsida för att hålla budskapet tydligt.
+        </p>
       </article>
     </div>
   </section>

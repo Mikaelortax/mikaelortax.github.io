@@ -1,17 +1,20 @@
-﻿---
+---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { cvPdfHref, getProfilePaths } from '../../lib/profile';
+
+const paths = getProfilePaths('sv');
 
 const profileHighlights = [
   { label: 'Erfarenhet', value: '20+ år', text: 'SEO, webbutveckling och digital tillväxt sedan 2003.' },
-  { label: 'Rollbredd', value: 'Specialist → Chef', text: 'Från operativ implementation till ledning och byrådrift.' },
-  { label: 'Parallell kompetens', value: 'Yrkesförare under utbildning', text: 'Bygger transportkompetens med C-behörighet, säkerhetsmoment och truckbehörigheter.' },
+  { label: 'Leveransmodell', value: 'Analys -> Release', text: 'Kombinerar analys, implementation, release och förbättring i samma arbetsflöde.' },
+  { label: 'Tillgänglighet', value: 'IT-först', text: 'Öppen för roller inom SEO, webbutveckling, automation och digital tillväxt.' },
 ];
 
 const keyStrengths = [
   'Teknisk SEO med tydlig koppling till affärsresultat',
   'Produktnära webbutveckling med hög prestanda och ren struktur',
   'Automation av arbetsflöden mellan formulär, CRM, inbox och team',
-  'Yrkesförarkompetens i utveckling med fokus på säker tung körning och operativt ansvar',
+  'Tvärfunktionell leverans mellan teknik, struktur, SEO och automation',
   'AI-stödd produktion för snabbare iteration och kvalitetssäkring',
   'Stabil leveransmodell från analys till release och uppföljning',
 ];
@@ -48,46 +51,14 @@ const recentExperience = [
 ];
 
 const earlierExperience = [
-  {
-    role: 'Gymnasielärare i yrkesämnen',
-    company: 'Thorén Innovation School',
-    period: 'Feb 2021 - Sep 2021',
-  },
-  {
-    role: 'Frilansande E-commerce Director',
-    company: 'Green Little Heart',
-    period: 'Maj 2020 - Apr 2021',
-  },
-  {
-    role: 'Webbansvarig',
-    company: 'VVS I SYD AB',
-    period: 'Mar 2019 - Aug 2019',
-  },
-  {
-    role: 'SEO/SEM Ansvarig',
-    company: 'Nilson Group AB',
-    period: 'Sep 2017 - Aug 2018',
-  },
-  {
-    role: 'Produktägare / SEO Specialist',
-    company: 'NA-KD',
-    period: 'Aug 2016 - Feb 2017',
-  },
-  {
-    role: 'VD / Utvecklare / Delägare',
-    company: 'E-komet AB',
-    period: 'Maj 2015 - Maj 2016',
-  },
-  {
-    role: 'SEO-Specialist',
-    company: 'DoubleSearch AB',
-    period: 'Aug 2014 - Apr 2015',
-  },
-  {
-    role: 'Grundare',
-    company: 'Mijo Media',
-    period: 'Nov 2012 - Maj 2016',
-  },
+  { role: 'Gymnasielärare i yrkesämnen', company: 'Thorén Innovation School', period: 'Feb 2021 - Sep 2021' },
+  { role: 'Frilansande E-commerce Director', company: 'Green Little Heart', period: 'Maj 2020 - Apr 2021' },
+  { role: 'Webbansvarig', company: 'VVS I SYD AB', period: 'Mar 2019 - Aug 2019' },
+  { role: 'SEO/SEM Ansvarig', company: 'Nilson Group AB', period: 'Sep 2017 - Aug 2018' },
+  { role: 'Produktägare / SEO Specialist', company: 'NA-KD', period: 'Aug 2016 - Feb 2017' },
+  { role: 'VD / Utvecklare / Delägare', company: 'E-komet AB', period: 'Maj 2015 - Maj 2016' },
+  { role: 'SEO-Specialist', company: 'DoubleSearch AB', period: 'Aug 2014 - Apr 2015' },
+  { role: 'Grundare', company: 'Mijo Media', period: 'Nov 2012 - Maj 2016' },
 ];
 
 const certifications = [
@@ -100,26 +71,7 @@ const certifications = [
   'HubSpot Content Marketing Certification',
 ];
 
-const transportQualifications = [
-  { label: 'Körkort', value: 'B och C' },
-  { label: 'Arbete På Väg', value: '1.1, 1.2, 1.3' },
-  { label: 'Truckkort', value: 'A2, A2, A4, B1, D' },
-  { label: 'ADR', value: 'Grund och explosivt' },
-];
-
 const education = [
-  {
-    title: 'Yrkesförarutbildning',
-    school: 'Transportutbildning',
-    period: 'September 2025 - Nu',
-    details: [
-      'Lastsäkring',
-      'YKB',
-      'C-behörighet',
-      'Truckbehörigheter',
-      'Praktiska moment inom säker transport och yrkeskörning',
-    ],
-  },
   {
     title: 'Medieteknik (inriktning interaktiva system)',
     school: 'Blekinge Tekniska Högskola, Karlshamn',
@@ -134,11 +86,7 @@ const education = [
     title: 'IT-Media',
     school: 'Johnbauer Gymnasiet, Karlshamn',
     period: '1 Sep 2005 - 15 Juni 2008',
-    details: [
-      'Grundkurser inom mediebranschen',
-      'Mediekommunikation',
-      'Mediekunskap',
-    ],
+    details: ['Grundkurser inom mediebranschen', 'Mediekommunikation', 'Mediekunskap'],
   },
 ];
 
@@ -153,18 +101,35 @@ const skills = {
 
 <BaseLayout
   title="CV | Mikael Johansson"
-  description="CV med erfarenhet, kärnkompetenser, teknisk profil och certifieringar inom SEO, webbutveckling och automation."
+  description="IT-fokuserat CV med erfarenhet, kärnkompetenser, teknisk profil och certifieringar inom SEO, webbutveckling och automation."
   lang="sv"
 >
   <div class="home-shell">
     <section class="band band--mesh" aria-labelledby="cv-title">
       <header class="section-head reveal-block">
-        <p class="section-kicker">CV / Profil</p>
+        <p class="section-kicker">CV / IT-profil</p>
         <h1 id="cv-title" class="section-title">Mikael Johansson - SEO, webbutveckling och automation</h1>
         <p class="section-lead">
-          Ett koncentrerat men komplett CV som visar både min IT-profil och min pågående kompetensutveckling mot yrkesförare för lastbil.
+          Ett IT-fokuserat CV som visar hur jag arbetar från analys och prioritering till implementation, release och vidare förbättring.
         </p>
       </header>
+
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a
+          href={paths.contact}
+          class="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+        >
+          Kontakta mig
+          <span aria-hidden="true">-&gt;</span>
+        </a>
+        <a
+          href={cvPdfHref}
+          class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+        >
+          Ladda ner CV (PDF)
+          <span aria-hidden="true">-&gt;</span>
+        </a>
+      </div>
 
       <div class="mt-10 grid gap-5 md:grid-cols-3">
         {profileHighlights.map((item) => (
@@ -268,46 +233,12 @@ const skills = {
           <li class="ui-card ui-card--interactive reveal-card p-5 text-left text-sm text-neutral-200" tabindex="0">{item}</li>
         ))}
       </ul>
-
-      <div class="mt-10 flex flex-wrap justify-center gap-3">
-        <a
-          href="/kontakt"
-          class="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-        >
-          Kontakta mig
-          <span aria-hidden="true">-&gt;</span>
-        </a>
-        <a
-          href="/projekt"
-          class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-        >
-          Se projekt
-          <span aria-hidden="true">-&gt;</span>
-        </a>
-      </div>
-    </section>
-
-    <section class="band band--mesh" aria-labelledby="transport-title">
-      <header class="section-head reveal-block">
-        <p class="section-kicker">Transport & behörigheter</p>
-        <h2 id="transport-title" class="section-title">Körkort och certifikat</h2>
-        <p class="section-lead">Kompletterande kvalifikationer för roller inom transport, logistik och yrkeskörning.</p>
-      </header>
-
-      <div class="mt-10 grid gap-4 md:grid-cols-2">
-        {transportQualifications.map((item) => (
-          <article class="ui-card ui-card--interactive reveal-card p-5 text-left" tabindex="0">
-            <p class="text-xs font-semibold tracking-[0.16em] text-cyan-300">{item.label}</p>
-            <p class="mt-2 text-base font-semibold text-white">{item.value}</p>
-          </article>
-        ))}
-      </div>
     </section>
 
     <section class="band band--surface" aria-labelledby="education-title">
       <header class="section-head reveal-block">
         <p class="section-kicker">Utbildning</p>
-        <h2 id="education-title" class="section-title">Aktuell utbildning</h2>
+        <h2 id="education-title" class="section-title">Utbildning och teknisk grund</h2>
       </header>
 
       <div class="mt-10 grid gap-5">
@@ -325,6 +256,33 @@ const skills = {
             </ul>
           </article>
         ))}
+      </div>
+    </section>
+
+    <section class="band band--dot" aria-labelledby="transport-profile-title">
+      <header class="section-head reveal-block">
+        <p class="section-kicker">Separat profil</p>
+        <h2 id="transport-profile-title" class="section-title">Söker du min transportprofil?</h2>
+        <p class="section-lead">
+          Yrkesförarprofilen ligger nu separat för att hålla detta CV tydligt IT-fokuserat.
+        </p>
+      </header>
+
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a
+          href={paths.transport}
+          class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+        >
+          Öppna yrkesförarsidan
+          <span aria-hidden="true">-&gt;</span>
+        </a>
+        <a
+          href={paths.projects}
+          class="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+        >
+          Se projekt
+          <span aria-hidden="true">-&gt;</span>
+        </a>
       </div>
     </section>
   </div>
