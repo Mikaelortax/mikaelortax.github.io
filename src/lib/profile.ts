@@ -2,8 +2,19 @@ import type { Locale } from './i18n';
 
 export type SiteProfile = 'it' | 'transport';
 
-// TODO: Add the actual PDF file at `public/documents/mikael-johansson-cv.pdf`.
-export const cvPdfHref = '/documents/mikael-johansson-cv.pdf';
+export const cvPdfPaths: Record<Locale, string> = {
+  sv: '/documents/mikael-johansson-cv-sv.pdf',
+  en: '/documents/mikael-johansson-cv-en.pdf',
+};
+
+export const getCvPdfHref = (lang: Locale) => cvPdfPaths[lang];
+
+export const getCvPdfLinkProps = (lang: Locale) =>
+  ({
+    href: getCvPdfHref(lang),
+    target: '_blank',
+    rel: 'noopener noreferrer',
+  }) as const;
 
 export const profilePaths = {
   sv: {

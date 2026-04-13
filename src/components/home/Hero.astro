@@ -1,5 +1,5 @@
 ---
-import { cvPdfHref, getProfilePaths } from '../../lib/profile';
+import { getCvPdfLinkProps, getProfilePaths } from '../../lib/profile';
 
 interface Props {
   lang?: 'sv' | 'en';
@@ -8,6 +8,7 @@ interface Props {
 const { lang = 'sv' } = Astro.props;
 const isEn = lang === 'en';
 const paths = getProfilePaths(lang);
+const cvPdfLinkProps = getCvPdfLinkProps(lang);
 ---
 
 <section class="band band--mesh overflow-hidden" aria-labelledby="hero-title">
@@ -52,10 +53,10 @@ const paths = getProfilePaths(lang);
         {isEn ? 'View projects' : 'Se projekt'}
       </a>
       <a
-        href={cvPdfHref}
+        {...cvPdfLinkProps}
         class="btn-secondary px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
       >
-        {isEn ? 'Download CV (PDF)' : 'Ladda ner CV (PDF)'}
+        {isEn ? 'Download CV' : 'Ladda ner CV'}
       </a>
     </div>
 

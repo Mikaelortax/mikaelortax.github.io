@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import { buildI18nSeo } from '../lib/seo';
-import { cvPdfHref, getCrossProfileHref, getProfilePaths, type SiteProfile } from '../lib/profile';
+import { getCrossProfileHref, getCvPdfLinkProps, getProfilePaths, type SiteProfile } from '../lib/profile';
 
 interface Props {
   title: string;
@@ -29,6 +29,7 @@ const twitterCard = ogImageUrl ? 'summary_large_image' : 'summary';
 const linkedInHref = 'https://www.linkedin.com/in/mikael-johansson-5084515b/';
 const profilePaths = getProfilePaths(seo.lang);
 const crossProfileHref = getCrossProfileHref(seo.lang, profile);
+const cvPdfLinkProps = getCvPdfLinkProps(seo.lang);
 
 const availability =
   seo.lang === 'sv'
@@ -37,7 +38,7 @@ const availability =
           text: 'Öppen för roller inom transport, körning och operativ leverans.',
           contactHref: profilePaths.contact,
           contactLabel: 'Kontakta mig',
-          secondaryHref: profilePaths.itDirect,
+          secondaryLinkProps: { href: profilePaths.itDirect },
           secondaryLabel: 'Se IT-profil',
           footerText: 'Yrkesförarprofil med genomförd utbildning och fokus på ansvar, säkerhet och stabil leverans.',
           footerSwitchIntro: 'Söker du min IT-profil för SEO, webbutveckling och automation?',
@@ -47,8 +48,8 @@ const availability =
           text: 'Öppen för roller inom SEO, webbutveckling, automation och digital tillväxt.',
           contactHref: profilePaths.contact,
           contactLabel: 'Kontakta mig',
-          secondaryHref: cvPdfHref,
-          secondaryLabel: 'Ladda ner CV (PDF)',
+          secondaryLinkProps: cvPdfLinkProps,
+          secondaryLabel: 'Ladda ner CV',
           footerText: 'Primär IT-profil inom SEO, webbutveckling, automation och AI-stödda arbetsflöden.',
           footerSwitchIntro: 'Söker du min profil för transport/yrkesförarroller?',
           footerSwitchLabel: 'Se den här',
@@ -58,7 +59,7 @@ const availability =
           text: 'Open to roles in transport, driving, and operational delivery.',
           contactHref: profilePaths.contact,
           contactLabel: 'Contact me',
-          secondaryHref: profilePaths.itDirect,
+          secondaryLinkProps: { href: profilePaths.itDirect },
           secondaryLabel: 'View IT profile',
           footerText: 'Professional driver profile with completed training and focus on responsibility, safety, and stable delivery.',
           footerSwitchIntro: 'Looking for my IT profile for SEO, web engineering, and automation?',
@@ -68,8 +69,8 @@ const availability =
           text: 'Open to roles in SEO, web engineering, automation, and digital growth.',
           contactHref: profilePaths.contact,
           contactLabel: 'Contact me',
-          secondaryHref: cvPdfHref,
-          secondaryLabel: 'Download CV (PDF)',
+          secondaryLinkProps: cvPdfLinkProps,
+          secondaryLabel: 'Download CV',
           footerText: 'Primary IT profile across SEO, web engineering, automation, and AI-assisted workflows.',
           footerSwitchIntro: 'Looking for my transport and professional driver profile?',
           footerSwitchLabel: 'View it here',
@@ -120,7 +121,7 @@ const availability =
           <a class="availability-link availability-link--primary px-4 py-2 text-xs font-semibold" href={availability.contactHref}>
             {availability.contactLabel}
           </a>
-          <a class="availability-link px-4 py-2 text-xs font-semibold" href={availability.secondaryHref}>
+          <a class="availability-link px-4 py-2 text-xs font-semibold" {...availability.secondaryLinkProps}>
             {availability.secondaryLabel}
           </a>
         </div>

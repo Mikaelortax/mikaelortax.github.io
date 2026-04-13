@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { cvPdfHref, getProfilePaths } from '../../../lib/profile';
+import { getCvPdfLinkProps, getProfilePaths } from '../../../lib/profile';
 
 const contactEmail = 'joha.micke@gmail.com';
 const linkedInHref = 'https://www.linkedin.com/in/mikael-johansson-5084515b/';
@@ -8,6 +8,7 @@ const primaryMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('Po
 const projectMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('Project inquiry')}`;
 const roleMailHref = `mailto:${contactEmail}?subject=${encodeURIComponent('IT role or collaboration')}`;
 const paths = getProfilePaths('en');
+const cvPdfLinkProps = getCvPdfLinkProps('en');
 ---
 
 <BaseLayout
@@ -64,8 +65,8 @@ const paths = getProfilePaths('en');
           <a href={paths.transport} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
             Professional driver profile
           </a>
-          <a href={cvPdfHref} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
-            Download CV (PDF)
+          <a {...cvPdfLinkProps} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
+            Download CV
           </a>
           <a href={linkedInHref} class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-neutral-100 transition hover:border-white/30 hover:bg-white/10">
             LinkedIn profile

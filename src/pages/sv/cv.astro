@@ -1,8 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { cvPdfHref, getProfilePaths } from '../../lib/profile';
+import { getCvPdfLinkProps, getProfilePaths } from '../../lib/profile';
 
 const paths = getProfilePaths('sv');
+const cvPdfLinkProps = getCvPdfLinkProps('sv');
 
 const profileHighlights = [
   { label: 'Erfarenhet', value: '20+ år', text: 'SEO, webbutveckling och digital tillväxt sedan 2003.' },
@@ -123,10 +124,10 @@ const skills = {
           <span aria-hidden="true">-&gt;</span>
         </a>
         <a
-          href={cvPdfHref}
+          {...cvPdfLinkProps}
           class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
         >
-          Ladda ner CV (PDF)
+          Ladda ner CV
           <span aria-hidden="true">-&gt;</span>
         </a>
       </div>
