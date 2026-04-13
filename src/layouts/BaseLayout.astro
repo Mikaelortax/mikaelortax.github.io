@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import { buildI18nSeo, formatSeoTitle, siteName } from '../lib/seo';
+import { siteIconPaths, siteThemeColor } from '../lib/site-icons';
 import type { StructuredDataConfig } from '../lib/structured-data';
 import { buildStructuredData, serializeJsonLd } from '../lib/structured-data';
 import { getCrossProfileHref, getCvPdfLinkProps, getProfilePaths, type SiteProfile } from '../lib/profile';
@@ -113,18 +114,18 @@ const availability =
     <meta name="author" content={siteName} />
     <meta name="application-name" content={siteName} />
     <meta name="apple-mobile-web-app-title" content={siteName} />
-    <meta name="theme-color" content="#0a0a0f" />
+    <meta name="theme-color" content={siteThemeColor} />
     {noindex && <meta name="robots" content="noindex,nofollow" />}
     {noindex && <meta name="googlebot" content="noindex,nofollow" />}
     <link rel="canonical" href={seo.canonical} />
     {seo.alternates.map((alternate) => (
       <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />
     ))}
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="icon" href="/favicon-48x48.png" sizes="48x48" type="image/png" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
-    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="icon" href={siteIconPaths.faviconIco} sizes="any" />
+    <link rel="icon" type="image/svg+xml" href={siteIconPaths.faviconSvg} />
+    <link rel="icon" type="image/png" sizes="48x48" href={siteIconPaths.favicon48} />
+    <link rel="apple-touch-icon" href={siteIconPaths.appleTouchIcon} />
+    <link rel="manifest" href={siteIconPaths.manifest} />
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:title" content={seoTitle} />

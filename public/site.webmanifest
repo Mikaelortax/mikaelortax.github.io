@@ -1,23 +1,13 @@
 {
-  "name": "Mikael Johansson",
+  "name": "Mikael Johansson - SEO, Web & Automation",
   "short_name": "Mikael Johansson",
-  "description": "Portfolio med fokus på SEO, webbutveckling, automation och digital tillväxt.",
+  "description": "Personal portfolio and CV for SEO, web development, automation, and digital growth.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0a0a0f",
   "theme_color": "#0a0a0f",
   "icons": [
-    {
-      "src": "/favicon-48x48.png",
-      "sizes": "48x48",
-      "type": "image/png"
-    },
-    {
-      "src": "/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
-    },
     {
       "src": "/android-chrome-192x192.png",
       "sizes": "192x192",
