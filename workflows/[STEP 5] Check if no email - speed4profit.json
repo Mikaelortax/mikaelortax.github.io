@@ -1,0 +1,171 @@
+{
+  "name": "[STEP 5] Check if no email - speed4profit",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://speed4profit.com/crm/api/leads",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authtoken",
+              "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiTGVhZEdlbmVyYXRvciIsIm5hbWUiOiJMZWFkR2VuZXJhdG9yIiwiQVBJX1RJTUUiOjE3NTc2Nzk2NTl9.XOVmYaHTA6P8xw2b_N_HP09xYprentU88x4LzuMEUOQ"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -128,
+        0
+      ],
+      "id": "a09ba1dc-78d9-4205-95e7-e721720c4dd5",
+      "name": "Get Leads from Perfex"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0b0f20c7-9b8b-4ac9-840d-8ea9836dd3b1",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "3",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "258f2349-456a-42a9-990c-85b1db563eda",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        64,
+        0
+      ],
+      "id": "a247e2ce-faf4-4415-8279-d8068dd7d49b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://speed4profit.com/crm/api/leads/{{ $json[\"id\"] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authtoken",
+              "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiTGVhZEdlbmVyYXRvciIsIm5hbWUiOiJMZWFkR2VuZXJhdG9yIiwiQVBJX1RJTUUiOjE3NTc2Nzk2NTl9.XOVmYaHTA6P8xw2b_N_HP09xYprentU88x4LzuMEUOQ"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "9"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        336,
+        -16
+      ],
+      "id": "3d067b41-97af-41e0-ae62-1301981c0fdb",
+      "name": "Get Leads from Perfex1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "30 9 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -368,
+        0
+      ],
+      "id": "00dbf7d8-bda8-48e8-862c-1be26965d6a4",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get Leads from Perfex": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get Leads from Perfex1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Leads from Perfex",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9410c7d8-2b4b-4afc-8573-efbf69ad9ca9",
+  "meta": {
+    "instanceId": "887cfafe23e9379c3e6aa6c5db589c82fa3b7c26d60ed707e8dd92c5291e5481"
+  },
+  "id": "2LD5crfgVzh2Ngra",
+  "tags": []
+}

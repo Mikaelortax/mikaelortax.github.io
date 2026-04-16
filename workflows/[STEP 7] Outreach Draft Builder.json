@@ -1,0 +1,543 @@
+{
+  "name": "My workflow 4",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1504,
+        224
+      ],
+      "id": "3debdbcd-bb1c-4003-84c9-62ff1c7dcac0",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "16nufaT01i0IEqczXQB_WEBd36CC-1gk-3dqfyin1_5k",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Outreach Candidates",
+          "mode": "name"
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "FORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1264,
+        416
+      ],
+      "id": "b30ec6bf-450e-413b-aecd-0666c1866ce8",
+      "name": "Read Outreach Candidates",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7i0FCMx3aI0V5LI1",
+          "name": "google-sheets-mystnet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "16nufaT01i0IEqczXQB_WEBd36CC-1gk-3dqfyin1_5k",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Outreach Drafts",
+          "mode": "name"
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "FORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1232,
+        128
+      ],
+      "id": "a99d6705-fea7-463f-8d12-28131d537d00",
+      "name": "Read Outreach Drafts",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7i0FCMx3aI0V5LI1",
+          "name": "google-sheets-mystnet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Reads both tabs and returns only candidates that are safe to draft now.\n\nconst BLOCKED_STATUSES = new Set([\n  'dead',\n  'invalid',\n  'do_not_contact',\n  'sent',\n  'opt_out',\n  'opt-out'\n]);\nconst BLOCKED_DRAFT_STATUSES = new Set(['drafted', 'queued', 'sent']);\nconst QUALIFIED_VALUES = new Set(['true', 'yes', 'ja', '1', 'qualified', 'ok']);\n\nfunction clean(v) {\n  return String(v ?? '').trim();\n}\n\nfunction lower(v) {\n  return clean(v).toLowerCase();\n}\n\nfunction normalizeToken(v) {\n  return lower(v).replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');\n}\n\nfunction firstNonEmpty(...values) {\n  for (const value of values) {\n    const normalized = clean(value);\n    if (normalized) return normalized;\n  }\n  return '';\n}\n\nfunction isTruthy(v) {\n  return QUALIFIED_VALUES.has(lower(v));\n}\n\nfunction isValidEmail(v) {\n  const email = clean(v);\n  return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);\n}\n\nfunction looksBlockedStatus(v) {\n  const token = normalizeToken(v);\n  if (!token) return false;\n  if (BLOCKED_STATUSES.has(token)) return true;\n  for (const blocked of BLOCKED_STATUSES) {\n    if (token.includes(blocked)) return true;\n  }\n  return false;\n}\n\nfunction looksBlockedDraftStatus(v) {\n  const token = normalizeToken(v);\n  if (!token) return false;\n  if (BLOCKED_DRAFT_STATUSES.has(token)) return true;\n  for (const blocked of BLOCKED_DRAFT_STATUSES) {\n    if (token.includes(blocked)) return true;\n  }\n  return false;\n}\n\nfunction inferLanguage(row) {\n  const explicit = lower(firstNonEmpty(row.Language, row.language, row.Locale, row.locale));\n  if (explicit.startsWith('sv')) return 'sv';\n  if (explicit.startsWith('en')) return 'en';\n\n  const country = lower(firstNonEmpty(row.Country, row.country));\n  const website = lower(firstNonEmpty(row.Website, row.website));\n  const city = lower(firstNonEmpty(row.City, row.city));\n\n  if (country === 'se' || country.includes('sweden') || country.includes('sverige')) return 'sv';\n  if (website.endsWith('.se') || website.includes('.se/')) return 'sv';\n  if (city) return 'sv';\n  return 'en';\n}\n\nfunction candidateIdentity(row) {\n  const rowNumber = firstNonEmpty(row.row_number, row.rowNumber, row.RowNumber);\n  const candidateId = firstNonEmpty(\n    row.CandidateId,\n    row.candidateId,\n    row.LeadId,\n    row.leadId,\n    row.LeadID,\n    row.lead_id,\n    rowNumber ? `row_${rowNumber}` : ''\n  );\n\n  return {\n    candidateId,\n    rowNumber,\n  };\n}\n\nconst candidateRows = (() => {\n  try {\n    return ($items('Read Outreach Candidates', 0) || []).map((item) => item.json || {});\n  } catch (error) {\n    return [];\n  }\n})();\n\nconst existingDraftRows = (() => {\n  try {\n    return ($items('Read Outreach Drafts', 0) || []).map((item) => item.json || {});\n  } catch (error) {\n    return [];\n  }\n})();\n\nconst existingDraftCandidateIds = new Set();\nconst existingDraftEmails = new Set();\n\nfor (const row of existingDraftRows) {\n  const candidateId = firstNonEmpty(row.CandidateId, row.candidateId, row.LeadId, row.leadId);\n  const email = lower(firstNonEmpty(row.Email, row.email));\n\n  if (candidateId) existingDraftCandidateIds.add(candidateId);\n  if (email) existingDraftEmails.add(email);\n}\n\nconst seenCandidateIds = new Set();\nconst seenEmails = new Set();\nconst eligible = [];\n\nfor (const row of candidateRows) {\n  const { candidateId, rowNumber } = candidateIdentity(row);\n  const email = firstNonEmpty(row.Email, row.email);\n  const emailKey = lower(email);\n  const status = firstNonEmpty(row.Status, row.status, row.LeadStatus, row.leadStatus);\n  const draftStatus = firstNonEmpty(row.DraftStatus, row.draftStatus);\n  const explicitQualified = firstNonEmpty(row.Qualified, row.qualified);\n  const fallbackQualified = explicitQualified || (clean(row.CandidateReason) || lower(draftStatus) === 'pending' ? 'qualified' : '');\n  const isQualified = isTruthy(explicitQualified || fallbackQualified);\n\n  if (!candidateId) continue;\n  if (!rowNumber) continue;\n  if (!isQualified) continue;\n  if (!isValidEmail(email)) continue;\n  if (looksBlockedStatus(status)) continue;\n  if (looksBlockedDraftStatus(draftStatus)) continue;\n  if (existingDraftCandidateIds.has(candidateId)) continue;\n  if (emailKey && existingDraftEmails.has(emailKey)) continue;\n  if (seenCandidateIds.has(candidateId)) continue;\n  if (emailKey && seenEmails.has(emailKey)) continue;\n\n  seenCandidateIds.add(candidateId);\n  if (emailKey) seenEmails.add(emailKey);\n\n  eligible.push({\n    json: {\n      row_number: Number(rowNumber),\n      CandidateId: candidateId,\n      CompanyName: firstNonEmpty(row.CompanyName, row.companyName, row.Company, row.company, candidateId),\n      ContactName: firstNonEmpty(row.ContactName, row.contactName, row.Name, row.name),\n      Email: email,\n      Website: firstNonEmpty(row.Website, row.website),\n      Phone: firstNonEmpty(row.Phone, row.phone, row.phonenumber),\n      City: firstNonEmpty(row.City, row.city),\n      Industry: firstNonEmpty(row.Industry, row.industry),\n      Language: inferLanguage(row),\n      Qualified: 'yes',\n      Status: status,\n      DraftStatus: lower(draftStatus) || 'pending',\n      Notes: firstNonEmpty(row.Notes, row.notes)\n    }\n  });\n}\n\nreturn eligible;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        288
+      ],
+      "id": "d556183d-e501-4968-b437-6f8b53b0593e",
+      "name": "Filter Eligible Candidates"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build deterministic drafts from boilerplate templates only.\n\nfunction clean(v) {\n  return String(v ?? '').trim();\n}\n\nfunction lower(v) {\n  return clean(v).toLowerCase();\n}\n\nfunction nowIso() {\n  return new Date().toISOString();\n}\n\nfunction safeIdPart(v) {\n  return clean(v).replace(/[^a-zA-Z0-9_-]+/g, '_').replace(/^_+|_+$/g, '') || 'candidate';\n}\n\nfunction makeDraftId(candidateId) {\n  return `draft_${safeIdPart(candidateId)}_${Date.now()}`;\n}\n\nfunction pickTemplate(row) {\n  const language = lower(row.Language);\n  const hasWebsite = clean(row.Website) !== '';\n  const hasCity = clean(row.City) !== '';\n\n  if (language === 'sv' && hasWebsite) return 'cold_se_website';\n  if (language === 'sv' && hasCity) return 'cold_se_local';\n  if (language === 'sv') return 'cold_se_generic';\n  return 'cold_en_generic';\n}\n\nfunction renderTemplate(templateKey, row) {\n  const companyName = clean(row.CompanyName) || 'ert företag';\n  const contactName = clean(row.ContactName);\n  const city = clean(row.City);\n  const industry = clean(row.Industry);\n  const website = clean(row.Website);\n\n  const contactNameOrDefault = templateKey.startsWith('cold_se_')\n    ? (contactName || 'där')\n    : (contactName || 'there');\n  const optionalCityPhrase = city ? ` i ${city}` : '';\n  const optionalWebsitePhrase = website ? ` på ${website}` : '';\n  const optionalIndustryPhrase = industry ? ` inom ${industry}` : '';\n\n  const templates = {\n    cold_se_website: {\n      Subject: `En snabb fråga om ${companyName}`,\n      Body: [\n        `Hej ${contactNameOrDefault},`,\n        `Jag såg ${companyName}${optionalCityPhrase} och ville höra en snabb sak.`,\n        `Jag noterade att ni redan har en webbplats${optionalWebsitePhrase}, och jag arbetar med att hjälpa företag att förbättra sin synlighet och skapa fler affärsmöjligheter digitalt.`,\n        `Om du vill kan jag skicka några korta och konkreta idéer som hade kunnat passa ${companyName}${optionalIndustryPhrase}.`,\n        `Vänliga hälsningar`\n      ].join('\\n\\n')\n    },\n    cold_se_local: {\n      Subject: `Kort fråga kring ${companyName}${optionalCityPhrase}`,\n      Body: [\n        `Hej ${contactNameOrDefault},`,\n        `Jag fick upp ögonen för ${companyName}${optionalCityPhrase} och ville bara skicka en snabb fråga.`,\n        `Jag hjälper företag att förbättra sin digitala närvaro och göra det tydligare för nya kunder att hitta rätt.`,\n        `Om det är intressant skickar jag gärna några enkla och konkreta förslag som hade kunnat passa er.`,\n        `Vänliga hälsningar`\n      ].join('\\n\\n')\n    },\n    cold_se_generic: {\n      Subject: `En snabb fråga om ${companyName}`,\n      Body: [\n        `Hej ${contactNameOrDefault},`,\n        `Jag såg ${companyName} och ville höra en snabb sak.`,\n        `Jag hjälper företag att förbättra sin digitala synlighet och göra det enklare att få in rätt kunder online.`,\n        `Om det känns relevant skickar jag gärna några korta idéer anpassade för er.`,\n        `Vänliga hälsningar`\n      ].join('\\n\\n')\n    },\n    cold_en_generic: {\n      Subject: `A quick question about ${companyName}`,\n      Body: [\n        `Hi ${contactNameOrDefault},`,\n        `I came across ${companyName} and wanted to ask a quick question.`,\n        `I help businesses improve their digital visibility and make it easier for potential customers to find and trust them online.`,\n        `If relevant, I'd be happy to share a few concrete ideas tailored to your business.`,\n        `Best regards`\n      ].join('\\n\\n')\n    }\n  };\n\n  return templates[templateKey] || templates.cold_en_generic;\n}\n\nreturn items.map((item) => {\n  const row = item.json || {};\n  const draftId = makeDraftId(row.CandidateId);\n  const createdAt = nowIso();\n  const templateKey = pickTemplate(row);\n  const rendered = renderTemplate(templateKey, row);\n\n  return {\n    json: {\n      DraftId: draftId,\n      CandidateId: clean(row.CandidateId),\n      CompanyName: clean(row.CompanyName),\n      ContactName: clean(row.ContactName),\n      Email: clean(row.Email),\n      Website: clean(row.Website),\n      Phone: clean(row.Phone),\n      City: clean(row.City),\n      Industry: clean(row.Industry),\n      Language: clean(row.Language) || 'en',\n      TemplateKey: templateKey,\n      Subject: rendered.Subject,\n      Body: rendered.Body,\n      DraftStatus: 'ready',\n      CreatedAt: createdAt,\n      UpdatedAt: createdAt,\n      SourceWorkflow: 'Workflow 7',\n      row_number: Number(row.row_number)\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -736,
+        320
+      ],
+      "id": "a2b358de-1423-41d1-94d9-a5e448a8e764",
+      "name": "Build Drafts From Templates"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "16nufaT01i0IEqczXQB_WEBd36CC-1gk-3dqfyin1_5k",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Outreach Drafts",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "DraftId": "={{ $json.DraftId }}",
+            "CandidateId": "={{ $json.CandidateId }}",
+            "CompanyName": "={{ $json.CompanyName }}",
+            "ContactName": "={{ $json.ContactName }}",
+            "Email": "={{ $json.Email }}",
+            "Website": "={{ $json.Website }}",
+            "Phone": "={{ $json.Phone ? \"'\" + String($json.Phone) : '' }}",
+            "City": "={{ $json.City }}",
+            "Industry": "={{ $json.Industry }}",
+            "Language": "={{ $json.Language }}",
+            "TemplateKey": "={{ $json.TemplateKey }}",
+            "Subject": "={{ $json.Subject }}",
+            "Body": "={{ $json.Body }}",
+            "DraftStatus": "={{ $json.DraftStatus }}",
+            "CreatedAt": "={{ $json.CreatedAt }}",
+            "UpdatedAt": "={{ $json.UpdatedAt }}",
+            "SourceWorkflow": "={{ $json.SourceWorkflow }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "DraftId",
+              "displayName": "DraftId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CandidateId",
+              "displayName": "CandidateId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CompanyName",
+              "displayName": "CompanyName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ContactName",
+              "displayName": "ContactName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "City",
+              "displayName": "City",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Language",
+              "displayName": "Language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TemplateKey",
+              "displayName": "TemplateKey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Body",
+              "displayName": "Body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DraftStatus",
+              "displayName": "DraftStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CreatedAt",
+              "displayName": "CreatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "UpdatedAt",
+              "displayName": "UpdatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SourceWorkflow",
+              "displayName": "SourceWorkflow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -400,
+        64
+      ],
+      "id": "516a63bf-51ee-4295-a3a4-2cd69510f930",
+      "name": "Append Outreach Drafts",
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7i0FCMx3aI0V5LI1",
+          "name": "google-sheets-mystnet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -80,
+        320
+      ],
+      "id": "c0b4a376-29da-4674-bdff-2ab072bea6a4",
+      "name": "Merge After Append"
+    },
+    {
+      "parameters": {
+        "jsCode": "function clean(v) {\n  return String(v ?? '').trim();\n}\n\nfunction nowIso() {\n  return new Date().toISOString();\n}\n\nreturn items\n  .filter((item) => clean(item.json?.DraftId) !== '' && item.json?.row_number != null)\n  .map((item) => {\n    const row = item.json || {};\n    return {\n      json: {\n        row_number: Number(row.row_number),\n        DraftStatus: 'drafted',\n        LastDraftedAt: clean(row.CreatedAt) || nowIso(),\n        LastDraftId: clean(row.DraftId),\n        NeedsRescrape: 'no'\n      }\n    };\n  });"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        320
+      ],
+      "id": "7758c0d3-1c55-4247-afda-e3f8794e071e",
+      "name": "Build Candidate Updates"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "16nufaT01i0IEqczXQB_WEBd36CC-1gk-3dqfyin1_5k",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Outreach Candidates",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.row_number }}",
+            "DraftStatus": "={{ $json.DraftStatus }}",
+            "LastDraftedAt": "={{ $json.LastDraftedAt }}",
+            "LastDraftId": "={{ $json.LastDraftId }}",
+            "NeedsRescrape": "={{ $json.NeedsRescrape }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "DraftStatus",
+              "displayName": "DraftStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LastDraftedAt",
+              "displayName": "LastDraftedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LastDraftId",
+              "displayName": "LastDraftId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "NeedsRescrape",
+              "displayName": "NeedsRescrape",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        496,
+        320
+      ],
+      "id": "39370b34-2270-4bbf-a83a-fb1d11306d9a",
+      "name": "Update Outreach Candidates",
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7i0FCMx3aI0V5LI1",
+          "name": "google-sheets-mystnet"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Outreach Drafts",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read Outreach Candidates",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Filter Eligible Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Eligible Candidates": {
+      "main": [
+        [
+          {
+            "node": "Build Drafts From Templates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Drafts From Templates": {
+      "main": [
+        [
+          {
+            "node": "Append Outreach Drafts",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge After Append",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Append Outreach Drafts": {
+      "main": [
+        [
+          {
+            "node": "Merge After Append",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge After Append": {
+      "main": [
+        [
+          {
+            "node": "Build Candidate Updates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Candidate Updates": {
+      "main": [
+        [
+          {
+            "node": "Update Outreach Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d8080ea2-44f6-4982-8628-10a06e5e03ca",
+  "meta": {
+    "instanceId": "887cfafe23e9379c3e6aa6c5db589c82fa3b7c26d60ed707e8dd92c5291e5481"
+  },
+  "id": "3QR2ublgm9oRIrmU",
+  "tags": []
+}

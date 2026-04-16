@@ -1,0 +1,3462 @@
+{
+  "name": "[STEP 2] Lead Generator to speed4profit crm",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Industry"
+            },
+            {
+              "name": "Country"
+            },
+            {
+              "name": "City"
+            },
+            {
+              "name": "CityCountry"
+            },
+            {
+              "name": "Row",
+              "type": "number"
+            },
+            {
+              "name": "CityIndex",
+              "type": "number"
+            },
+            {
+              "name": "NextIndustryRow",
+              "type": "number"
+            },
+            {
+              "name": "NextCityIndex",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        -448
+      ],
+      "id": "adaec787-5638-4c52-8d7c-b2d47628d386",
+      "name": "Input from WF1"
+    },
+    {
+      "parameters": {
+        "url": "https://maps.googleapis.com/maps/api/geocode/json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "address",
+              "value": "={{ $json.AddressForGeocode }}"
+            },
+            {
+              "name": "language",
+              "value": "={{ $json.GeocodeLang }}"
+            },
+            {
+              "name": "region",
+              "value": "={{$json.GeocodeRegion}}"
+            },
+            {
+              "name": "key",
+              "value": "=AIzaSyDkzGxXbBOfr9VJWizKEqP7N_K_dDv5DbU"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1664,
+        192
+      ],
+      "id": "d4ea1c79-6f5d-452f-a720-4c44fc63be80",
+      "name": "Geocode City",
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract Geo — robust pass-through + kvotvalidering\n// Stödjer både:\n//  - HTTP \"Full Response\": { body: { results: [...] , status, error_message } }\n//  - HTTP \"Body in root\":  { results: [...] , status, error_message }\n// Körs efter Merge så seed/query följer med.\n\nconst CONFIG = {\n  failOn: ['OVER_QUERY_LIMIT'], // lägg ev. till: 'REQUEST_DENIED','INVALID_REQUEST'\n};\n\nconst out = [];\n\nfor (const it of items) {\n  const j = it.json || {};\n\n  // Stöd för båda responslägena\n  const body = j.body || j;\n  const results = Array.isArray(body?.results) ? body.results : [];\n  const status = (body?.status || '').toString().toUpperCase();\n  const errMsg = body?.error_message || j?.error_message || null;\n\n  // === Kvot/fel-validering ===\n  if (CONFIG.failOn.includes(status)) {\n    // Kasta fel så kvotflödet kan fånga/pausa\n    throw new Error(\n      `[Extract Geo] Geocoding failed with status=${status}` +\n      (errMsg ? ` — ${errMsg}` : '')\n    );\n  }\n\n  // Hämta koordinat om den finns\n  const loc = results[0]?.geometry?.location;\n\n  // Alias: säkerställ gemener om endast versaler finns\n  const query = j.query ?? j.Query ?? null;\n  const lang  = j.lang  ?? j.Lang  ?? null;\n  const gl    = j.gl    ?? j.Gl    ?? null;\n\n  // Seed: om saknas som objekt, bygg från toppnivå\n  const seed = j.seed || {\n    Industry: j.Industry,\n    Country: j.Country,\n    City: j.City,\n    CityCountry: j.CityCountry,\n    Row: j.Row,\n    CityIndex: j.CityIndex,\n    NextIndustryRow: j.NextIndustryRow,\n    NextCityIndex: j.NextCityIndex,\n  };\n\n  if (!loc) {\n    // Ingen geokoordinat hittad — lämna kvar item för felsökning\n    out.push({\n      json: {\n        ...j,\n        query, lang, gl,\n        seed,\n        geo: null,\n        GeocodeStatus: status || null,\n        _warn: 'No lat/lng found in Geocode response',\n      },\n    });\n    continue;\n  }\n\n  out.push({\n    json: {\n      ...j,\n      query, lang, gl,\n      seed,\n      geo: { lat: loc.lat, lng: loc.lng },\n      GeocodeStatus: status || 'OK',\n      GeocodePlaceId: results[0]?.place_id ?? null,\n      GeocodeFormatted: results[0]?.formatted_address ?? null,\n    },\n  });\n}\n\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2080,
+        -432
+      ],
+      "id": "ec71003b-da5e-4c86-ab5d-e9ee588519e4",
+      "name": "Extract Geo"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node — BUILD QUERIES (balanserad budget + varianter)\n\n// ======= CONFIG =======\nconst CONFIG = {\n  baseMaxVariants: 3,\n  lang: 'sv',\n  gl: 'se',\n  sourceHint: 'serpapi|apify',\n  strict: true,\n\n  quotaMetricForVariants: 'text',\n  quotaMetricForDetails:  'details',\n\n  // Fallback om kvota saknas\n  fallbackDetailsTotalCap: 200,\n\n  // Planerat max\n  pagesPlanned: 3,                 // vi kan nedjustera dynamiskt\n  defaultDetailsCapPerPage: 5,\n  minDetailsPerPage: 5,\n\n  TEST_SEED: {\n    Industry: 'Elektriker',\n    Country:  'Sweden',\n    City:     'Stockholm',\n    CityCountry: 'Stockholm, Sweden',\n    Row: 1, CityIndex: 0, NextIndustryRow: 1, NextCityIndex: 1,\n  },\n};\n\n// ---------- helpers ----------\nconst nowIso = () => new Date().toISOString();\nconst clean  = (s) => (s ?? '').toString().trim();\nconst norm   = (s) => clean(s).toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'');\n\n// Bransch → Google Places type (enkla regler – kan byggas ut)\nconst TYPE_RULES = [\n  [/\\b(elektriker|elinstallat|elfirma|el[-\\s]?montör)\\b/, 'electrician'],\n  [/\\b(rörmok|vvs)\\b/, 'plumber'],\n  [/\\b(målare|måleri)\\b/, 'painter'],\n  [/\\b(snickare|bygg|timmerman)\\b/, 'carpenter'],\n  [/\\b(lås|låssmed|larm\\W*installat|\\blarm\\b)\\b/, 'locksmith'],\n  [/\\b(taklägg|tak|takfirma)\\b/, 'roofing_contractor'],\n  [/\\b(hvac|ventilation|kyla|värmepump)\\b/, 'hvac_contractor'],\n  [/\\b(städ|städning|städfirma)\\b/, 'house_cleaning'],\n];\n\nfunction inferPlaceTypeFromIndustry(industry) {\n  const s = norm(industry);\n  for (const [re, type] of TYPE_RULES) if (re.test(s)) return type;\n  return null;\n}\n\n// Läs kvot från \"Gate Build (Quota ready)\" om den finns\nfunction readQuota(metricOverride) {\n  let items = [];\n  try { items = $items('Gate Build (Quota ready)'); } catch {}\n  if (!items?.length) return null;\n\n  const j = items[0]?.json || {};\n  const caps = j.caps || {};\n\n  const metric =\n    (typeof metricOverride === 'string' && metricOverride) ||\n    (typeof j.quotaMetric === 'string' && j.quotaMetric) ||\n    CONFIG.quotaMetricForVariants || 'text';\n\n  const kCapDaily   = `${metric}Daily`;\n  const kUsed       = `${metric}Used`;\n  const kUsedToday  = `${metric}UsedToday`;\n  const kLimit      = `${metric}Limit`;\n  const kCapGeneric = `${metric}Cap`;\n  const kCapToday   = `${metric}CapToday`;\n  const kRemaining  = `${metric}Remaining`;\n\n  const num  = (x) => { const n = Number(x); return Number.isFinite(n) ? n : null; };\n  const pick = (obj, keys) => { for (const k of keys) if (obj && obj[k] != null) return obj[k]; return null; };\n\n  const cap =\n    num(caps[kCapDaily]) ??\n    num(pick(j, [kCapToday, `${metric}DailyCap`, kCapGeneric, `${metric}LimitToday`, kLimit])) ?? null;\n\n  const used =\n    num(j[kUsed]) ?? num(j[kUsedToday]) ??\n    num(pick(j, ['usedText','textRequests'])) ?? null;\n\n  let remaining = num(j[kRemaining]) ?? num(pick(j, ['remainingText'])) ?? null;\n  if (remaining == null && cap != null && used != null) remaining = Math.max(0, cap - used);\n\n  return { metric, cap: cap ?? null, used: used ?? null, remaining: remaining ?? null, raw: j };\n}\n\nfunction decideVariantCap(quota, fallback) {\n  if (!quota) return fallback;\n  const cap = quota.cap;\n  let remaining = quota.remaining;\n  if (remaining == null && cap != null && quota.used != null) remaining = Math.max(0, cap - quota.used);\n  if (cap == null && remaining == null) return fallback;\n\n  const effCap = cap ?? Math.max(remaining, 1);\n  const effRem = remaining ?? Math.max(effCap * 0.2, 1);\n\n  if (effRem <= 50) return 1;\n  const ratio = effRem / effCap;\n  if (ratio >= 0.5) return Math.min(4, CONFIG.baseMaxVariants);\n  if (ratio >= 0.2) return Math.min(3, CONFIG.baseMaxVariants);\n  if (ratio >= 0.1) return Math.min(2, CONFIG.baseMaxVariants);\n  return 1;\n}\n\nfunction buildVariants(seed, maxVariants) {\n  const industry = seed.Industry;\n  const city = seed.City;\n  const country = seed.Country;\n  const cityCountry = seed.CityCountry;\n\n  const sv = [\n    `${industry} i ${city}, ${country}`,\n    `bästa ${industry.toLowerCase()} ${city}`,\n    `${industry} ${cityCountry}`,\n    `${industry} företag ${city}`,\n  ];\n  const en = [\n    `${industry} ${city}, ${country}`,\n    `${industry} near ${city}`,\n  ];\n\n  const all = [...sv, ...en].filter(Boolean);\n  return all.slice(0, Math.max(1, maxVariants));\n}\n\n// --------- robust seed-intag ---------\nfunction toSeedObj(j0 = {}) {\n  const j = j0 || {};\n  const s = j.seed || {};\n  const Industry = clean(j.Industry || s.Industry);\n  const Country  = clean(j.Country  || s.Country);\n  const City     = clean(j.City     || s.City);\n  const CityCountry = clean(j.CityCountry || s.CityCountry || (City && Country ? `${City}, ${Country}` : ''));\n\n  const seed = {\n    Industry, Country, City, CityCountry,\n    Row: (j.Row ?? s.Row ?? null),\n    CityIndex: (j.CityIndex ?? s.CityIndex ?? null),\n    NextIndustryRow: (j.NextIndustryRow ?? s.NextIndustryRow ?? null),\n    NextCityIndex: (j.NextCityIndex ?? s.NextCityIndex ?? null),\n  };\n  const ok = !!seed.Industry && (!!seed.City || !!seed.CityCountry) && !!seed.Country;\n  return { seed, ok };\n}\n\n// Hämta kandidater från: 1) input till noden, 2) \"Input from WF1\"\nlet candidates = ($input.all() || []).map(i => i.json || {});\ntry {\n  const wfSeeds = ($items('Input from WF1') || []).map(i => i.json || {});\n  candidates = candidates.concat(wfSeeds);\n} catch {}\n\nlet seeds = [];\nconst seen = new Set();\nfor (const obj of candidates) {\n  const { seed, ok } = toSeedObj(obj);\n  if (!ok) continue;\n  const key = `${seed.Industry}|${seed.CityCountry}|${seed.Row}|${seed.CityIndex}`;\n  if (seen.has(key)) continue;\n  seen.add(key);\n  seeds.push(seed);\n}\n\nif (!seeds.length) {\n  if (CONFIG.strict) {\n    throw new Error('Build queries: Inget giltigt seed hittades på input (Industry, City/CityCountry, Country krävs).');\n  }\n  seeds = [CONFIG.TEST_SEED];\n}\n\n// --------- kvot → varianter ---------\nconst quotaForVariants = readQuota(CONFIG.quotaMetricForVariants);\nlet maxVariants        = decideVariantCap(quotaForVariants, CONFIG.baseMaxVariants);\n\n// --------- budget för Place Details (balansering) ---------\nconst PAGE_SIZE = 20;\nconst SOFT_MIN  = 12;\n\nconst quotaForDetails      = readQuota(CONFIG.quotaMetricForDetails);\nconst detailsLeftTodayRaw  = Number(quotaForDetails?.remaining);\nlet   detailsLeftToday     = Number.isFinite(detailsLeftTodayRaw) ? Math.max(0, detailsLeftTodayRaw)\n                                                                  : CONFIG.fallbackDetailsTotalCap;\n\n// hur många seeds i denna körning?\nlet seedsPlanned = seeds.length;\ntry {\n  const wf1Items = $items('Input from WF1') || [];\n  if (wf1Items.length) seedsPlanned = wf1Items.length;\n} catch {}\n\nlet P = CONFIG.pagesPlanned;   // kan nedjusteras\nlet V = maxVariants;\n\nconst idealDenom = Math.max(1, seedsPlanned * V * P);\nlet perPage = Math.floor(detailsLeftToday / idealDenom);\nperPage = Math.min(PAGE_SIZE, Math.max(SOFT_MIN, perPage));\n\n// prioritera fulla sidor (20) genom att skala ned P/V om budgeten är tajt\nif (perPage < PAGE_SIZE) {\n  // 1) färre sidor\n  if (P > 2 && (perPage * 2) >= PAGE_SIZE) {\n    P = 2;\n    perPage = PAGE_SIZE;\n  }\n  // 2) färre varianter\n  if (perPage < PAGE_SIZE) {\n    const denomV1 = Math.max(1, seedsPlanned * 1 * P);\n    const perPageIfV1 = Math.floor(detailsLeftToday / denomV1);\n    if (V > 1 && perPageIfV1 >= PAGE_SIZE) {\n      V = 1;\n      perPage = PAGE_SIZE;\n    }\n  }\n}\n\n// om budgeten fortfarande inte räcker: respektera golv men gå inte över 20\nperPage = Math.min(PAGE_SIZE, Math.max(SOFT_MIN, perPage));\n\n// bygg varianter med ev. nedjusterat V\nconst variantCounts = seeds.map(s => buildVariants(s, V).length);\nconst totalVariants = Math.max(1, variantCounts.reduce((a,b)=>a+b, 0));\n\n// --------- bygg ut ----------\nfunction makeOutputItems(seed, variants, capPerPage) {\n  const createdAt = nowIso();\n  const placeType = inferPlaceTypeFromIndustry(seed.Industry);\n  const wantTypes = placeType ? [placeType, 'establishment'] : [];\n\n  return variants.map((q, idx) => {\n    const lang = idx <= 2 ? CONFIG.lang : 'en';\n    return {\n      json: {\n        Query: q, query: q,\n        VariantIndex: idx,\n        Lang: lang, lang,\n        Gl: CONFIG.gl, gl: CONFIG.gl,\n        Source: CONFIG.sourceHint,\n        CreatedAt: createdAt,\n\n        Industry: seed.Industry,\n        Country:  seed.Country,\n        City:     seed.City,\n        CityCountry: seed.CityCountry,\n        Row: seed.Row,\n        CityIndex: seed.CityIndex,\n        NextIndustryRow: seed.NextIndustryRow,\n        NextCityIndex:   seed.NextCityIndex,\n\n        seed: { ...seed },\n\n        // budget-signaler nedströms\n        _detailsCap: Math.max(1, Number(capPerPage) || CONFIG.defaultDetailsCapPerPage),\n        _detailsCapPerPage: Math.max(1, Number(capPerPage) || CONFIG.defaultDetailsCapPerPage),\n        _pagesPlanned: P,\n        _variantsPlanned: V,\n\n        PlaceType: placeType,\n        WantTypes: wantTypes,\n\n        // Viktigt: ge bredare träffbild i TextSearch\n        useType: false,\n\n        _buildQueries: true,\n      },\n    };\n  });\n}\n\nlet out = [];\nlet idxSeed = 0;\nfor (const s of seeds) {\n  const vCount = variantCounts[idxSeed++] || V;\n  const variants = buildVariants(s, vCount);\n  out = out.concat(makeOutputItems(s, variants, perPage));\n}\n\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        -448
+      ],
+      "id": "6dfb70ec-b1e2-4c91-ab46-1af9a46d0082",
+      "name": "Build queries"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1872,
+        -432
+      ],
+      "id": "eb869d0a-6476-46b1-ac38-078e5678e0ff",
+      "name": "Merge Seed + Geocode"
+    },
+    {
+      "parameters": {
+        "url": "https://maps.googleapis.com/maps/api/place/textsearch/json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.query || $json.Query }}"
+            },
+            {
+              "name": "location",
+              "value": "={{$json.geo.lat}},{{$json.geo.lng}}"
+            },
+            {
+              "name": "radius",
+              "value": "50000"
+            },
+            {
+              "name": "language",
+              "value": "={{ $json.lang || \"sv\" }}"
+            },
+            {
+              "name": "region",
+              "value": "={{ $json.gl || \"se\" }}"
+            },
+            {
+              "name": "key",
+              "value": "AIzaSyDkzGxXbBOfr9VJWizKEqP7N_K_dDv5DbU"
+            },
+            {
+              "name": "pagetoken",
+              "value": "={{$json.paginate?.token}}"
+            },
+            {
+              "name": "type",
+              "value": "={{ $json.useType ? $json.PlaceType : undefined }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3552,
+        -448
+      ],
+      "id": "cf85c24d-de20-4c95-a8cc-50e903124f1e",
+      "name": "Places Text Search",
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ===== Explode Search Results =====\n\n// Hårdkap för hur många vi *max* vill skicka vidare (används bara om _detailsCap inte finns)\nconst DEFAULT_DETAILS_CAP = 10;\n\nconst CONFIG = {\n  failOn:  ['OVER_QUERY_LIMIT', 'REQUEST_DENIED'],\n  softZero: ['ZERO_RESULTS'],\n};\n\nconst out = [];\n\nfor (const it of items) {\n  const j = it.json || {};\n\n  // Skip-flagga från tidigare gren\n  if (j._skipTextSearch) continue;\n\n  // Stöd: full HTTP-respons (body) eller redan-nerlyft body\n  const body   = j.body || j;\n  const status = String(body?.status || '').toUpperCase();\n  const page   = j._page ?? 1;\n\n  // Status-hantering\n  if (CONFIG.failOn.includes(status)) {\n    throw new Error(`[Explode] TextSearch failed: status=${status}${body?.error_message ? ' — ' + body.error_message : ''}`);\n  }\n  if (CONFIG.softZero.includes(status)) {\n    continue; // 0 items vidare\n  }\n\n  // Resultlistan\n  const all = Array.isArray(body?.results) ? body.results : [];\n\n  // Cap: använd item-specifik _detailsCap, annars DEFAULT. Om cap <= 0 => ta alla.\n  const rawCap = Number(j._detailsCap);\n  const cap = Number.isFinite(rawCap) ? rawCap : DEFAULT_DETAILS_CAP;\n  const picked = cap > 0 ? all.slice(0, cap) : all;\n\n  // Alias/seed/geo\n  const query = j.query ?? j.Query ?? null;\n  const lang  = j.lang  ?? j.Lang  ?? null;\n  const gl    = j.gl    ?? j.Gl    ?? null;\n\n  const seed  = j.seed || {\n    Industry: j.Industry, Country: j.Country, City: j.City,\n    CityCountry: j.CityCountry, Row: j.Row, CityIndex: j.CityIndex,\n    NextIndustryRow: j.NextIndustryRow, NextCityIndex: j.NextCityIndex,\n  };\n\n  const geo   = j.geo ?? null;\n\n  // Ett item per träff\n  for (const r of picked) {\n    out.push({\n      json: {\n        // kontext\n        seed, geo, query, lang, gl,\n        _page: page,\n        _textsearch_status: status || null,\n\n        // snabbåtkomstfält\n        place_id: r.place_id ?? null,\n        name: r.name ?? null,\n        rating: r.rating ?? null,\n        reviews: r.user_ratings_total ?? null,\n        address: r.formatted_address ?? null,\n        types: Array.isArray(r.types) ? r.types : [],\n\n        // praktisk Maps-URL\n        maps_url: r.place_id ? `https://www.google.com/maps/place/?q=place_id:${r.place_id}` : null,\n\n        // hela råträffen (ifall vi behöver mer senare)\n        result: r,\n      }\n    });\n  }\n}\n\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4992,
+        -160
+      ],
+      "id": "7053a0e2-1fe2-4b22-89a8-8bf92897127f",
+      "name": "Explode Search Results"
+    },
+    {
+      "parameters": {
+        "url": "https://maps.googleapis.com/maps/api/place/details/json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "place_id",
+              "value": "={{ $json.place_id || $json.result?.place_id }}"
+            },
+            {
+              "name": "fields",
+              "value": "place_id,name,formatted_address,types,rating,user_ratings_total,website,url,international_phone_number,formatted_phone_number"
+            },
+            {
+              "name": "language",
+              "value": "={{ $json.lang || 'sv' }}"
+            },
+            {
+              "name": "region",
+              "value": "={{ $json.gl || 'se' }}"
+            },
+            {
+              "name": "key",
+              "value": "AIzaSyDkzGxXbBOfr9VJWizKEqP7N_K_dDv5DbU"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6032,
+        -480
+      ],
+      "id": "02230a3b-6b8c-4d3a-a476-e5ef399d3564",
+      "name": "Place Details",
+      "retryOnFail": true,
+      "waitBetweenTries": 1000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalize → fält för RAW & VALIDATED (robust)\nfunction norm(v){ return (v ?? '').toString().trim(); }\nfunction onlyDigitsPlus(s){ return norm(s).replace(/[^0-9+]/g, ''); }\nfunction hostFromUrl(u){\n  let s = norm(u);\n  if (!s) return '';\n  try {\n    if (!/^https?:\\/\\//i.test(s)) s = 'http://' + s;\n    return new URL(s).hostname.toLowerCase().replace(/^www\\./, '');\n  } catch { return ''; }\n}\n\nreturn items.map(it => {\n  const j = it.json || {};\n\n  // Flexibla källor (Explode/Details/HTTP kan ha olika former)\n  const details = j?.details?.result || j?.details || j?.result || {};\n\n  // Länkar\n  const website  = norm(details.website || j.Website || j.website || '');\n  const domain   = hostFromUrl(website);\n  const gmapsUrl = norm(details.url || j.url || j.GoogleMapsUrl || j.googlemapsurl || j.maps_url || '');\n\n  // Telefon — stöd för både Google-fields och våra egna guard-fält\n  const phoneRawSource =\n    details.international_phone_number ||\n    details.formatted_phone_number ||\n    details.phone_raw ||\n    j.details?.phone_raw ||\n    j.PhoneRaw || j.Phone || j.phone || '';\n\n  const phoneRaw  = norm(phoneRawSource);\n  const phoneNorm = onlyDigitsPlus(details.phone_norm || phoneRaw);\n\n  const out = {\n    // Id & namn\n    PlaceId: j.PlaceId || j.place_id || details.place_id || (j.result?.place_id || j.details?.place_id) || '',\n    Name:    j.Name    || j.name     || details.name     || (j.result?.name || ''),\n\n    // Adress/typer/betyg\n    Address:\n      j.Address || j.address ||\n      details.address || details.formatted_address || details.vicinity ||\n      j.result?.formatted_address || j.result?.vicinity || '',\n    Types:   Array.isArray(j.Types) ? j.Types : (details.types || j.result?.types || []),\n    Rating:  (j.Rating ?? j.rating ?? details.rating ?? j.result?.rating ?? null),\n    Reviews: (j.Reviews ?? j.reviews ?? details.user_ratings_total ?? j.result?.user_ratings_total ?? null),\n\n    // Länkar\n    GoogleMapsUrl: gmapsUrl,\n    Website: website,\n    Domain:  domain,\n\n    // Telefon (rå + normaliserad)\n    Phone: phoneNorm,\n    PhoneRaw: phoneRaw,\n    PhoneNormalized: phoneNorm,\n\n    // Seed-kontekst\n    Industry:     (j.seed?.Industry     ?? j.Industry     ?? ''),\n    Country:      (j.seed?.Country      ?? j.Country      ?? ''),\n    City:         (j.seed?.City         ?? j.City         ?? ''),\n    CityCountry:  (j.seed?.CityCountry  ?? j.CityCountry  ?? ''),\n\n    // Övrigt\n    _page: j._page,\n    _textsearch_status: j._textsearch_status,\n    CreatedAt: new Date().toISOString(),\n\n    // Snabba flaggor\n    HasWebsite: !!(website || domain),\n    HasPhone:   phoneNorm.length >= 6,\n  };\n\n  return { json: out };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8112,
+        -144
+      ],
+      "id": "77bce2a3-6681-4b18-a454-cd99fb2a291e",
+      "name": "Normalize (to Leads RAW)"
+    },
+    {
+      "parameters": {
+        "jsCode": "const seen = new Set();\nconst out = [];\n\nfor (const it of items) {\n  const j = it.json || {};\n  const pid = j.place_id || j.result?.place_id;\n\n  // Saknar place_id? hoppa över\n  if (!pid) continue;\n\n  if (seen.has(pid)) continue; // redan skickad\n  seen.add(pid);\n\n  out.push({ json: j });\n}\n\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5408,
+        -160
+      ],
+      "id": "70a916d6-cfda-47c7-ac14-7c20ec777088",
+      "name": "Keep Unique by place_id"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validated-kriterier\nconst REQUIRE_WEBSITE = true;  // true = kräver sajt; false = sajt ELLER telefon\n\nfunction norm(v){ return (v ?? '').toString().trim(); }\nfunction onlyDigitsPlus(s){ return norm(s).replace(/[^0-9+]/g, ''); }\n\nreturn items.filter(it => {\n  const j = it.json || {};\n\n  // Läs primärt top-level (Normalize lade dessa), men backa till details vid behov\n  const website = norm(j.Website || j.website || j.details?.website || '');\n  const domain  = norm(j.Domain  || j.domain  || '');\n  const phone   = onlyDigitsPlus(j.Phone || j.PhoneNormalized || j.phone || j.details?.phone_norm || j.details?.phone_raw || '');\n\n  const hasWebsite = !!(website || domain || j.HasWebsite === true);\n  const hasPhone   = (j.HasPhone === true) || (phone.length >= 6);\n\n  // Policy: kräver sajt? annars sajt eller telefon\n  const ok = REQUIRE_WEBSITE ? hasWebsite : (hasWebsite || hasPhone);\n\n  return ok;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9984,
+        192
+      ],
+      "id": "abdaffd0-bad3-4f90-9f76-c3344ad5af7f",
+      "name": "Filter: has Website or Phone"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "16nufaT01i0IEqczXQB_WEBd36CC-1gk-3dqfyin1_5k",
+          "mode": "list",
+          "cachedResultName": "Mystnet Lead Automation (n8n)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16nufaT01i0IEqczXQB_WEBd36CC-1gk-3dqfyin1_5k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 597704908,
+          "mode": "list",
+          "cachedResultName": "Leads (Validated)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16nufaT01i0IEqczXQB_WEBd36CC-1gk-3dqfyin1_5k/edit#gid=597704908"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Website": "={{ $json.Website }}",
+            "Phone": "={{ $json.Phone ? \"'\" + String($json.Phone) : \"\" }}",
+            "Address": "={{ $json.Address }}",
+            "Rating": "={{ $json.Rating }}",
+            "Reviews": "={{ $json.Reviews }}",
+            "GoogleMapsUrl": "={{ $json.GoogleMapsUrl }}",
+            "PlaceId": "={{ $json.PlaceId }}",
+            "Source": "={{ $json.Source }}",
+            "Industry": "={{ $json.Industry }}",
+            "Country": "={{ $json.Country }}",
+            "City": "={{ $json.City }}",
+            "CityCountry": "={{ $json.CityCountry }}",
+            "Row": "={{ $json.Row }}",
+            "CityIndex": "={{ $json.CityIndex }}",
+            "NextIndustryRow": "={{ $json.NextIndustryRow }}",
+            "NextCityIndex": "={{ $json.NextCityIndex }}",
+            "CreatedAt": "={{ $json.CreatedAt }}",
+            "Domain": "={{$json.Domain}}"
+          },
+          "matchingColumns": [
+            "PlaceId"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Domain",
+              "displayName": "Domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Rating",
+              "displayName": "Rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Reviews",
+              "displayName": "Reviews",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "GoogleMapsUrl",
+              "displayName": "GoogleMapsUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PlaceId",
+              "displayName": "PlaceId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "City",
+              "displayName": "City",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CityCountry",
+              "displayName": "CityCountry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Row",
+              "displayName": "Row",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CityIndex",
+              "displayName": "CityIndex",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "NextIndustryRow",
+              "displayName": "NextIndustryRow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "NextCityIndex",
+              "displayName": "NextCityIndex",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CreatedAt",
+              "displayName": "CreatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "_page",
+              "displayName": "_page",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "_textsearch_status",
+              "displayName": "_textsearch_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "details_status",
+              "displayName": "details_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Types",
+              "displayName": "Types",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PhoneNormalized",
+              "displayName": "PhoneNormalized",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "HasWebsite",
+              "displayName": "HasWebsite",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "HasPhone",
+              "displayName": "HasPhone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "IsSocialDomain",
+              "displayName": "IsSocialDomain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "IsHostedSite",
+              "displayName": "IsHostedSite",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "IsLikelyOwnSite",
+              "displayName": "IsLikelyOwnSite",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "QualityScore",
+              "displayName": "QualityScore",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        10400,
+        208
+      ],
+      "id": "e62cac4a-953b-49ad-9c33-3827f294042f",
+      "name": "Append → Leads (Validated)",
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7i0FCMx3aI0V5LI1",
+          "name": "google-sheets-mystnet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "16nufaT01i0IEqczXQB_WEBd36CC-1gk-3dqfyin1_5k",
+          "mode": "list",
+          "cachedResultName": "Mystnet Lead Automation (n8n)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16nufaT01i0IEqczXQB_WEBd36CC-1gk-3dqfyin1_5k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 579586784,
+          "mode": "list",
+          "cachedResultName": "Leads (RAW)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16nufaT01i0IEqczXQB_WEBd36CC-1gk-3dqfyin1_5k/edit#gid=579586784"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Phone": "={{ $json.Phone ? \"'\" + String($json.Phone) : \"\" }}",
+            "Address": "={{ $json.Address }}",
+            "Rating": "={{ $json.Rating }}",
+            "Reviews": "={{ $json.Reviews }}",
+            "GoogleMapsUrl": "={{ $json.GoogleMapsUrl }}",
+            "PlaceId": "={{ $json.PlaceId }}",
+            "Industry": "={{ $json.Industry }}",
+            "Country": "={{ $json.Country }}",
+            "City": "={{ $json.City }}",
+            "CityCountry": "={{ $json.CityCountry }}",
+            "CreatedAt": "={{ $json.CreatedAt }}",
+            "Domain": "={{$json.Domain}}",
+            "Website": "={{$json.Website}}",
+            "Types": "={{ Array.isArray($json.Types) ? $json.Types.join(', ') : String($json.Types || '') }}"
+          },
+          "matchingColumns": [
+            "PlaceId"
+          ],
+          "schema": [
+            {
+              "id": "PlaceId",
+              "displayName": "PlaceId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Types",
+              "displayName": "Types",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Rating",
+              "displayName": "Rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Reviews",
+              "displayName": "Reviews",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "GoogleMapsUrl",
+              "displayName": "GoogleMapsUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Domain",
+              "displayName": "Domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PhoneNormalized",
+              "displayName": "PhoneNormalized",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "City",
+              "displayName": "City",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CityCountry",
+              "displayName": "CityCountry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CreatedAt",
+              "displayName": "CreatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "HasWebsite",
+              "displayName": "HasWebsite",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "HasPhone",
+              "displayName": "HasPhone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "IsSocialDomain",
+              "displayName": "IsSocialDomain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "IsHostedSite",
+              "displayName": "IsHostedSite",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "IsLikelyOwnSite",
+              "displayName": "IsLikelyOwnSite",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "QualityScore",
+              "displayName": "QualityScore",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        9776,
+        -384
+      ],
+      "id": "8c454d12-6705-4e44-acd2-2d5db4e0c82d",
+      "name": "Append → Leads (RAW)",
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7i0FCMx3aI0V5LI1",
+          "name": "google-sheets-mystnet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Init Quota Caps — dagliga tak m. säkerhetsmarginal + kompatibla alias\n\nconst now = new Date();\nconst daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();\n\n// Justera vid behov\nconst SAFETY = 0.80; // 80% av gratisnivån som säkerhetsmarginal\n\n// Gratis/månad enligt nuvarande modell (ändra här om du vill finjustera)\nconst MONTHLY = {\n  text:    5000,  // Places Text Search (Pro)\n  details: 5000,  // Place Details (Pro)\n  geocode: 10000, // Geocoding (Essentials)\n};\n\n// Räkna fram dagliga tak (avrundat nedåt) + se till att minsta tak är 1\nfunction dailyCap(monthly) {\n  return Math.max(1, Math.floor((monthly / daysInMonth) * SAFETY));\n}\n\nconst caps = {\n  textDaily:    dailyCap(MONTHLY.text),\n  detailsDaily: dailyCap(MONTHLY.details),\n  geocodeDaily: dailyCap(MONTHLY.geocode),\n};\n\n// Returnera även alias/flat keys för maximal kompatibilitet\nreturn [{\n  json: {\n    monthKey: now.toISOString().slice(0, 7), // \"YYYY-MM\"\n    daysInMonth,\n    safety: SAFETY,\n\n    monthly: { ...MONTHLY },\n\n    // Primär kapslad struktur\n    caps: { ...caps },\n\n    // Kompatibla alias som andra noder letar efter\n    textDailyCap:    caps.textDaily,\n    detailsDailyCap: caps.detailsDaily,\n    geocodeDailyCap: caps.geocodeDaily,\n\n    // Meta\n    generatedAt: now.toISOString(),\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        -576
+      ],
+      "id": "368a87df-8a52-42b9-ad17-98139f9121ce",
+      "name": "Init Quota Caps"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "16nufaT01i0IEqczXQB_WEBd36CC-1gk-3dqfyin1_5k",
+          "mode": "list",
+          "cachedResultName": "Mystnet Lead Automation (n8n)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16nufaT01i0IEqczXQB_WEBd36CC-1gk-3dqfyin1_5k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1449146030,
+          "mode": "list",
+          "cachedResultName": "Quota",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16nufaT01i0IEqczXQB_WEBd36CC-1gk-3dqfyin1_5k/edit#gid=1449146030"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "detectAutomatically"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        -576
+      ],
+      "id": "f8c25ea8-0131-4677-992e-8177de1a2180",
+      "name": "Quota → Read (All)",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7i0FCMx3aI0V5LI1",
+          "name": "google-sheets-mystnet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Bygg/behåll dagens rad till Quota-bladet\nconst today    = new Date().toISOString().slice(0,10); // YYYY-MM-DD\nconst monthKey = today.slice(0,7);                      // YYYY-MM\n\n// Plocka ev. befintlig rad för \"today\" från Quota → Read (All)\nconst rows = (items || []).map(it => it.json || {});\nconst existing = rows.find(r => String(r.Day) === today) || null;\n\nconst out = {\n  Day: today,\n  MonthKey: monthKey,\n  textUsed:    Number(existing?.textUsed    || 0),\n  detailsUsed: Number(existing?.detailsUsed || 0),\n  geocodeUsed: Number(existing?.geocodeUsed || 0),\n};\n\nreturn [{ json: out }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        -576
+      ],
+      "id": "d420fc59-8478-477c-8daf-548eac0f4cf7",
+      "name": "Ensure Today (build)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tar CityCountry (fallback City + Country) och bygger ett säkert address-fält\nconst city = ($json.City || '').toString().trim();\nconst country = ($json.Country || '').toString().trim();\nconst cityCountry = ($json.CityCountry || '').toString().trim() || [city, country].filter(Boolean).join(', ');\n\n// Throw om vi saknar nödvändigt under strict-läge\nif (!cityCountry) {\n  throw new Error('Prep Geocode Input: Saknar City/Country för geokodning.');\n}\n\nreturn [\n  {\n    json: {\n      ...$json,\n      AddressForGeocode: cityCountry, // t.ex. \"Karlshamn, Sweden\"\n      GeocodeLang: 'sv',\n      GeocodeRegion: 'se',\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1456,
+        192
+      ],
+      "id": "9dff2715-6e19-42bc-8042-2e5c34f05ea0",
+      "name": "Prep Geocode Input"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "067ceb70-00c9-46a4-b661-7a60f2dddf98",
+              "leftValue": "={{$json.hasGeo}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2496,
+        -432
+      ],
+      "id": "7b226528-5582-4c63-8235-c250cf08f4ec",
+      "name": "IF has geo"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    ...$json,\n    _skipTextSearch: true,\n    __reason: 'no-geo'  // för enklare felsök/loggning\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2912,
+        -144
+      ],
+      "id": "46c42cb8-b3d0-49e3-ad4a-9f52e2d9e0fe",
+      "name": "Skip TextSearch (no geo)"
+    },
+    {
+      "parameters": {
+        "jsCode": "const j = $json || {};\nconst hasGeo = !!(j.geo && typeof j.geo.lat === 'number' && typeof j.geo.lng === 'number');\nreturn [{ json: { ...j, hasGeo } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2288,
+        -432
+      ],
+      "id": "eefb905b-2426-4216-a19d-1ae1565dbe49",
+      "name": "Has Geo"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { __quota: { geocode: 1 } } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2080,
+        960
+      ],
+      "id": "7c02f20a-4bb5-416b-a864-fd5316fb1be8",
+      "name": "Quota Δ Geocode"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "place_id",
+        "joinMode": "enrichInput1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        7696,
+        -144
+      ],
+      "id": "18d11555-f12f-4363-a4f8-2acf6a3a4ed8",
+      "name": "Merge Δ (Text+Details)"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        7904,
+        -304
+      ],
+      "id": "d4751cc1-9b15-430f-85cd-6d351e4f9d46",
+      "name": "Merge Δ (All)"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sum = { text: 0, details: 0, geocode: 0 };\n\nfor (const it of items) {\n  const q = it.json?.__quota || {};\n  sum.text    += Number(q.text    || 0);\n  sum.details += Number(q.details || 0);\n  sum.geocode += Number(q.geocode || 0);\n}\n\n// Bygg en enda rad som nästa steg kan merge:a med \"Ensure Today (build)\"\nreturn [{\n  json: {\n    Day: new Date().toISOString().slice(0,10),  // \"YYYY-MM-DD\"\n    textUsed: sum.text,\n    detailsUsed: sum.details,\n    geocodeUsed: sum.geocode,\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        10608,
+        -736
+      ],
+      "id": "b19dd30b-7bed-4a37-94a7-e541f2add82b",
+      "name": "Quota Δ Sum"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Quota Totals — robust läsning av bas + delta\n// - delta kommer från föregående nod (Quota Δ Sum) via $input\n// - bas hämtas säkert från \"Ensure Today (build)\" med try/catch\n\nfunction safeFirstJson(nodeName) {\n  try {\n    const arr = $items(nodeName);\n    if (Array.isArray(arr) && arr.length) return arr[0].json || {};\n  } catch (e) {\n    // noden kan saknas vid vissa körningar – ignorera\n  }\n  return {};\n}\n\nconst today = new Date().toISOString().slice(0, 10);\n\n// 1) Delta från Quota Δ Sum (inkommande item)\nconst delta = ($input.first() && $input.first().json) || {};\n\n// 2) Bas från Ensure Today (build)\nconst base = safeFirstJson('Ensure Today (build)');\n\nconst asNum = (v) => Number(v || 0);\n\n// 3) Slå ihop\nconst day = base.Day || delta.Day || today;\nconst monthKey = base.MonthKey ?? (day ? day.slice(0, 7) : today.slice(0, 7));\n\nreturn [{\n  json: {\n    Day: day,\n    MonthKey: monthKey,\n\n    textUsed:    asNum(base.textUsed)    + asNum(delta.textUsed),\n    detailsUsed: asNum(base.detailsUsed) + asNum(delta.detailsUsed),\n    geocodeUsed: asNum(base.geocodeUsed) + asNum(delta.geocodeUsed),\n\n    // valfria fält om du har kolumner för dem\n    lastReset: base.lastReset ?? null,\n    notes: base.notes ?? '',\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        10816,
+        -736
+      ],
+      "id": "3aefde06-140d-4cf4-8430-91be600ec76a",
+      "name": "Quota Totals"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "16nufaT01i0IEqczXQB_WEBd36CC-1gk-3dqfyin1_5k",
+          "mode": "list",
+          "cachedResultName": "Mystnet Lead Automation (n8n)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16nufaT01i0IEqczXQB_WEBd36CC-1gk-3dqfyin1_5k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1449146030,
+          "mode": "list",
+          "cachedResultName": "Quota",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16nufaT01i0IEqczXQB_WEBd36CC-1gk-3dqfyin1_5k/edit#gid=1449146030"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Day": "={{ $json.Day }}",
+            "MonthKey": "={{ $json.MonthKey }}",
+            "textUsed": "={{ $json.textUsed }}",
+            "detailsUsed": "={{ $json.detailsUsed }}",
+            "geocodeUsed": "={{ $json.geocodeUsed }}",
+            "lastReset": "={{ $json.lastReset }}",
+            "notes": "={{ $json.notes }}"
+          },
+          "matchingColumns": [
+            "Day"
+          ],
+          "schema": [
+            {
+              "id": "Day",
+              "displayName": "Day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "MonthKey",
+              "displayName": "MonthKey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "textUsed",
+              "displayName": "textUsed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "detailsUsed",
+              "displayName": "detailsUsed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "geocodeUsed",
+              "displayName": "geocodeUsed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lastReset",
+              "displayName": "lastReset",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        11648,
+        -448
+      ],
+      "id": "4d8eda44-9e45-43a0-9d8a-1ed1e17a9496",
+      "name": "Quota → Upsert1",
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7i0FCMx3aI0V5LI1",
+          "name": "google-sheets-mystnet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Guard Details Response — pass-through + lyft ut centrala fält från Place Details\nfunction normPhone(p){ return String(p || '').replace(/[^\\d+]/g, ''); }\nfunction getDomain(website){\n  if (!website) return '';\n  try {\n    const url = /^https?:\\/\\//i.test(website) ? website : `http://${website}`;\n    return new URL(url).hostname.replace(/^www\\./, '');\n  } catch { return ''; }\n}\n\nreturn items.map(it => {\n  const j = it.json || {};\n  const body   = j.body ?? j;                 // HTTP full response eller redan \"flattened\"\n  const status = body.status ?? j.status ?? null;\n  const res    = body.result ?? body;         // stöd för båda varianter\n\n  // Fält från Place Details\n  const pid     = res.place_id ?? j.place_id ?? null;\n  const name    = res.name ?? j.name ?? '';\n  const address = res.formatted_address ?? j.address ?? '';\n  const rating  = res.rating ?? j.rating ?? null;\n  const reviews = res.user_ratings_total ?? j.reviews ?? null;\n  const types   = Array.isArray(res.types) ? res.types : (Array.isArray(j.types) ? j.types : []);\n\n  const website = res.website ?? j.website ?? '';\n  const url     = res.url ?? j.url ?? '';\n  const phone   = res.international_phone_number ?? res.formatted_phone_number ?? j.phone ?? '';\n  const phoneN  = normPhone(phone);\n  const domain  = getDomain(website);\n\n  // Praktisk Maps-URL på toppnivå\n  const mapsUrl = pid ? `https://www.google.com/maps/place/?q=place_id:${pid}` : (url || '');\n\n  return {\n    json: {\n      // Behåll ALLT (sånt som kom från TextSearch hänger kvar om det redan fanns)\n      ...j,\n\n      // Lyft upp nycklar som Merge/Normalize behöver på toppnivå\n      place_id: pid,\n      Name: name || j.Name,\n      Address: address || j.Address,\n      Rating: rating ?? j.Rating ?? null,\n      Reviews: reviews ?? j.Reviews ?? null,\n      GoogleMapsUrl: mapsUrl || j.GoogleMapsUrl || null,\n      Website: website || j.Website || '',\n      details_status: status,\n\n      // Rikt details-objekt för Normalize/fallbackar\n      details: {\n        place_id: pid,\n        name, address, rating, reviews, types,\n        website, url,\n        phone_raw: phone, phone_norm: phoneN,\n        domain\n      }\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7280,
+        -48
+      ],
+      "id": "9fedc3a6-463a-4edd-94a3-3885ce064102",
+      "name": "Guard Details Response"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1040,
+        -192
+      ],
+      "id": "bc1dd681-d230-452a-9d1c-cbef6fb3bec4",
+      "name": "Gate Build (Quota ready)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Quota Ctx — bygger ett sammanhängande objekt för resten av flödet\nfunction firstJson(name) {\n  try {\n    const arr = $items(name);\n    if (Array.isArray(arr) && arr.length) return arr[0].json || {};\n  } catch {}\n  return {};\n}\n\nconst today = new Date().toISOString().slice(0,10);\n\n// 1) Capar från Init Quota Caps\nconst capsIn = firstJson('Init Quota Caps');\nconst caps = capsIn.caps || {};\nconst capText    = Number(caps.textDaily    ?? capsIn.textDailyCap    ?? 0);\nconst capDetails = Number(caps.detailsDaily ?? capsIn.detailsDailyCap ?? 0);\nconst capGeo     = Number(caps.geocodeDaily ?? capsIn.geocodeDailyCap ?? 0);\n\n// 2) Dagens rad från Quota → Read (All)\nconst allRows = $items('Quota → Read (All)') || [];\nconst rowToday = allRows.map(x => x.json || {}).find(r => (r.Day || r.day) === today) || {};\nconst usedText    = Number(rowToday.textUsed    || 0);\nconst usedDetails = Number(rowToday.detailsUsed || 0);\nconst usedGeo     = Number(rowToday.geocodeUsed || 0);\n\n// 3) Remaining + konservativt aggregat\nconst remainingText    = Math.max(0, capText    - usedText);\nconst remainingDetails = Math.max(0, capDetails - usedDetails);\nconst remainingGeo     = Math.max(0, capGeo     - usedGeo);\n\nconst aggCap  = Math.min(...[capText || Infinity, capDetails || Infinity, capGeo || Infinity]);\nconst aggUsed = Math.max(usedText, usedDetails, usedGeo);\nconst aggRemaining = Math.max(0, (isFinite(aggCap) ? aggCap : 0) - aggUsed);\n\n// 4) Output (många kompatibla nycklar så Build queries hittar dem)\nreturn [{\n  json: {\n    caps: {\n      textDaily: capText,\n      detailsDaily: capDetails,\n      geocodeDaily: capGeo,\n    },\n    textDailyCap: capText,\n    detailsDailyCap: capDetails,\n    geocodeDailyCap: capGeo,\n\n    textUsedToday: usedText,\n    detailsUsedToday: usedDetails,\n    geocodeUsedToday: usedGeo,\n\n    textRemaining: remainingText,\n    detailsRemaining: remainingDetails,\n    geocodeRemaining: remainingGeo,\n\n    // Aggregat som Build queries läser som fallback\n    textCapToday: aggCap,\n    textUsed: aggUsed,\n    usedText: aggUsed,\n    textRequests: aggUsed,\n    remainingTextAgg: aggRemaining,\n\n    day: today,\n    generatedAt: new Date().toISOString(),\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        -576
+      ],
+      "id": "e8c3f33b-3009-444a-bc09-3bbff0214aa4",
+      "name": "Quota Ctx"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initiera sid-kontekst för TextSearch\nconst out = [];\nfor (const it of items) {\n  const j = it.json || {};\n  out.push({\n    json: {\n      ...j,\n      paginate: { page: 1, token: null } // page 1, ingen token ännu\n    }\n  });\n}\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3120,
+        -704
+      ],
+      "id": "745064d3-6502-494e-bb57-cf538b2205ee",
+      "name": "Init PageCtx"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Paginate TextSearch — single output med rutt-taggning\n// _route: 'this'  → denna sidans resultat → Explode → Keep Unique → Details\n// _route: 'next'  → nästa sidans request (med pagetoken) → Wait ~2700 ms → Places Text Search\n\nconst MAX_PAGES = 3;\nconst out = [];\n\nconst arr = Array.isArray(items) ? items : [];\nfor (const it of arr) {\n  const j = (it && it.json) ? it.json : {};\n  const body = j.body || j;\n  const next = body && body.next_page_token ? body.next_page_token : null;\n\n  const page = Number.isFinite(j._page) ? Number(j._page) : 1;\n  const status = String(body?.status || '').toUpperCase();\n\n  // 1) Denna sidans payload (utan token)\n  out.push({\n    json: {\n      ...j,\n      paginate: undefined,\n      _page: page,\n      _textsearch_status: status,\n      _route: 'this',\n    },\n  });\n\n  // 2) Nästa sidans request (med token) – om tillgänglig\n  if (next && page < MAX_PAGES) {\n    out.push({\n      json: {\n        ...j,                          // behåll seed/query/_detailsCap m.m.\n        paginate: { token: next },     // ← Places Text Search läser denna\n        _page: page + 1,\n        _route: 'next',\n      },\n    });\n  }\n}\n\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4160,
+        -464
+      ],
+      "id": "3e4ad651-d32c-4805-a27c-9f31041d5d99",
+      "name": "Paginate TextSearch",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "jsCode": "const j = $json || {};\nreturn [{\n  json: {\n    __control: {\n      CurrentIndustryRow: j.NextIndustryRow,\n      CurrentCityIndex:   j.NextCityIndex,\n    }\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        -304
+      ],
+      "id": "f871f119-f55b-488c-aded-efbe862462ff",
+      "name": "Return __control"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bfef6f1d-da0b-4878-8930-40df6777e4bf",
+              "leftValue": "={{ $json._route === 'next' }}",
+              "rightValue": "=textsearch.next",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        4576,
+        -448
+      ],
+      "id": "31c52c1c-d9d1-4421-af74-6eca2d8ea5e4",
+      "name": "IF: Next?"
+    },
+    {
+      "parameters": {
+        "amount": "={{ Math.max(2, Math.ceil(( $json._waitMs ?? 2500 ) / 1000 )) }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4784,
+        -464
+      ],
+      "id": "c06b29e2-2e70-45aa-acc7-d65c3aa5b327",
+      "name": "Wait next",
+      "webhookId": "403b5c75-dbf7-4664-b359-1dabfdcc0540"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        9152,
+        -144
+      ],
+      "id": "c124af1f-a82b-4449-964e-c42037666d2d",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        10176,
+        192
+      ],
+      "id": "70a6d6fe-19e7-42d7-9b21-d71823069968",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        10400,
+        -464
+      ],
+      "id": "a90bee18-a149-421f-99ff-ed604d00ca9f",
+      "name": "Gate: Upsert after Validated done"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Details Inspect — sätt _needsRetry för transienta fel, max 2 försök\nconst MAX_RETRIES = 2;\n\n// Statusar i body.status som brukar lösa sig vid retry\nconst RETRYABLE_STATUS = new Set([\n  'OVER_QUERY_LIMIT',\n  'UNKNOWN_ERROR',\n  'RESOURCE_EXHAUSTED'\n]);\n\nreturn items.map(it => {\n  const j = it.json || {};\n  const body = j.body || j;\n\n  // HTTP-kod från noden (varierar med credential/nod)\n  const httpCode = Number(j.code || j.statusCode || body.code || 0);\n  const status   = String(body.status || j.status || '').toUpperCase();\n\n  const hasResult = !!(body.result || j.result);\n  const curRetry  = Number(j._retry_details || 0);\n\n  // Transienta fel: HTTP 429 eller “retryable” status OCH vi har inte fått resultat\n  const isTransient =\n    httpCode === 429 || (RETRYABLE_STATUS.has(status) && !hasResult);\n\n  const needsRetry = isTransient && curRetry < MAX_RETRIES;\n\n  return {\n    json: {\n      ...j,\n      _details_status: status || (hasResult ? 'OK' : 'UNKNOWN'),\n      _http_details: httpCode,\n      _needsRetry: needsRetry,\n      _retry_details: curRetry // bumpas i Bump Retry\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6448,
+        -480
+      ],
+      "id": "d32b0bc4-2fb5-450c-89e9-853a8fa88198",
+      "name": "Details Inspect"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c39f0759-4eac-47b5-a910-d0686cc7dc58",
+              "leftValue": "={{ $json._needsRetry === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        6656,
+        -480
+      ],
+      "id": "1d59299c-6172-4134-83db-686e9eef96a8",
+      "name": "IF: Needs retry?"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json._retryDelayMs || 2500 }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        6864,
+        -496
+      ],
+      "id": "eccdb1ff-bcdd-47ae-9ace-fc907848cfad",
+      "name": "Wait Retry",
+      "webhookId": "7efb5b54-3bf4-4fc5-94e0-2c491cac1009"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Bump Retry — öka försök & beräkna backoff\nreturn items.map(it => {\n  const j = it.json || {};\n  const n = Number(j._retry || 0) + 1;                    // nästa försök\n  const delay = Math.min(60000, Math.round(2000 * Math.pow(1.8, n - 1))); // 2s, 3.6s, 6.5s, 11.7s, 21.0s ...\n  return { json: { ...j, _retry: n, _retryDelayMs: delay } };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7072,
+        -496
+      ],
+      "id": "02934079-49ef-4303-af28-023fd46a6724",
+      "name": "Bump Retry"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Kvalitetsflaggor och små saneringar för Website/Domain/Phone.\n// OBS: vi filtrerar INTE här – bara sätter flaggor + ett enkelt score.\n\nfunction norm(v){ return (typeof v === 'string' ? v.trim() : ''); }\nfunction cleanPhone(p){\n  let s = norm(p);\n  if (!s) return '';\n  // ta bort allt utom siffror och +\n  s = s.replace(/[^\\d+]/g, '');\n  // 00 -> + (internationellt prefix)\n  if (s.startsWith('00')) s = '+' + s.slice(2);\n  return s;\n}\nfunction hostFromUrl(u){\n  let s = norm(u);\n  if(!s) return '';\n  try{\n    if(!/^https?:\\/\\//i.test(s)) s = 'http://' + s;\n    const h = new URL(s).hostname.toLowerCase();\n    return h.replace(/^www\\./, '');\n  }catch{ return ''; }\n}\n\nconst SOCIAL = new Set([\n  'facebook.com','m.facebook.com','instagram.com','linkedin.com','twitter.com','x.com','tiktok.com','youtube.com',\n  'goo.gl','g.page','maps.google.com'\n]);\nconst HOSTED = new Set([\n  'business.site','sites.google.com','wixsite.com','godaddysites.com','webnode.page','webflow.io','wordpress.com'\n]);\n\nreturn items.map(it => {\n  const j = it.json || {};\n\n  // säkerställ domain/website/phone\n  const website = norm(j.Website || '');\n  const domain  = j.Domain ? j.Domain.toLowerCase() : hostFromUrl(website);\n  const phone   = cleanPhone(j.Phone || '');\n\n  const hasWebsite = !!website;\n  const hasPhone   = phone.length >= 6;\n  const isSocial   = SOCIAL.has(domain);\n  const isHosted   = HOSTED.has(domain);\n  const ownSite    = hasWebsite && !isSocial && !isHosted; // sannolik egen site\n\n  // enkel kvalitets-score (0–7)\n  let score = 0;\n  if (ownSite) score += 2;\n  if (hasPhone) score += 2;\n  const reviews = Number(j.Reviews ?? 0);\n  const rating  = Number(j.Rating  ?? 0);\n  if (reviews >= 5) score += 1;\n  if (rating  >= 4) score += 1;\n  if (Array.isArray(j.Types) && j.Types.length) score += 1;\n\n  return {\n    json: {\n      ...j,\n      Website: website,\n      Domain: domain,\n      Phone: phone,\n      HasWebsite: hasWebsite,\n      HasPhone: hasPhone,\n      IsSocialDomain: isSocial,\n      IsHostedSite: isHosted,\n      IsLikelyOwnSite: ownSite,\n      QualityScore: score\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8320,
+        -144
+      ],
+      "id": "66c23d67-8e45-40ba-b157-55f227982ec7",
+      "name": "Quality flags & sanitize"
+    },
+    {
+      "parameters": {
+        "amount": "={{ 2 + Math.random() * 1 }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        11440,
+        -448
+      ],
+      "id": "7aaac785-6a61-4d6a-99a8-f9ae3610df2b",
+      "name": "Wait → Quota Upsert",
+      "webhookId": "da2bb97d-5cc0-4da3-ba51-e70486efbc14"
+    },
+    {
+      "parameters": {
+        "amount": "={{ 2.8 + Math.random() * 1.7 }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        9760,
+        -128
+      ],
+      "id": "ce08f45d-6116-4c8d-ae8e-e485667b69cb",
+      "name": "Wait (RAW)",
+      "webhookId": "2c92bb9d-ae7e-4191-8772-88e183ec55e1"
+    },
+    {
+      "parameters": {
+        "amount": "={{ 5.5 + Math.random() * 2.5 }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        10608,
+        208
+      ],
+      "id": "9cef0fe7-1501-4a75-b8c2-b184771b6c2b",
+      "name": "Wait Validated",
+      "webhookId": "9edf1f60-5eb1-4745-a630-0a9e1f83d1c1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Debug: finns next_page_token och hur många resultat?\nconst out = [];\nfor (const it of items) {\n  const b = it.json.body || it.json;\n  const n = Array.isArray(b.results) ? b.results.length : 0;\n  console.log('TextSearch results:', n, 'next_page_token:', b.next_page_token || null);\n  out.push(it); // pass-through\n}\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3952,
+        -464
+      ],
+      "id": "8a719490-ad35-481b-bec0-b1876f7e54ca",
+      "name": "debug"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pass-through: lämna seedets query oförändrad (från Build queries)\nreturn items;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3328,
+        -448
+      ],
+      "id": "631e8d47-7077-4426-9575-b44da4b4bfc5",
+      "name": "Force Query (test)"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3744,
+        -464
+      ],
+      "id": "b1961390-2edc-4ee3-8180-6ced1b0ae13f",
+      "name": "Merge PageCtx + Response"
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        5824,
+        -352
+      ],
+      "id": "5236e820-4044-4287-8da0-04e4659b161b",
+      "name": "Split in Batches (DetailsLoop)"
+    },
+    {
+      "parameters": {
+        "jsCode": "let ok=0, fail=0;\nfor (const it of items) {\n  const j = it.json||{};\n  const hasWeb = !!(j.Website || j.website);\n  const phone  = (j.Phone || j.phone || '').replace(/[^\\d+]/g,'');\n  const hasPh  = phone.length >= 6;\n  if (hasWeb && hasPh) ok++; else fail++;\n  console.log('▶', j.Name || j.name, { hasWeb, hasPh, phone });\n}\nconsole.log('SUM:', { ok, fail });\nreturn items;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8736,
+        -144
+      ],
+      "id": "fc2d4e59-c40b-4405-9d50-2ef058e02362",
+      "name": "sanity-debug"
+    },
+    {
+      "parameters": {
+        "amount": 0.25
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        6240,
+        -480
+      ],
+      "id": "bdfcbcc8-c24c-4d0b-b84a-bcf56970c100",
+      "name": "Wait",
+      "webhookId": "6b4ad287-a8d8-4420-b8ce-b5fa6f0f900d"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { __continue: true } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7696,
+        656
+      ],
+      "id": "fe82e48c-cdf2-4080-be5f-b3cf3b30228c",
+      "name": "Next batch (signal)"
+    },
+    {
+      "parameters": {
+        "jsCode": "const seen = new Set(), out = [];\nfor (const it of items) {\n  const j = it.json || {};\n  const pid = j.PlaceId || j.place_id || '';\nconst dom = (j.Domain || '').toLowerCase();\nconst key = pid || dom; // föredra PlaceId, annars domän\nif (!key) { out.push({ json: j }); continue; } // om inget, släpp igenom\n  if (seen.has(key)) continue;\n  seen.add(key);\n  out.push({ json: j });\n}\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8528,
+        -144
+      ],
+      "id": "cf933845-50c1-4de3-9231-89ed52d5462c",
+      "name": "Dedupe PlaceId|Domain"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6272a2ac-4d52-4909-999d-54817b3b9328",
+              "leftValue": "={{ $json._route === 'this' }}",
+              "rightValue": "=textsearch.page",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        4368,
+        -224
+      ],
+      "id": "59ee94db-52c2-4128-8aa1-a9fc1b5c63cf",
+      "name": "IF: This?"
+    },
+    {
+      "parameters": {
+        "jsCode": "console.log('Explode produced:', items.length);\nreturn items; // pass-through, behåll alla items\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5200,
+        -160
+      ],
+      "id": "e01c2935-3e4a-414a-891c-ff0b05ecf5b4",
+      "name": "count-tap"
+    },
+    {
+      "parameters": {
+        "jsCode": "console.log('After Keep Unique:', items.length);\nreturn items; // pass-through, låt detaljer-loopen få alla\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5616,
+        -160
+      ],
+      "id": "a2424021-f2b5-4368-94c0-8ea3aa18141b",
+      "name": "count-tap-3"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { __quota: { details: 1 } } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7488,
+        -384
+      ],
+      "id": "75e792e0-d9dc-42f7-8fd5-b2416915cbae",
+      "name": "quota only"
+    },
+    {
+      "parameters": {
+        "content": "### Input from WF1\nTrigger entrypoint for seeds from Workflow 1.  \nReceives Industry, Country, City, CityCountry, Row, CityIndex, NextIndustryRow, NextCityIndex.",
+        "height": 720,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -48,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "22412932-754b-4c27-afc8-65e09b3b49b4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "### Init Quota Caps\nCompute daily quota caps from monthly allowances (with safety margin).  \nOutputs baseline caps for text, details, and geocode requests.",
+        "height": 560,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        160,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "e89249c9-a6b4-4c08-9359-3dced46decb0",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "### Quota → Read (All)\nReads the entire Quota sheet to check past usage.  \nAlways output data to avoid empty pipeline breaks.",
+        "height": 560,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        368,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "a815d93e-230a-4222-8846-615c4e82172a",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "### Ensure Today (build)\nEnsures a row for today's date exists in the Quota sheet.  \nIf missing, builds a zeroed record for today.\n",
+        "height": 560,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        576,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "28bd71ec-fa38-4ca7-83a6-37e05fcc8673",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "### Quota Ctx\nBuilds aggregated quota context for the run.  \nCombines Init Quota Caps + today's row to calculate remaining budget.",
+        "height": 560,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        784,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "0b5d515e-f7ad-48a2-b0ac-f146c7660ca5",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "### Gate Build (Quota ready)\nEnsures Build queries only runs when quota context is ready.  \nInput1 = Quota Ctx, Input2 = Return __control from WF1.",
+        "height": 992,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        992,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "5bb6039f-27d6-4c26-8cc6-a922eb90dc91",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "### Build queries\nGenerates search queries (variants per seed) with balanced quota usage.  \nInfers Google PlaceType from industry and calculates per-page details cap.",
+        "height": 720,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1200,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "c74c846f-2cb3-4c4e-82be-daafe98cca70",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "### Prep Geocode Input\nPrepares address string (City, Country) for geocoding.  \nAdds language/region hints for API request.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1408,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "2532030d-a59c-45a7-bb6b-195dd02d1419",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "### Geocode City\nHTTP request to Google Geocode API.  \nFetches lat/lng for the given City, Country.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1616,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "9d66f742-2bc5-4c7b-8216-0ebb12259630",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "### Extract Geo\nParses geocode response.  \nValidates status, extracts lat/lng, attaches to seed.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2032,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "5e2c8d3e-a5c2-40a6-b3eb-a4d29e8d8fdc",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "### Has Geo\nAdds flag `hasGeo` if valid lat/lng exists.  \nUsed to branch IF: has geo.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2240,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "6665a8cf-969c-41f2-a099-76fe88e8f4d4",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "### IF has geo\nRoutes items:  \n- TRUE → Init PageCtx (continue to TextSearch).  \n- FALSE → Skip TextSearch (no geo).",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2448,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "1381ab6a-ea44-4ce2-bfd7-a581b70e419e",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "### IF has geo\nRoutes items:  \n- TRUE → Init PageCtx (continue to TextSearch).  \n- FALSE → Skip TextSearch (no geo).",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2656,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "357aefeb-9b39-4121-a255-1d65a4c32254",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "### Skip TextSearch (no geo)\nPass-through with skip flag if no geocoordinates.  \nStill allows pipeline continuity.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2864,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "c3676bba-199e-48d6-8c51-4244314dda3f",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "### Init PageCtx\nInitialize pagination context for TextSearch (page=1, token=null).  \nEnsures subsequent pagination works correctly.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3072,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "3b11419b-6bc2-4bfc-9e97-8e34deb05fb3",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "### Force Query (test)\nOptional debug node: forces query unchanged.  \nPass-through for testing variations.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3280,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "177b2243-98c9-4ded-88dd-45751fb24c8d",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "### Places Text Search\nHTTP request to Google Places TextSearch API.  \nSearch businesses with query + geo location, supports pagetoken.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3488,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "45791265-5285-4d75-b82a-7d7d335b48ea",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "### Merge PageCtx + Response\nMerges request context with API response.  \nKeeps pagination state.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3696,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "cdbbbd96-d62f-4797-9aa8-a625a5611876",
+      "name": "Sticky Note18"
+    },
+    {
+      "parameters": {
+        "content": "### debug\nLogs number of results and presence of next_page_token.  \nFor troubleshooting pagination.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3904,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "f9b0e22e-49ee-4255-9fd8-12041aea66b4",
+      "name": "Sticky Note19"
+    },
+    {
+      "parameters": {
+        "content": "### Paginate TextSearch\nSplits TextSearch output into two routes:  \n- `_route: this` → current page results.  \n- `_route: next` → request for next page (if token exists).",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4112,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "70b45919-4cc3-4bc3-8253-e741eef76b19",
+      "name": "Sticky Note20"
+    },
+    {
+      "parameters": {
+        "content": "### IF: This?\nFilters items tagged `_route: this`.  \nSends them to Explode Search Results.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4320,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "4cbd4ff1-2939-4eb7-8eff-7272524e7ede",
+      "name": "Sticky Note21"
+    },
+    {
+      "parameters": {
+        "content": "### IF: Next?\nFilters items tagged `_route: next`.  \nSends them to Wait next before re-calling TextSearch.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4528,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "a1840eea-39a9-41bc-8620-5ce8bffa5d0a",
+      "name": "Sticky Note22"
+    },
+    {
+      "parameters": {
+        "content": "### Wait next\nDelays ~2.5s to let next_page_token activate.  \nThen loops back into Places Text Search.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4736,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "f7af6121-f24f-4785-bc69-209d3d43e751",
+      "name": "Sticky Note23"
+    },
+    {
+      "parameters": {
+        "content": "### Explode Search Results\nExpands Places results into individual items.  \nAdds seed context and caps items per query.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4944,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "98c9bcea-e81b-40be-b442-2360cec08bba",
+      "name": "Sticky Note24"
+    },
+    {
+      "parameters": {
+        "content": "### count-tap\nDebug node counting results after explode.  \nHelps validate expected output size.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5152,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "57f6939f-1c0d-42f9-8b08-302e52ac4079",
+      "name": "Sticky Note25"
+    },
+    {
+      "parameters": {
+        "content": "### Keep Unique by place_id\nFilters duplicates by Google place_id.  \nEnsures one unique record per place.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5360,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "f1b4cee5-4993-477c-8311-da9d4fc0255a",
+      "name": "Sticky Note26"
+    },
+    {
+      "parameters": {
+        "content": "### count-tap-3\nDebug node counting after uniqueness filter.  \nAlso routes into quota and batching nodes.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5568,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "a766fa07-fcb6-4788-a2e1-61b0d083b5fb",
+      "name": "Sticky Note27"
+    },
+    {
+      "parameters": {
+        "content": "### Split in Batches (DetailsLoop)\nProcesses items in small batches for Place Details requests.  \nBatch size 10 by default.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5776,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "d2126bb6-0a4b-4c0a-8d66-d7ed71e141ca",
+      "name": "Sticky Note28"
+    },
+    {
+      "parameters": {
+        "content": "### Place Details\nHTTP request to Google Places Details API.  \nFetches website, phone, url, rating, reviews.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5984,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "d0c5b0d2-8e91-4167-b849-7f150d16fcff",
+      "name": "Sticky Note29"
+    },
+    {
+      "parameters": {
+        "content": "### Wait\nShort delay between Detail calls (~0.25s).  \nPrevents hammering the API.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6192,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "42db6c91-84db-4e6d-8cb6-86f15f498f6f",
+      "name": "Sticky Note30"
+    },
+    {
+      "parameters": {
+        "content": "### Details Inspect\nChecks Place Details response.  \nFlags transient errors and sets `_needsRetry`.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6400,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "a1a4c83d-573a-4e23-a792-a8fca767bf8a",
+      "name": "Sticky Note31"
+    },
+    {
+      "parameters": {
+        "content": "### IF: Needs retry?\nRoutes items:  \n- TRUE → Wait Retry + Bump Retry → retry Place Details.  \n- FALSE → Guard Details Response.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6608,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "1e5d1db6-92f7-442a-941c-2ee9c1a6debd",
+      "name": "Sticky Note32"
+    },
+    {
+      "parameters": {
+        "content": "### Wait Retry\nDelay before retrying Place Details.  \nBackoff increases per retry attempt.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6816,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "c12cce33-834c-4134-a051-848e6aca12b0",
+      "name": "Sticky Note33"
+    },
+    {
+      "parameters": {
+        "content": "### Bump Retry\nIncrements retry counter and sets backoff delay.  \nLimits retries to MAX_RETRIES.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        7024,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "b91e01e8-e2cb-44e0-a868-79315deffcc0",
+      "name": "Sticky Note34"
+    },
+    {
+      "parameters": {
+        "content": "### Guard Details Response\nNormalizes Place Details output.  \nEnsures place_id, website, phone, url are promoted to top-level.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        7232,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "342e8121-2dad-40c0-8032-ccde2e089e3f",
+      "name": "Sticky Note35"
+    },
+    {
+      "parameters": {
+        "content": "### quota only\nProduces quota delta for details calls.  \nSignals 1 unit of usage per Place Details.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        7440,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "7251c5a2-762a-448c-99fb-b10e850f8b63",
+      "name": "Sticky Note36"
+    },
+    {
+      "parameters": {
+        "content": "### Merge Δ (Text+Details)\nCombines TextSearch + Details results.  \nEnrich mode: keep input1 (TextSearch), enrich with Details.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        7648,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "655eeee8-aecd-4265-ba33-047a71b0cec6",
+      "name": "Sticky Note37"
+    },
+    {
+      "parameters": {
+        "content": "### Merge Δ (All)\nCombines quota deltas (text, details, geocode).  \nFeeds into Quota Δ Sum.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        7856,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "da7697d3-75bc-460e-a812-87ef62fb704b",
+      "name": "Sticky Note38"
+    },
+    {
+      "parameters": {
+        "content": "### Normalize (to Leads RAW)\nBuilds normalized record for RAW leads sheet.  \nExtracts PlaceId, Name, Address, Website, Phone, Domain, etc.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        8064,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "b1374c04-6aae-4a1e-a601-906b9c10c8d9",
+      "name": "Sticky Note39"
+    },
+    {
+      "parameters": {
+        "content": "### Quality flags & sanitize\nAdds boolean flags and computes QualityScore.  \nFlags: HasWebsite, HasPhone, IsSocialDomain, IsHostedSite, IsLikelyOwnSite.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        8272,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "f257df80-779e-4dbd-8ebd-e38f479cd06f",
+      "name": "Sticky Note40"
+    },
+    {
+      "parameters": {
+        "content": "### Dedupe PlaceId|Domain\nDeduplicates leads by PlaceId or Domain.  \nEnsures unique leads downstream.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        8480,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "f5f48ec7-038a-4e22-8f35-dbcacab4ec5e",
+      "name": "Sticky Note41"
+    },
+    {
+      "parameters": {
+        "content": "### sanity-debug\nDebug node printing counts of valid website/phone.  \nVerifies filtering logic.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        8688,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "4d759196-ea51-4a1a-b3e1-c73da8318dfa",
+      "name": "Sticky Note42"
+    },
+    {
+      "parameters": {
+        "content": "### Loop Over Items\nBatch appender for RAW leads.  \nOne-by-one append to Google Sheet + wait.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        8896,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "252d7871-35c3-4a7e-991d-395d762b5894",
+      "name": "Sticky Note43"
+    },
+    {
+      "parameters": {
+        "content": "### Append → Leads (RAW)\nAppends normalized leads to RAW sheet.  \nAuto-maps fields.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        9104,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "4cac5e6c-ae44-4f85-95c5-b8424f180430",
+      "name": "Sticky Note44"
+    },
+    {
+      "parameters": {
+        "content": "### Wait (RAW)\nDelay between RAW writes (~3–4s).  \nLoops back to Loop Over Items.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        9312,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "f860db43-be36-4e9f-b09c-141535b8ad77",
+      "name": "Sticky Note45"
+    },
+    {
+      "parameters": {
+        "content": "### Filter: has Website or Phone\nFilters items for VALIDATED sheet.  \nPolicy toggle: requires Website (true) or Website OR Phone.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        9520,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "eb7a34a2-4276-4b21-ad45-1011e8567470",
+      "name": "Sticky Note46"
+    },
+    {
+      "parameters": {
+        "content": "### Loop Over Items1\nBatch appender for VALIDATED leads.  \nAppend one-by-one to Validated sheet + wait.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        9728,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "0ca0bcb4-b494-4d33-9bd1-da9e0a33dca0",
+      "name": "Sticky Note47"
+    },
+    {
+      "parameters": {
+        "content": "### Append → Leads (Validated)\nAppends deduped + filtered leads to VALIDATED sheet.  \nUpsert by PlaceId.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        9936,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "0468da87-8c87-45d7-98a8-62f8b1ae20ac",
+      "name": "Sticky Note48"
+    },
+    {
+      "parameters": {
+        "content": "### Wait Validated\nDelay between VALIDATED writes (~5–7s).  \nLoops back to Loop Over Items1.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        10144,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "74e1f34d-77c7-44cd-86a2-f7470509b570",
+      "name": "Sticky Note49"
+    },
+    {
+      "parameters": {
+        "content": "### Gate: Upsert after Validated done\nEnsures quota updates only after Validated writes finish.  \nSynchronizes quota pipeline.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        10352,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "9285e3fb-82e8-40fd-a386-2d167ea00018",
+      "name": "Sticky Note50"
+    },
+    {
+      "parameters": {
+        "content": "### Quota Δ Geocode\nQuota delta: +1 for each Geocode request.  \nFeeds into Merge Δ (All).",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2032,
+        368
+      ],
+      "typeVersion": 1,
+      "id": "a3ee52c9-7b84-434d-93ba-574abdd4eab2",
+      "name": "Sticky Note51"
+    },
+    {
+      "parameters": {
+        "content": "### Quota Δ Sum\nAggregates all quota deltas (text, details, geocode).  \nPrepares totals for today.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        10560,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "4322574d-6a27-4963-8715-c12651ee5c66",
+      "name": "Sticky Note52"
+    },
+    {
+      "parameters": {
+        "content": "### Quota Totals\nCombines Ensure Today baseline + quota deltas.  \nFinal usage counts for the day.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        10768,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "7eb90591-d5d3-42ed-ac3a-03ddbf0fca6f",
+      "name": "Sticky Note53"
+    },
+    {
+      "parameters": {
+        "content": "### Wait → Quota Upsert\nDelay before quota upsert (~2–3s).  \nSmooths API calls.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        10976,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "72d5d83e-6c12-49f1-aa81-c8fd7693d343",
+      "name": "Sticky Note54"
+    },
+    {
+      "parameters": {
+        "content": "### Quota → Upsert1\nWrites updated quota usage to Quota sheet.  \nUpserts by Day column.",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        11184,
+        -976
+      ],
+      "typeVersion": 1,
+      "id": "adc1ff8c-6679-4e20-a369-9f3a8dfbcbd3",
+      "name": "Sticky Note55"
+    },
+    {
+      "parameters": {
+        "content": "### Next Batch (Signal)\nLightweight completion signal emitted at the very end of W2.  \nPurpose: unblock the upstream loop and allow the next seed/batch to start. ",
+        "height": 1328,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        7648,
+        368
+      ],
+      "typeVersion": 1,
+      "id": "99cc17fa-a3f6-4c98-8d64-b190748197ea",
+      "name": "Sticky Note56"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://speed4profit.com/crm/api/leads",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authtoken",
+              "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiTGVhZEdlbmVyYXRvciIsIm5hbWUiOiJMZWFkR2VuZXJhdG9yIiwiQVBJX1RJTUUiOjE3NTc2Nzk2NTl9.XOVmYaHTA6P8xw2b_N_HP09xYprentU88x4LzuMEUOQ"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "source",
+              "value": "={{ $json.source }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $json.Name }}"
+            },
+            {
+              "name": "company",
+              "value": "={{ $json.Name }}"
+            },
+            {
+              "name": "website",
+              "value": "={{ $json.Website }}"
+            },
+            {
+              "name": "address",
+              "value": "={{ $json.Address }}"
+            },
+            {
+              "name": "city",
+              "value": "={{ $json.City }}"
+            },
+            {
+              "name": "country",
+              "value": "={{ $json.Country }}"
+            },
+            {
+              "name": "assigned",
+              "value": "1"
+            },
+            {
+              "name": "custom_fields[leads][1]",
+              "value": "={{$json['Industry']}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        9472,
+        -288
+      ],
+      "id": "6a20d5d1-5c4f-4325-b45c-429cc9338d8b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e3fc683b-ffc2-4b38-871a-160847159c36",
+              "name": "status",
+              "value": "2",
+              "type": "string"
+            },
+            {
+              "id": "6406be9a-5d32-4c48-a2c2-012c3cdb1b44",
+              "name": "source",
+              "value": "3",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        8944,
+        -144
+      ],
+      "id": "f9e08908-24c3-400f-ab1a-8b439a6d1461",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Input from WF1": {
+      "main": [
+        [
+          {
+            "node": "Build queries",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Init Quota Caps",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Return __control",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Geocode City": {
+      "main": [
+        [
+          {
+            "node": "Quota Δ Geocode",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Seed + Geocode",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Build queries": {
+      "main": [
+        [
+          {
+            "node": "Merge Seed + Geocode",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prep Geocode Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Seed + Geocode": {
+      "main": [
+        [
+          {
+            "node": "Extract Geo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Geo": {
+      "main": [
+        [
+          {
+            "node": "Has Geo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Places Text Search": {
+      "main": [
+        [
+          {
+            "node": "Merge PageCtx + Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Explode Search Results": {
+      "main": [
+        [
+          {
+            "node": "count-tap",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Place Details": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize (to Leads RAW)": {
+      "main": [
+        [
+          {
+            "node": "Quality flags & sanitize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keep Unique by place_id": {
+      "main": [
+        [
+          {
+            "node": "count-tap-3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter: has Website or Phone": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append → Leads (Validated)": {
+      "main": [
+        [
+          {
+            "node": "Wait Validated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Init Quota Caps": {
+      "main": [
+        [
+          {
+            "node": "Quota → Read (All)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quota → Read (All)": {
+      "main": [
+        [
+          {
+            "node": "Ensure Today (build)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ensure Today (build)": {
+      "main": [
+        [
+          {
+            "node": "Quota Ctx",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep Geocode Input": {
+      "main": [
+        [
+          {
+            "node": "Geocode City",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF has geo": {
+      "main": [
+        [
+          {
+            "node": "Init PageCtx",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip TextSearch (no geo)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skip TextSearch (no geo)": {
+      "main": [
+        [
+          {
+            "node": "Explode Search Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Geo": {
+      "main": [
+        [
+          {
+            "node": "IF has geo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quota Δ Geocode": {
+      "main": [
+        [
+          {
+            "node": "Merge Δ (All)",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Δ (Text+Details)": {
+      "main": [
+        [
+          {
+            "node": "Merge Δ (All)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Normalize (to Leads RAW)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Δ (All)": {
+      "main": [
+        [
+          {
+            "node": "Quota Δ Sum",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quota Δ Sum": {
+      "main": [
+        [
+          {
+            "node": "Quota Totals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quota Totals": {
+      "main": [
+        [
+          {
+            "node": "Gate: Upsert after Validated done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guard Details Response": {
+      "main": [
+        [
+          {
+            "node": "Next batch (signal)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Δ (Text+Details)",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Gate Build (Quota ready)": {
+      "main": [
+        [
+          {
+            "node": "Build queries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quota Ctx": {
+      "main": [
+        [
+          {
+            "node": "Gate Build (Quota ready)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Init PageCtx": {
+      "main": [
+        [
+          {
+            "node": "Force Query (test)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge PageCtx + Response",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Paginate TextSearch": {
+      "main": [
+        [
+          {
+            "node": "IF: This?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "IF: Next?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF: Next?": {
+      "main": [
+        [
+          {
+            "node": "Wait next",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait next": {
+      "main": [
+        [
+          {
+            "node": "Places Text Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append → Leads (RAW)": {
+      "main": [
+        [
+          {
+            "node": "Wait (RAW)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Filter: has Website or Phone",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Wait → Quota Upsert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append → Leads (Validated)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gate: Upsert after Validated done": {
+      "main": [
+        [
+          {
+            "node": "Wait → Quota Upsert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Details Inspect": {
+      "main": [
+        [
+          {
+            "node": "IF: Needs retry?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF: Needs retry?": {
+      "main": [
+        [
+          {
+            "node": "Wait Retry",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Guard Details Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Retry": {
+      "main": [
+        [
+          {
+            "node": "Bump Retry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bump Retry": {
+      "main": [
+        [
+          {
+            "node": "Place Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quality flags & sanitize": {
+      "main": [
+        [
+          {
+            "node": "Dedupe PlaceId|Domain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Return __control": {
+      "main": [
+        [
+          {
+            "node": "Gate Build (Quota ready)",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Wait → Quota Upsert": {
+      "main": [
+        [
+          {
+            "node": "Quota → Upsert1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait (RAW)": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Validated": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "debug": {
+      "main": [
+        [
+          {
+            "node": "Paginate TextSearch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Force Query (test)": {
+      "main": [
+        [
+          {
+            "node": "Places Text Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge PageCtx + Response": {
+      "main": [
+        [
+          {
+            "node": "debug",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split in Batches (DetailsLoop)": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Place Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sanity-debug": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Details Inspect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Next batch (signal)": {
+      "main": [
+        [
+          {
+            "node": "Split in Batches (DetailsLoop)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dedupe PlaceId|Domain": {
+      "main": [
+        [
+          {
+            "node": "sanity-debug",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF: This?": {
+      "main": [
+        [
+          {
+            "node": "Explode Search Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "count-tap": {
+      "main": [
+        [
+          {
+            "node": "Keep Unique by place_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "count-tap-3": {
+      "main": [
+        [
+          {
+            "node": "quota only",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Split in Batches (DetailsLoop)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Δ (Text+Details)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "quota only": {
+      "main": [
+        [
+          {
+            "node": "Quota Δ Sum",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Append → Leads (RAW)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "acb598fd-9b07-45f9-8851-5cbf9b5a57b8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "887cfafe23e9379c3e6aa6c5db589c82fa3b7c26d60ed707e8dd92c5291e5481"
+  },
+  "id": "5FoyGi3Y2UAvdRvE",
+  "tags": [
+    {
+      "createdAt": "2025-09-12T12:21:36.582Z",
+      "updatedAt": "2025-09-12T12:21:36.582Z",
+      "id": "v8lTCuScvOZ5lXf4",
+      "name": "Speed4Profit"
+    }
+  ]
+}
