@@ -14,18 +14,18 @@ const cvPdfLinkProps = getCvPdfLinkProps(lang);
 <section class="band band--mesh overflow-hidden" aria-labelledby="hero-title">
   <div class="hero-content">
     <p class="section-kicker reveal-block">
-      {isEn ? 'PROFILE: SEO + WEB + AUTOMATION' : 'PROFIL: SEO + WEB + AUTOMATION'}
+      {isEn ? 'SEEKING EMPLOYMENT: SEO + WEB + AUTOMATION' : 'SÖKER ANSTÄLLNING: SEO + WEBB + AUTOMATION'}
     </p>
 
     <h1 id="hero-title" class="reveal-block reveal-delay-1 mx-auto mt-6 max-w-[56rem] text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl">
       {
         isEn ? (
           <>
-            I build durable <span class="hero-accent">growth systems</span> across search, web engineering, and automation.
+            I'm looking for an employed role within <span class="hero-accent">SEO, web, digital development, or automation</span>.
           </>
         ) : (
           <>
-            Jag bygger hållbara <span class="hero-accent">tillväxtsystem</span> inom sök, webbutveckling och automation.
+            Jag söker anställning inom <span class="hero-accent">SEO, webb, digital utveckling eller automation</span>.
           </>
         )
       }
@@ -34,29 +34,37 @@ const cvPdfLinkProps = getCvPdfLinkProps(lang);
     <p class="reveal-block reveal-delay-2 mx-auto mt-7 max-w-[46rem] text-lg leading-relaxed text-neutral-300 sm:text-xl">
       {
         isEn
-          ? 'Since 2003 I have worked hands-on in roles such as specialist, lead, product-oriented developer, and founder. This portfolio shows how I move from analysis and strategy to implementation, release, and continued improvement of solutions that hold up over time.'
-          : 'Sedan 2003 har jag arbetat hands-on i roller som specialist, lead, produktnära utvecklare och grundare. Den här portfolion visar hur jag går från analys och strategi till implementation, release och vidare förbättring av lösningar som håller över tid.'
+          ? 'I have long experience combining SEO, web development, technical structure, analytics, and hands-on implementation. My strength is understanding business, users, and technology, and turning that into clearer websites, better digital workflows, and measurable improvements.'
+          : 'Jag har lång erfarenhet av att kombinera SEO, webbutveckling, teknisk struktur, analys och praktisk implementation. Min styrka är att förstå både affär, användare och teknik, och omsätta det till tydligare webbplatser, bättre digitala flöden och mer mätbara förbättringar.'
+      }
+    </p>
+
+    <p class="reveal-block reveal-delay-2 mx-auto mt-4 max-w-[46rem] text-base leading-relaxed text-neutral-300 sm:text-lg">
+      {
+        isEn
+          ? "I'm based in Blekinge, Sweden, and primarily looking for roles where I can contribute within SEO, website management, CMS/WordPress, AI-assisted workflows, automation, growth, or digital coordination. I'm open to on-site, hybrid, or remote employment."
+          : 'Jag bor i Blekinge och söker främst roller där jag kan bidra med SEO, webbförvaltning, CMS/WordPress, AI-stödda arbetsflöden, automation, growth eller digital koordinering. Jag är öppen för anställning på plats, hybrid eller remote.'
       }
     </p>
 
     <div class="reveal-block reveal-delay-3 mt-9 flex flex-wrap justify-center gap-3">
       <a
-        href={paths.about}
+        href={paths.contact}
         class="btn-primary px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
       >
-        {isEn ? 'Read profile' : 'Läs mer om mig'}
-      </a>
-      <a
-        href={paths.projects}
-        class="btn-secondary px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-      >
-        {isEn ? 'View projects' : 'Se projekt'}
+        {isEn ? 'Contact me' : 'Kontakta mig'}
       </a>
       <a
         {...cvPdfLinkProps}
         class="btn-secondary px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
       >
         {isEn ? 'Download CV' : 'Ladda ner CV'}
+      </a>
+      <a
+        href={paths.projects}
+        class="btn-secondary px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+      >
+        {isEn ? 'View work examples' : 'Se arbetsexempel'}
       </a>
     </div>
 
@@ -70,23 +78,23 @@ const cvPdfLinkProps = getCvPdfLinkProps(lang);
 
     <ul class="mx-auto mt-9 grid max-w-[56rem] gap-3 text-sm text-neutral-200 sm:grid-cols-2 lg:grid-cols-4" aria-label={isEn ? 'Capability highlights' : 'Kompetenshöjdpunkter'}>
       <li class="pill-chip reveal-card px-4 py-3">Technical SEO / AEO</li>
-      <li class="pill-chip reveal-card px-4 py-3">{isEn ? 'E-commerce growth' : 'E-handelsdriven tillväxt'}</li>
-      <li class="pill-chip reveal-card px-4 py-3">Automation (n8n / APIs)</li>
-      <li class="pill-chip reveal-card px-4 py-3">{isEn ? 'Product-oriented web engineering' : 'Produktnära web engineering'}</li>
+      <li class="pill-chip reveal-card px-4 py-3">{isEn ? 'Website management / CMS' : 'Webbförvaltning / CMS'}</li>
+      <li class="pill-chip reveal-card px-4 py-3">{isEn ? 'AI-assisted workflows' : 'AI-stödda arbetsflöden'}</li>
+      <li class="pill-chip reveal-card px-4 py-3">{isEn ? 'Product-oriented implementation' : 'Produktnära implementation'}</li>
     </ul>
 
     <p class="mx-auto mt-8 max-w-[56rem] text-sm text-neutral-400">
       <span class="font-semibold text-neutral-200">{isEn ? 'Now:' : 'Nu:'}</span>
       {
         isEn
-          ? ' Building AI-assisted SEO workflows, release-ready automation, and high-performance interfaces with focus on sustainable delivery, clear structure, and measurable impact.'
-          : ' Bygger AI-stödda SEO-flöden, releaseklara automationer och högpresterande gränssnitt med fokus på hållbar leverans, tydlig struktur och mätbar effekt.'
+          ? ' Actively looking for an employed role where SEO, web structure, analytics, CMS/WordPress, automation, and AI-assisted workflows meet practical implementation.'
+          : ' Söker aktivt en anställning där SEO, webbstruktur, analys, CMS/WordPress, automation och AI-stödda arbetsflöden möter praktisk implementation.'
       }
     </p>
 
     <p class="mx-auto mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-300/10 px-4 py-2 text-xs font-semibold tracking-[0.04em] text-emerald-200">
       <span class="h-1.5 w-1.5 rounded-full bg-emerald-300" aria-hidden="true"></span>
-      {isEn ? 'Available for roles in SEO, web engineering, growth, and automation' : 'Tillgänglig för roller inom SEO, webbutveckling, growth och automation.'}
+      {isEn ? 'Open to employed roles on-site, hybrid, or remote' : 'Öppen för anställda roller på plats, hybrid eller remote'}
     </p>
   </div>
 </section>

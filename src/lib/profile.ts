@@ -61,12 +61,12 @@ export const itFaqItems: Record<Locale, FaqItem[]> = {
     {
       question: 'Vad arbetar du med idag?',
       answer:
-        'Jag arbetar med technical SEO, webbutveckling, AI-stödda arbetsflöden, automation och digital tillväxt i leveranser som ska fungera i verklig drift.',
+        'Min nuvarande inriktning är anställning inom SEO, webb, CMS/WordPress, AI-stödda arbetsflöden, automation, growth eller digital koordinering.',
     },
     {
-      question: 'Vilka typer av projekt tar du dig an?',
+      question: 'Vilka roller söker du?',
       answer:
-        'Jag bygger och förbättrar webbplatser, case- och innehållsstrukturer, SEO-grunder, integrationer och automatiserade flöden mellan formulär, CRM, team och interna processer.',
+        'Jag söker roller som SEO-specialist, technical SEO specialist, webbansvarig, CMS- eller WordPress-specialist, digital koordinator, webbutvecklare nära produkt eller roller nära AI och automation.',
     },
     {
       question: 'Hur lång erfarenhet har du inom SEO, webbutveckling och automation?',
@@ -79,14 +79,14 @@ export const itFaqItems: Record<Locale, FaqItem[]> = {
         'Ja. Jag arbetar med technical SEO, informationsstruktur, AEO-orienterad tydlighet och AI-stödda arbetsflöden som förbättrar analys, produktion, release och uppföljning.',
     },
     {
-      question: 'Är du öppen för roller eller uppdrag?',
+      question: 'Söker du främst anställning?',
       answer:
-        'Ja. Jag är öppen för roller och uppdrag inom SEO, webbutveckling, growth, automation och digital leverans.',
+        'Jag söker främst en anställning där jag kan bidra långsiktigt inom SEO, webb, digital utveckling, automation eller digital koordinering. Jag bor i Blekinge och är öppen för plats, hybrid eller remote.',
     },
     {
       question: 'Hur arbetar du från analys till implementation?',
       answer:
-        'Jag börjar med nuläge, mål och prioritering, går sedan vidare till implementation och release, och avslutar med mätning och förbättring så att leveransen håller över tid.',
+        'Jag börjar med nuläge, mål och prioritering, går sedan vidare till implementation och release, och avslutar med mätning och förbättring så att lösningen håller över tid.',
     },
   ],
   en: [
@@ -98,12 +98,12 @@ export const itFaqItems: Record<Locale, FaqItem[]> = {
     {
       question: 'What do you work with today?',
       answer:
-        'I work with technical SEO, web engineering, AI-assisted workflows, automation, and digital growth in delivery setups that need to perform in real operations.',
+        'My current focus is finding an employed role within SEO, web, CMS/WordPress, AI-assisted workflows, automation, growth, or digital coordination.',
     },
     {
-      question: 'What types of projects do you take on?',
+      question: 'What roles are you looking for?',
       answer:
-        'I build and improve websites, information structures, SEO foundations, integrations, and automated flows between forms, CRM systems, teams, and internal processes.',
+        'I am looking for roles such as SEO Specialist, Technical SEO Specialist, Web Manager, CMS or WordPress Specialist, Digital Coordinator, product-oriented Web Developer, or roles close to AI and automation.',
     },
     {
       question: 'How much experience do you have in SEO, web engineering, and automation?',
@@ -116,14 +116,14 @@ export const itFaqItems: Record<Locale, FaqItem[]> = {
         'Yes. I work with technical SEO, information architecture, AEO-oriented clarity, and AI-assisted workflows that improve analysis, production, release, and follow-up.',
     },
     {
-      question: 'Are you open to roles or projects?',
+      question: 'Are you primarily looking for employment?',
       answer:
-        'Yes. I am open to roles and projects across SEO, web engineering, growth, automation, and digital delivery.',
+        'I am primarily looking for employment where I can contribute long term within SEO, web, digital development, automation, or digital coordination. I am based in Blekinge, Sweden, and open to on-site, hybrid, or remote work.',
     },
     {
       question: 'How do you work from analysis to implementation?',
       answer:
-        'I start with current state, goals, and prioritization, move into implementation and release, and then follow up with measurement and improvement so the delivery holds up over time.',
+        'I start with current state, goals, and prioritization, move into implementation and release, and then follow up with measurement and improvement so the solution holds up over time.',
     },
   ],
 };
