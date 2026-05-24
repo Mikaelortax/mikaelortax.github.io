@@ -1,4 +1,4 @@
-﻿---
+---
 interface Props {
   lang?: 'sv' | 'en';
 }
@@ -8,205 +8,143 @@ const isEn = lang === 'en';
 
 const content = isEn
   ? {
-      kicker: 'Work examples',
-      title: 'Selected work examples',
+      kicker: 'Practical proof',
+      title: 'Projects that show how I work',
       intro:
-        'Examples that show how I think, build, and improve over time in real production environments.',
+        'Alongside my job search, I build personal digital projects to develop and demonstrate my practical skills in SEO, web, AI, automation, CMS, product structure, and digital workflows. These projects show how I take ideas from analysis and structure to working solutions.',
+      labels: {
+        projectType: 'Personal project',
+        proof: 'What it shows',
+        skills: 'Skills',
+        readMore: 'View case',
+      },
       cards: [
         {
           id: '01',
-          title: 'Hotel Hötorget',
-          text: 'Development of hotelhotorget.se with focus on clarity, performance, and SEO readiness.',
-          role: 'Role: Web developer and SEO engineer',
-          built: 'Built: Site structure, implementation, and technical optimization for long-term maintainability.',
-          result: 'Result: Stronger technical foundation and a faster, clearer website experience.',
-          href: '/en/projects/hotell-hotorget/',
+          title: 'Mystnet SaaS / AI Dashboard',
+          text:
+            'A SaaS and dashboard project where I work with Laravel, AI-assisted features, client portal concepts, live chat/inbox flows, automations, and product-oriented UI/UX.',
+          proof:
+            'Ability to think in systems, workflows, user roles, and practical implementation.',
+          skills: ['Laravel', 'SaaS', 'AI workflows', 'UI/UX', 'Automation', 'Product thinking'],
         },
         {
           id: '02',
-          title: 'Hotel at Old Town',
-          text: 'Development of hotelatoldtown.se with focus on speed, structure, and SEO-ready implementation.',
-          role: 'Role: Web developer and SEO engineer',
-          built: 'Built: Site structure, technical implementation, and optimization for maintainability.',
-          result: 'Result: Better speed, clearer navigation, and stronger search visibility foundation.',
-          href: '/en/projects/hotel-at-old-town/',
+          title: 'WordPress Assistant / AI Content Workflow',
+          text:
+            'An AI-assisted WordPress and Chrome extension concept for content, SEO, metadata, product copy, and CMS workflows.',
+          proof:
+            'How I combine SEO, WordPress, AI, and practical editorial workflows.',
+          skills: ['WordPress', 'SEO', 'AI', 'Chrome extension', 'CMS workflows', 'Content operations'],
         },
         {
           id: '03',
-          title: 'Ringheims',
-          text: 'Development of ringheims.se with modern structure and conversion-oriented user flow.',
-          role: 'Role: Web developer and growth engineer',
-          built: 'Built: Information architecture, frontend implementation, and technical optimization.',
-          result: 'Result: Better usability and stronger conditions for SEO and conversion.',
-          href: '/en/projects/ringheims/',
+          title: 'Withdrawal Button for WordPress',
+          text:
+            'A WordPress plugin for managing withdrawal and cancellation requests with admin screens, public forms, email flows, language support, and optional WooCommerce integration.',
+          proof:
+            'Structured plugin development, user flows, and production-oriented thinking.',
+          skills: ['WordPress plugins', 'WooCommerce', 'Admin UX', 'Email workflows', 'Multilingual support'],
         },
         {
           id: '04',
-          title: 'Fairless Security',
-          text: 'Membership system with onboarding, permissions, and predictable lifecycle states.',
-          role: 'Role: Fullstack developer and system architect',
-          built: 'Built: Both website and membership platform with automation for access and lifecycle handling.',
-          result: 'Result: Less manual overhead and a smoother experience for members and admins.',
-          href: '/en/projects/fairless-security/',
+          title: 'Image-layer Product Visualizer',
+          text:
+            'A custom WordPress plugin for letting users choose an environment and visually test different window sills.',
+          proof:
+            'Work with image layers, admin editing, frontend rendering, and product-oriented e-commerce functionality.',
+          skills: ['WordPress', 'Visual editor', 'Frontend rendering', 'E-commerce UX', 'Product configurator'],
         },
         {
           id: '05',
           title: 'n8n Lead Automation',
-          text: 'Automated lead pipelines from form input to first qualified conversation.',
-          role: 'Role: Automation architect',
-          built: 'Built: Validation, scoring, and notifications across form, inbox, CRM, and handoff.',
-          result: 'Result: Better lead quality and shorter time to first contact.',
+          text:
+            'A lead generation automation workflow using n8n, Google Sheets, API data, normalization, deduplication, and validation.',
+          proof:
+            'How I build structured workflows that save time and improve data quality.',
+          skills: ['n8n', 'Automation', 'APIs', 'Data normalization', 'Lead generation', 'Workflow design'],
           href: '/en/projects/n8n-lead-automation/',
         },
         {
           id: '06',
-          title: 'n8n Instagram/TikTok Video Automation',
-          text: 'Automated video publishing workflow from content input to scheduled social publishing.',
-          role: 'Role: Automation builder',
-          built: 'Built: Validation, metadata handling, scheduling, and notification logic in n8n.',
-          result: 'Result: Less manual work and more consistent publishing cadence.',
-          href: '/en/projects/n8n-instagram-tiktok-video-automation/',
-        },
-        {
-          id: '07',
-          title: 'n8n Instagram Story Automation',
-          text: 'Automated Story workflow with structured timing and repeatable content flow.',
-          role: 'Role: Automation builder',
-          built: 'Built: Story pipeline with trigger logic, scheduling, and operational control.',
-          result: 'Result: Faster Story production with clearer execution.',
-          href: '/en/projects/n8n-instagram-story-automation/',
-        },
-        {
-          id: '08',
-          title: 'n8n CRM Process Automation',
-          text: 'Automation of CRM handoffs and status logic where manual steps were removed.',
-          role: 'Role: Automation architect',
-          built: 'Built: Workflow orchestration across CRM events, validation, and follow-up actions.',
-          result: 'Result: Lower manual overhead and higher data quality in CRM operations.',
-          href: '/en/projects/n8n-crm-process-automation/',
-        },
-        {
-          id: '09',
-          title: 'SwedRentals',
-          text: 'Website development and SEO work for stronger organic visibility and technical quality.',
-          role: 'Role: Web developer and SEO engineer',
-          built: 'Built: Site structure, implementation, and SEO improvements for long-term growth.',
-          result: 'Result: Better technical foundation, clearer user flow, and stronger search readiness.',
-          href: '/en/projects/swedrentals/',
-        },
-        {
-          id: '10',
-          title: 'Wise Solutions',
-          text: 'Website development with SEO focus on structure, clarity, and conversion support.',
-          role: 'Role: Web developer and SEO engineer',
-          built: 'Built: Technical setup, information flow, and SEO baseline improvements.',
-          result: 'Result: Better usability, cleaner architecture, and stronger growth conditions.',
-          href: '/en/projects/wise-solutions/',
+          title: 'Lastsmart / Tungportalen-related tools',
+          text:
+            'An education and tools-oriented web project with calculators, structured content, and digital functionality for heavy transport, load, and logistics-related needs.',
+          proof:
+            'Ability to build clear digital tools within a specific domain.',
+          skills: ['Laravel/web tools', 'Calculators', 'Content structure', 'Domain logic', 'UX'],
         },
       ],
-      readMore: 'View case',
     }
   : {
-      kicker: 'Arbetsexempel',
-      title: 'Utvalda arbetsexempel',
+      kicker: 'Praktiska bevis',
+      title: 'Projekt som visar hur jag arbetar',
       intro:
-        'Exempel som speglar min profil: tekniskt djup, tydlig struktur och lösningar som fungerar i vardagen.',
+        'Vid sidan av min jobbsökning bygger jag egna digitala projekt för att utveckla och visa min praktiska kompetens inom SEO, webb, AI, automation, CMS, produktstruktur och digitala arbetsflöden. Projekten visar hur jag tar idéer från analys och struktur till fungerande lösningar.',
+      labels: {
+        projectType: 'Eget projekt',
+        proof: 'Vad det visar',
+        skills: 'Kompetenser',
+        readMore: 'Öppna case',
+      },
       cards: [
         {
           id: '01',
-          title: 'Hotell Hötorget',
-          text: 'Utveckling av hotelhotorget.se med fokus på tydlig struktur, prestanda och SEO.',
-          role: 'Roll: Webbutvecklare och SEO-engineer',
-          built: 'Leverans: Webbplatsutveckling, teknisk struktur och optimering för långsiktig förvaltning.',
-          result: 'Effekt: Snabbare sajt, tydligare användarflöde och bättre teknisk grund för synlighet.',
-          href: '/projekt/hotell-hotorget/',
+          title: 'Mystnet SaaS / AI Dashboard',
+          text:
+            'Ett SaaS- och dashboardprojekt där jag arbetar med Laravel, AI-stödda funktioner, kundportal-koncept, live chat/inbox, automationsflöden och produktnära UI/UX.',
+          proof:
+            'Min förmåga att tänka i system, flöden, användarroller och praktisk implementation.',
+          skills: ['Laravel', 'SaaS', 'AI-flöden', 'UI/UX', 'Automation', 'Produkttänk'],
         },
         {
           id: '02',
-          title: 'Hotel at Old Town',
-          text: 'Utveckling av hotelatoldtown.se med fokus på hastighet, struktur och SEO-kvalitet.',
-          role: 'Roll: Webbutvecklare och SEO-engineer',
-          built: 'Leverans: Webbplatsutveckling, teknisk implementation och optimering för långsiktig förvaltning.',
-          result: 'Effekt: Bättre prestanda, tydligare navigation och starkare grund för organisk synlighet.',
-          href: '/projekt/hotel-at-old-town/',
+          title: 'WordPress Assistant / AI Content Workflow',
+          text:
+            'Ett AI-stött WordPress- och Chrome extension-koncept för att hjälpa med innehåll, SEO, metadata, produkttexter och CMS-arbete.',
+          proof:
+            'Hur jag kombinerar SEO, WordPress, AI och praktiska redaktörsflöden.',
+          skills: ['WordPress', 'SEO', 'AI', 'Chrome extension', 'CMS-flöden', 'Content operations'],
         },
         {
           id: '03',
-          title: 'Ringheims',
-          text: 'Utveckling av ringheims.se med modern struktur och konverteringsfokuserat användarflöde.',
-          role: 'Roll: Webbutvecklare och growth engineer',
-          built: 'Leverans: Informationsarkitektur, frontend-implementation och teknisk optimering.',
-          result: 'Effekt: Bättre användbarhet och starkare förutsättningar för SEO och konvertering.',
-          href: '/projekt/ringheims/',
+          title: 'Withdrawal Button for WordPress',
+          text:
+            'Ett WordPress-plugin för att hantera ånger- och avbokningsförfrågningar med adminvy, formulär, e-postflöden, språkstöd och valfri WooCommerce-koppling.',
+          proof:
+            'Strukturerad pluginutveckling, användarflöden och produktionsnära tänk.',
+          skills: ['WordPress-plugin', 'WooCommerce', 'Admin UX', 'E-postflöden', 'Språkstöd'],
         },
         {
           id: '04',
-          title: 'Fairless Security',
-          text: 'Medlemssystem med onboarding, behörigheter och förutsägbara livscykelsteg.',
-          role: 'Roll: Fullstackutvecklare och systemarkitekt',
-          built: 'Leverans: Både webbplats och medlemssystem med onboarding, accesslogik och automation.',
-          result: 'Effekt: Mindre handpåläggning och jämnare upplevelse för både medlemmar och administratörer.',
-          href: '/projekt/fairless-security/',
+          title: 'Image-layer Product Visualizer',
+          text:
+            'Ett specialbyggt WordPress-plugin för att låta användare välja miljö och testa olika fönsterbänkar visuellt.',
+          proof:
+            'Arbete med bildlager, admin-editor, frontend-rendering och produktnära e-handelsfunktionalitet.',
+          skills: ['WordPress', 'Visuell editor', 'Frontend-rendering', 'E-handels-UX', 'Produktkonfigurator'],
         },
         {
           id: '05',
           title: 'n8n Lead Automation',
-          text: 'Automatiserade leadflöden från formulär till första kvalificerade dialog.',
-          role: 'Roll: Automationsarkitekt',
-          built: 'Leverans: Validering, scoring och notifieringar mellan formulär, inbox och CRM.',
-          result: 'Effekt: Högre leadkvalitet och kortare tid till första kvalificerade kontakt.',
+          text:
+            'Ett automationsflöde för leadgenerering med n8n, Google Sheets, API-data, normalisering, deduplicering och validering.',
+          proof:
+            'Hur jag bygger strukturerade arbetsflöden som sparar tid och skapar bättre datakvalitet.',
+          skills: ['n8n', 'Automation', 'API:er', 'Datanormalisering', 'Leadgenerering', 'Workflow design'],
           href: '/projekt/n8n-lead-automation/',
         },
         {
           id: '06',
-          title: 'n8n Instagram/TikTok Video Automation',
-          text: 'Automatiserat videoflöde från innehåll till schemalagd publicering i sociala kanaler.',
-          role: 'Roll: Automation builder',
-          built: 'Leverans: Validering, metadata, schemaläggning och notifieringslogik i n8n.',
-          result: 'Effekt: Mindre manuellt arbete och jämnare publiceringstakt.',
-          href: '/projekt/n8n-instagram-tiktok-video-automation/',
-        },
-        {
-          id: '07',
-          title: 'n8n Instagram Story Automation',
-          text: 'Automatiserat Story-flöde med tydlig timing och repeterbar struktur.',
-          role: 'Roll: Automation builder',
-          built: 'Leverans: Story-pipeline med triggerlogik, schemaläggning och operativ kontroll.',
-          result: 'Effekt: Snabbare Story-produktion och tydligare genomförande.',
-          href: '/projekt/n8n-instagram-story-automation/',
-        },
-        {
-          id: '08',
-          title: 'n8n CRM Process Automation',
-          text: 'Automation av CRM-flöden där manuella moment ersattes av stabil arbetslogik.',
-          role: 'Roll: Automationsarkitekt',
-          built: 'Leverans: Orkestrering av CRM-event, validering och uppföljande actions.',
-          result: 'Effekt: Mindre administration, snabbare handoff och högre datakvalitet.',
-          href: '/projekt/n8n-crm-process-automation/',
-        },
-        {
-          id: '09',
-          title: 'SwedRentals',
-          text: 'Webbplatsutveckling och SEO-arbete för starkare organisk synlighet och teknisk kvalitet.',
-          role: 'Roll: Webbutvecklare och SEO-engineer',
-          built: 'Leverans: Webbstruktur, implementation och SEO-förbättringar för långsiktig tillväxt.',
-          result: 'Effekt: Bättre teknisk grund, tydligare användarflöde och bättre sökförutsättningar.',
-          href: '/projekt/swedrentals/',
-        },
-        {
-          id: '10',
-          title: 'Wise Solutions',
-          text: 'Webbplatsutveckling med SEO-fokus på struktur, tydlighet och konverteringsstöd.',
-          role: 'Roll: Webbutvecklare och SEO-engineer',
-          built: 'Leverans: Teknisk implementation, informationsflöde och förbättrad SEO-bas.',
-          result: 'Effekt: Bättre användbarhet, renare arkitektur och starkare tillväxtförutsättningar.',
-          href: '/projekt/wise-solutions/',
+          title: 'Lastsmart / Tungportalen-relaterade verktyg',
+          text:
+            'Ett utbildnings- och verktygsinriktat webbprojekt med kalkylatorer, strukturerat innehåll och digitala funktioner för tung trafik, last och transportrelaterade behov.',
+          proof:
+            'Min förmåga att bygga tydliga digitala verktyg inom ett specifikt ämnesområde.',
+          skills: ['Laravel/webbverktyg', 'Kalkylatorer', 'Innehållsstruktur', 'Domänlogik', 'UX'],
         },
       ],
-      readMore: 'Öppna case',
     };
-
-const visibleCards = content.cards.slice(0, 3);
 ---
 
 <section id="work" class="band band--surface" aria-labelledby="work-title">
@@ -216,33 +154,48 @@ const visibleCards = content.cards.slice(0, 3);
     <p class="section-lead">{content.intro}</p>
   </header>
 
-  <div class="mt-10 grid gap-6 lg:grid-cols-3">
-    {visibleCards.map((card, index) => (
+  <div class="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+    {content.cards.map((card, index) => (
       <article
         class="ui-card ui-card--interactive portfolio-card reveal-card p-6 text-left"
-        style={`animation-delay: ${index * 90}ms;`}
+        style={`animation-delay: ${index * 70}ms;`}
         tabindex="0"
       >
-        <div class="card-id mb-4 inline-flex rounded-full border border-cyan-300/25 bg-cyan-300/10 px-2.5 py-1 text-[11px] font-semibold tracking-[0.16em] text-cyan-200">
-          {card.id}
+        <div class="mb-4 flex flex-wrap items-center gap-2">
+          <span class="card-id inline-flex rounded-full border border-cyan-300/25 bg-cyan-300/10 px-2.5 py-1 text-[11px] font-semibold tracking-[0.16em] text-cyan-200">
+            {card.id}
+          </span>
+          <span class="inline-flex rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-semibold text-neutral-300">
+            {content.labels.projectType}
+          </span>
         </div>
 
         <h3 class="text-2xl font-semibold leading-tight text-white">{card.title}</h3>
-        <p class="mt-3 text-sm text-neutral-300">{card.text}</p>
+        <p class="mt-3 text-sm leading-relaxed text-neutral-300">{card.text}</p>
 
-        <ul class="mt-5 space-y-3 text-sm text-neutral-200">
-          <li class="card-meta">{card.role}</li>
-          <li class="card-meta">{card.built}</li>
-          <li class="card-meta">{card.result}</li>
-        </ul>
+        <div class="mt-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.12em] text-cyan-200">{content.labels.proof}</p>
+          <p class="mt-2 text-sm leading-relaxed text-neutral-200">{card.proof}</p>
+        </div>
 
-        <a
-          href={card.href}
-          class="mt-6 inline-flex items-center text-sm font-semibold text-cyan-300 transition hover:text-cyan-200"
-        >
-          {content.readMore}
-          <span aria-hidden="true" class="ml-1">-&gt;</span>
-        </a>
+        <div class="mt-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.12em] text-neutral-400">{content.labels.skills}</p>
+          <div class="mt-3 flex flex-wrap gap-2" aria-label={`${content.labels.skills}: ${card.title}`}>
+            {card.skills.map((skill) => (
+              <span class="capability-tag">{skill}</span>
+            ))}
+          </div>
+        </div>
+
+        {card.href && (
+          <a
+            href={card.href}
+            class="mt-6 inline-flex items-center text-sm font-semibold text-cyan-300 transition hover:text-cyan-200"
+          >
+            {content.labels.readMore}
+            <span aria-hidden="true" class="ml-1">-&gt;</span>
+          </a>
+        )}
       </article>
     ))}
   </div>
