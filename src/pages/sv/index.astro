@@ -1,22 +1,15 @@
-﻿---
+---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ITLanding from '../../components/profiles/ITLanding.astro';
+import { itFaqItems } from '../../lib/profile';
 ---
 
 <BaseLayout
-  title="Svensk startsida – SEO, Web och Automation"
-  description="Svensk startsida för portfolion med fokus på SEO, webbutveckling och automation."
+  title="Söker anställning inom SEO, webb och automation"
+  description="Mikael Johansson söker anställning inom SEO, webb, digital utveckling, CMS/WordPress, automation och digital koordinering, med praktiska egna projekt som visar arbetssättet."
   lang="sv"
+  ogType="profile"
+  structuredData={{ includePerson: true, includeProfilePage: true, faqItems: itFaqItems.sv }}
 >
-  <section class="band band--surface" aria-labelledby="start-title">
-    <h1 id="start-title" class="section-title">Start</h1>
-    <p class="section-lead">
-      Detta är den svenska startpunkten för portfolion. Härifrån kan du utforska projekt, kompetenser och CV.
-    </p>
-    <div class="mt-8 flex justify-center">
-      <a href="/" class="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm">
-        Öppna huvudsidan
-        <span aria-hidden="true">-&gt;</span>
-      </a>
-    </div>
-  </section>
+  <ITLanding lang="sv" />
 </BaseLayout>
