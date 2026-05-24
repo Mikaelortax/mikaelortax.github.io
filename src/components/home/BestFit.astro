@@ -1,0 +1,165 @@
+---
+interface Props {
+  lang?: 'sv' | 'en';
+}
+
+const { lang = 'sv' } = Astro.props;
+const isEn = lang === 'en';
+
+const content = isEn
+  ? {
+      kicker: 'Best-fit tracks',
+      title: 'Where I fit best',
+      intro:
+        'My profile is broad, but it is strongest in roles where SEO, web, technology, structure, and practical implementation meet. These three tracks show where I am most likely to create value as an employee.',
+      labels: {
+        roles: 'Best-fit roles',
+        contribution: 'What I contribute',
+      },
+      tracks: [
+        {
+          id: '01',
+          title: 'SEO, growth, and technical SEO',
+          description:
+            'For roles where SEO, technical SEO, AEO, content structure, analytics, measurement, and growth need to connect with practical implementation.',
+          roles: [
+            'SEO Specialist',
+            'Technical SEO Specialist',
+            'Growth Coordinator',
+            'Digital Marketing Specialist',
+            'SEO/Web Analyst',
+          ],
+          contribution:
+            'I can contribute with search strategy, technical structure, prioritization, analytics, content improvements, and AI-assisted workflows that make SEO work more practical and actionable.',
+        },
+        {
+          id: '02',
+          title: 'Web, CMS, and WordPress',
+          description:
+            'For roles where a website, CMS, structure, UX, content, performance, and continuous improvement need to be owned, maintained, or developed.',
+          roles: [
+            'Web Manager',
+            'Website Manager',
+            'CMS Specialist',
+            'WordPress Specialist',
+            'Web Coordinator',
+            'Product-oriented Web Developer',
+          ],
+          contribution:
+            'I can contribute with structure, publishing workflows, CMS understanding, SEO perspective, technical troubleshooting, improved user experience, and more sustainable web processes.',
+        },
+        {
+          id: '03',
+          title: 'Digital coordination, IT management, and automation',
+          description:
+            'For roles where technology, business needs, structure, documentation, prioritization, system understanding, and improvement work need to be connected.',
+          roles: [
+            'Digital Coordinator',
+            'Application Manager',
+            'IT/Application Management-related roles',
+            'System Administrator-related roles',
+            'Product Owner / Junior Product Owner',
+            'Automation Specialist',
+          ],
+          contribution:
+            'I can contribute by translating needs into structure, creating clearer workflows, documenting decisions, coordinating improvements, and building smarter AI and automation support.',
+        },
+      ],
+    }
+  : {
+      kicker: 'Prioriterade spår',
+      title: 'Var jag passar bäst',
+      intro:
+        'Min profil är bred, men den blir som starkast i roller där SEO, webb, teknik, struktur och praktisk implementation möts. De här tre spåren visar var jag troligen skapar mest värde som anställd.',
+      labels: {
+        roles: 'Passande roller',
+        contribution: 'Det jag bidrar med',
+      },
+      tracks: [
+        {
+          id: '01',
+          title: 'SEO, growth och technical SEO',
+          description:
+            'För roller där SEO, technical SEO, AEO, innehållsstruktur, analys, mätning och growth behöver kopplas till praktisk implementation.',
+          roles: [
+            'SEO-specialist',
+            'Technical SEO Specialist',
+            'Growth Coordinator',
+            'Digital Marketing Specialist',
+            'SEO/Web Analyst',
+          ],
+          contribution:
+            'Jag kan bidra med sökstrategi, teknisk struktur, prioritering, analys, innehållsförbättringar och AI-stödda arbetsflöden som gör SEO-arbetet mer praktiskt och genomförbart.',
+        },
+        {
+          id: '02',
+          title: 'Webb, CMS och WordPress',
+          description:
+            'För roller där webbplats, CMS, struktur, UX, innehåll, prestanda och löpande förbättring behöver ägas, förvaltas eller utvecklas.',
+          roles: [
+            'Webbansvarig',
+            'Web Manager',
+            'CMS-specialist',
+            'WordPress-specialist',
+            'Web Coordinator',
+            'Produktnära webbutvecklare',
+          ],
+          contribution:
+            'Jag kan bidra med struktur, publiceringsflöden, CMS-förståelse, SEO-perspektiv, teknisk felsökning, förbättrad användarupplevelse och mer hållbara webbprocesser.',
+        },
+        {
+          id: '03',
+          title: 'Digital koordinering, IT-förvaltning och automation',
+          description:
+            'För roller där teknik, verksamhet, struktur, dokumentation, prioritering, systemförståelse och förbättringsarbete behöver hållas ihop.',
+          roles: [
+            'Digital koordinator',
+            'Systemförvaltare',
+            'Förvaltningsledare IT',
+            'Applikationsansvarig',
+            'Produktägare light',
+            'Automationsspecialist',
+          ],
+          contribution:
+            'Jag kan bidra med att översätta behov till struktur, skapa tydligare arbetsflöden, dokumentera beslut, koordinera förbättringar och bygga smartare AI- och automationsstöd.',
+        },
+      ],
+    };
+---
+
+<section id="best-fit" class="band band--surface" aria-labelledby="best-fit-title">
+  <header class="section-head reveal-block">
+    <p class="section-kicker">{content.kicker}</p>
+    <h2 id="best-fit-title" class="section-title">{content.title}</h2>
+    <p class="section-lead">{content.intro}</p>
+  </header>
+
+  <div class="mt-10 grid gap-5 lg:grid-cols-3">
+    {content.tracks.map((track, index) => (
+      <article
+        class="ui-card ui-card--interactive capability-card reveal-card p-6 text-left"
+        style={`animation-delay: ${index * 80}ms;`}
+        tabindex="0"
+      >
+        <div class="capability-topline" aria-hidden="true"></div>
+        <p class="capability-index">{track.id}</p>
+        <h3 class="mt-3 text-xl font-semibold leading-tight text-white">{track.title}</h3>
+        <p class="mt-3 text-sm leading-relaxed text-neutral-300">{track.description}</p>
+
+        <div class="mt-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.12em] text-cyan-200">{content.labels.roles}</p>
+          <div class="mt-3 flex flex-wrap gap-2" aria-label={`${content.labels.roles}: ${track.title}`}>
+            {track.roles.map((role) => (
+              <span class="capability-tag">{role}</span>
+            ))}
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.12em] text-neutral-400">{content.labels.contribution}</p>
+          <p class="mt-2 text-sm leading-relaxed text-neutral-200">{track.contribution}</p>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
