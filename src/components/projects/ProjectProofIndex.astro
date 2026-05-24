@@ -1,0 +1,413 @@
+---
+interface ProjectEntry {
+  slug: string;
+  data: {
+    title: string;
+    excerpt: string;
+    tags: string[];
+    stack: string[];
+    liveUrl?: string;
+    featured?: boolean;
+  };
+}
+
+interface ProofItem {
+  id: string;
+  title: string;
+  summary: string;
+  demonstrates: string;
+  skills: string[];
+  tracks: string[];
+  href?: string;
+  liveUrl?: string;
+  featured?: boolean;
+  priority: number;
+}
+
+interface Props {
+  lang?: 'sv' | 'en';
+  projects: ProjectEntry[];
+}
+
+const { lang = 'sv', projects } = Astro.props;
+const isEn = lang === 'en';
+
+const content = isEn
+  ? {
+      title: 'Projects that show how I work',
+      intro:
+        'My projects are not just examples of things I have built. They show how I work with problems, structure, technology, SEO, AI, automation, CMS, and digital workflows — from idea and analysis to practical implementation. Together, they act as concrete evidence of the type of value I can contribute in an employed role.',
+      trackTitle: 'Which roles the projects support',
+      trackText:
+        'The projects primarily strengthen my fit for three types of roles: SEO/growth/technical SEO, web/CMS/WordPress, and digital coordination/automation/IT or web management.',
+      labels: {
+        demonstrates: 'What the project demonstrates',
+        skills: 'Skills',
+        tracks: 'Supports roles within',
+        read: 'Read project',
+        visit: 'Visit site',
+      },
+      personalProjects: [
+        {
+          id: 'mystnet-saas-ai-dashboard',
+          title: 'Mystnet SaaS / AI Dashboard',
+          summary:
+            'A SaaS and dashboard project where I work with Laravel, AI-assisted features, client portal concepts, live chat/inbox flows, automations, and product-oriented UI/UX.',
+          demonstrates:
+            'Shows my ability to think in systems, user roles, workflows, UI structure, AI features, and practical implementation.',
+          skills: ['Laravel', 'SaaS', 'AI workflows', 'UI/UX', 'Automation', 'Product thinking'],
+          tracks: ['Product-oriented development', 'AI/Automation', 'Digital coordination', 'IT/Web management'],
+          priority: 1,
+        },
+        {
+          id: 'wordpress-assistant-ai-content-workflow',
+          title: 'WordPress Assistant / AI Content Workflow',
+          summary:
+            'An AI-assisted WordPress and Chrome extension concept for content, SEO, metadata, product copy, and CMS workflows.',
+          demonstrates:
+            'Shows how I combine SEO, WordPress, AI, content structure, and practical editorial workflows.',
+          skills: ['WordPress', 'SEO', 'AI', 'Chrome extension', 'CMS workflows', 'Content operations'],
+          tracks: ['SEO/Growth', 'Web/CMS', 'WordPress', 'AI/Automation'],
+          priority: 2,
+        },
+        {
+          id: 'withdrawal-button-wordpress',
+          title: 'Withdrawal Button for WordPress',
+          summary:
+            'A WordPress plugin for managing withdrawal and cancellation requests with admin screens, public forms, email flows, language support, and optional WooCommerce integration.',
+          demonstrates:
+            'Shows structured plugin development, admin UX, form flows, security awareness, multilingual handling, and production-oriented WordPress work.',
+          skills: ['WordPress plugin development', 'WooCommerce', 'Admin UX', 'Email workflows', 'Multilingual support'],
+          tracks: ['WordPress', 'Web/CMS', 'E-commerce', 'Product-oriented development'],
+          priority: 3,
+        },
+        {
+          id: 'image-layer-product-visualizer',
+          title: 'Image-layer Product Visualizer',
+          summary:
+            'A custom WordPress plugin for letting users choose an environment and visually test different window sills.',
+          demonstrates:
+            'Shows work with image layers, visual admin editing, frontend rendering, product visualization, and e-commerce-oriented UX.',
+          skills: ['WordPress', 'Visual editor', 'Frontend rendering', 'E-commerce UX', 'Product configurator'],
+          tracks: ['WordPress', 'Web/CMS', 'E-commerce', 'Product-oriented development'],
+          priority: 4,
+        },
+        {
+          id: 'lastsmart-tungportalen-tools',
+          title: 'Lastsmart / Tungportalen-related tools',
+          summary:
+            'An education and tools-oriented web project with calculators, structured content, and digital functionality for heavy transport, load, and logistics-related needs.',
+          demonstrates:
+            'Shows my ability to structure complex information, build digital tools, and create clear user flows within a specific domain.',
+          skills: ['Web tools', 'Calculators', 'Content structure', 'Domain logic', 'UX'],
+          tracks: ['Web/CMS', 'Digital coordination', 'IT/Web management', 'Product-oriented development'],
+          priority: 6,
+        },
+      ],
+      overrides: {
+        'n8n-lead-automation': {
+          summary:
+            'A lead generation automation workflow using n8n, Google Sheets, API data, normalization, deduplication, and validation.',
+          demonstrates:
+            'Shows how I build structured workflows that save time, improve data quality, and connect multiple systems.',
+          skills: ['n8n', 'Automation', 'APIs', 'Data normalization', 'Lead generation', 'Workflow design'],
+          tracks: ['AI/Automation', 'SEO/Growth', 'Digital coordination'],
+          priority: 5,
+        },
+        'n8n-crm-process-automation': {
+          demonstrates:
+            'Shows workflow design, CRM status logic, handoff structure, and automation that improves operational consistency.',
+          tracks: ['AI/Automation', 'Digital coordination', 'IT/Web management'],
+          priority: 20,
+        },
+        'n8n-instagram-story-automation': {
+          demonstrates:
+            'Shows structured content operations, scheduling logic, repeatable workflows, and automation for publishing routines.',
+          tracks: ['AI/Automation', 'SEO/Growth', 'Digital coordination'],
+          priority: 21,
+        },
+        'n8n-instagram-tiktok-video-automation': {
+          demonstrates:
+            'Shows automation of content workflows, metadata handling, scheduling structure, and quality checks across channels.',
+          tracks: ['AI/Automation', 'SEO/Growth', 'Digital coordination'],
+          priority: 22,
+        },
+        'fairless-security': {
+          demonstrates:
+            'Shows system thinking, user access flows, onboarding structure, admin needs, and fullstack implementation.',
+          tracks: ['Product-oriented development', 'Digital coordination', 'IT/Web management', 'AI/Automation'],
+          priority: 30,
+        },
+        'hotel-at-old-town': {
+          demonstrates:
+            'Shows website structure, technical SEO, performance focus, CMS implementation, and maintainable web delivery.',
+          tracks: ['SEO/Growth', 'Web/CMS', 'WordPress', 'IT/Web management'],
+          priority: 31,
+        },
+        'hotell-hotorget': {
+          demonstrates:
+            'Shows website structure, technical SEO, performance improvement, CMS delivery, and stable website operations.',
+          tracks: ['SEO/Growth', 'Web/CMS', 'WordPress', 'IT/Web management'],
+          priority: 32,
+        },
+        ringheims: {
+          demonstrates:
+            'Shows web structure, conversion-oriented UX, technical quality, and practical implementation for a clearer user flow.',
+          tracks: ['SEO/Growth', 'Web/CMS', 'WordPress', 'E-commerce'],
+          priority: 33,
+        },
+        swedrentals: {
+          demonstrates:
+            'Shows information architecture, technical SEO, content structure, and web implementation for stronger organic foundations.',
+          tracks: ['SEO/Growth', 'Web/CMS', 'WordPress', 'IT/Web management'],
+          priority: 34,
+        },
+        'wise-solutions': {
+          demonstrates:
+            'Shows web structure, SEO implementation, UX clarity, and practical improvements to a maintainable website foundation.',
+          tracks: ['SEO/Growth', 'Web/CMS', 'WordPress', 'IT/Web management'],
+          priority: 35,
+        },
+      },
+    }
+  : {
+      title: 'Projekt som visar hur jag arbetar',
+      intro:
+        'Mina projekt är inte bara exempel på vad jag har byggt. De visar hur jag arbetar med problem, struktur, teknik, SEO, AI, automation, CMS och digitala flöden — från idé och analys till praktisk implementation. Tillsammans fungerar de som konkreta bevis på den typ av värde jag kan bidra med i en anställd roll.',
+      trackTitle: 'Vilka roller projekten stärker',
+      trackText:
+        'Projekten stärker framför allt min matchning mot tre typer av roller: SEO/growth/technical SEO, webb/CMS/WordPress och digital koordinering/automation/IT-förvaltning.',
+      labels: {
+        demonstrates: 'Vad projektet visar',
+        skills: 'Kompetenser',
+        tracks: 'Stärker roller inom',
+        read: 'Läs projekt',
+        visit: 'Besök sajt',
+      },
+      personalProjects: [
+        {
+          id: 'mystnet-saas-ai-dashboard',
+          title: 'Mystnet SaaS / AI Dashboard',
+          summary:
+            'Ett SaaS- och dashboardprojekt där jag arbetar med Laravel, AI-stödda funktioner, kundportal, live chat/inbox, automationsflöden och produktnära UI/UX.',
+          demonstrates:
+            'Visar min förmåga att tänka i system, användarroller, arbetsflöden, UI-struktur, AI-funktioner och praktisk implementation.',
+          skills: ['Laravel', 'SaaS', 'AI workflows', 'UI/UX', 'Automation', 'Product thinking'],
+          tracks: ['Produktnära utveckling', 'AI/Automation', 'Digital koordinering', 'IT-förvaltning'],
+          priority: 1,
+        },
+        {
+          id: 'wordpress-assistant-ai-content-workflow',
+          title: 'WordPress Assistant / AI Content Workflow',
+          summary:
+            'Ett AI-stött WordPress- och Chrome extension-koncept för innehåll, SEO, metadata, produkttexter och CMS-arbete.',
+          demonstrates:
+            'Visar hur jag kombinerar SEO, WordPress, AI, innehållsstruktur och praktiska redaktörsflöden.',
+          skills: ['WordPress', 'SEO', 'AI', 'Chrome extension', 'CMS workflows', 'Content operations'],
+          tracks: ['SEO/Growth', 'Webb/CMS', 'WordPress', 'AI/Automation'],
+          priority: 2,
+        },
+        {
+          id: 'withdrawal-button-wordpress',
+          title: 'Withdrawal Button for WordPress',
+          summary:
+            'Ett WordPress-plugin för att hantera ånger- och avbokningsförfrågningar med adminvy, publikt formulär, e-postflöden, språkstöd och optional WooCommerce-koppling.',
+          demonstrates:
+            'Visar strukturerad pluginutveckling, admin-UX, formulärflöden, säkerhetstänk, språkhantering och produktionsnära WordPress-arbete.',
+          skills: ['WordPress plugin development', 'WooCommerce', 'Admin UX', 'Email workflows', 'Multilingual support'],
+          tracks: ['WordPress', 'Webb/CMS', 'E-handel', 'Produktnära utveckling'],
+          priority: 3,
+        },
+        {
+          id: 'image-layer-product-visualizer',
+          title: 'Image-layer Product Visualizer',
+          summary:
+            'Ett specialbyggt WordPress-plugin för att låta användare välja miljö och visuellt testa olika fönsterbänkar.',
+          demonstrates:
+            'Visar arbete med bildlager, visuell admin-editor, frontend-rendering, produktvisualisering och e-handelsnära UX.',
+          skills: ['WordPress', 'Visual editor', 'Frontend rendering', 'E-commerce UX', 'Product configurator'],
+          tracks: ['WordPress', 'Webb/CMS', 'E-handel', 'Produktnära utveckling'],
+          priority: 4,
+        },
+        {
+          id: 'lastsmart-tungportalen-tools',
+          title: 'Lastsmart / Tungportalen-relaterade verktyg',
+          summary:
+            'Ett utbildnings- och verktygsinriktat webbprojekt med kalkylatorer, strukturerat innehåll och digitala funktioner för tung trafik, last och transportrelaterade behov.',
+          demonstrates:
+            'Visar min förmåga att strukturera komplex information, bygga digitala verktyg och skapa tydliga användarflöden inom ett specifikt ämnesområde.',
+          skills: ['Web tools', 'Calculators', 'Content structure', 'Domain logic', 'UX'],
+          tracks: ['Webb/CMS', 'Digital koordinering', 'IT-förvaltning', 'Produktnära utveckling'],
+          priority: 6,
+        },
+      ],
+      overrides: {
+        'n8n-lead-automation': {
+          summary:
+            'Ett automationsflöde för leadgenerering med n8n, Google Sheets, API-data, normalisering, deduplicering och validering.',
+          demonstrates:
+            'Visar hur jag bygger strukturerade arbetsflöden som sparar tid, förbättrar datakvalitet och kopplar ihop flera system.',
+          skills: ['n8n', 'Automation', 'API:er', 'Data normalization', 'Lead generation', 'Workflow design'],
+          tracks: ['AI/Automation', 'SEO/Growth', 'Digital koordinering'],
+          priority: 5,
+        },
+        'n8n-crm-process-automation': {
+          demonstrates:
+            'Visar arbetsflödesdesign, CRM-logik, handoff-struktur och automation som gör operativt arbete mer konsekvent.',
+          tracks: ['AI/Automation', 'Digital koordinering', 'IT-förvaltning'],
+          priority: 20,
+        },
+        'n8n-instagram-story-automation': {
+          demonstrates:
+            'Visar strukturerad content operations, schemaläggningslogik, repeterbara flöden och automation för publiceringsrutiner.',
+          tracks: ['AI/Automation', 'SEO/Growth', 'Digital koordinering'],
+          priority: 21,
+        },
+        'n8n-instagram-tiktok-video-automation': {
+          demonstrates:
+            'Visar automation av innehållsflöden, metadatahantering, schemaläggning och kvalitetskontroll över flera kanaler.',
+          tracks: ['AI/Automation', 'SEO/Growth', 'Digital koordinering'],
+          priority: 22,
+        },
+        'fairless-security': {
+          demonstrates:
+            'Visar systemtänk, accessflöden, onboarding-struktur, adminbehov och fullstack-implementation.',
+          tracks: ['Produktnära utveckling', 'Digital koordinering', 'IT-förvaltning', 'AI/Automation'],
+          priority: 30,
+        },
+        'hotel-at-old-town': {
+          demonstrates:
+            'Visar webbstruktur, teknisk SEO, prestandafokus, CMS-implementation och hållbar webbleverans.',
+          tracks: ['SEO/Growth', 'Webb/CMS', 'WordPress', 'IT-förvaltning'],
+          priority: 31,
+        },
+        'hotell-hotorget': {
+          demonstrates:
+            'Visar webbstruktur, teknisk SEO, prestandaförbättring, CMS-leverans och stabil webbförvaltning.',
+          tracks: ['SEO/Growth', 'Webb/CMS', 'WordPress', 'IT-förvaltning'],
+          priority: 32,
+        },
+        ringheims: {
+          demonstrates:
+            'Visar webbstruktur, konverteringsnära UX, teknisk kvalitet och praktisk implementation för tydligare användarflöden.',
+          tracks: ['SEO/Growth', 'Webb/CMS', 'WordPress', 'E-handel'],
+          priority: 33,
+        },
+        swedrentals: {
+          demonstrates:
+            'Visar informationsarkitektur, teknisk SEO, innehållsstruktur och webbutveckling för en starkare organisk grund.',
+          tracks: ['SEO/Growth', 'Webb/CMS', 'WordPress', 'IT-förvaltning'],
+          priority: 34,
+        },
+        'wise-solutions': {
+          demonstrates:
+            'Visar webbstruktur, SEO-implementation, UX-tydlighet och praktiska förbättringar av en hållbar webbgrund.',
+          tracks: ['SEO/Growth', 'Webb/CMS', 'WordPress', 'IT-förvaltning'],
+          priority: 35,
+        },
+      },
+    };
+
+const projectPath = isEn ? '/en/projects' : '/projekt';
+const overrides = content.overrides as Record<string, Partial<ProofItem>>;
+const personalItems = content.personalProjects as ProofItem[];
+
+const collectionItems: ProofItem[] = projects.map((project) => {
+  const override = overrides[project.slug] ?? {};
+
+  return {
+    id: project.slug,
+    title: project.data.title,
+    summary: override.summary ?? project.data.excerpt,
+    demonstrates:
+      override.demonstrates ??
+      (isEn
+        ? 'Shows practical work across structure, implementation, technical quality, and digital improvement.'
+        : 'Visar praktiskt arbete med struktur, implementation, teknisk kvalitet och digital förbättring.'),
+    skills: override.skills ?? [...project.data.stack, ...project.data.tags],
+    tracks:
+      override.tracks ??
+      (isEn ? ['Web/CMS', 'IT/Web management'] : ['Webb/CMS', 'IT-förvaltning']),
+    href: `${projectPath}/${project.slug}/`,
+    liveUrl: project.data.liveUrl,
+    featured: project.data.featured,
+    priority: override.priority ?? 100,
+  };
+});
+
+const proofItems = [...personalItems, ...collectionItems].sort((a, b) => {
+  if (a.priority !== b.priority) return a.priority - b.priority;
+  return a.title.localeCompare(b.title, isEn ? 'en' : 'sv');
+});
+---
+
+<section class="band band--surface" aria-labelledby="projects-title">
+  <header class="section-head reveal-block">
+    <p class="section-kicker">{isEn ? 'Project proof' : 'Projektbevis'}</p>
+    <h1 id="projects-title" class="section-title">{content.title}</h1>
+    <p class="section-lead">{content.intro}</p>
+  </header>
+
+  <article class="ui-card mt-8 p-6 text-left">
+    <p class="text-xs font-semibold uppercase tracking-[0.14em] text-cyan-300">{content.trackTitle}</p>
+    <p class="mt-3 text-sm leading-relaxed text-neutral-300">{content.trackText}</p>
+  </article>
+
+  <div class="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+    {proofItems.map((project) => (
+      <article class="ui-card ui-card--interactive flex h-full flex-col p-6 text-left" tabindex="0">
+        <div class="flex flex-wrap items-center gap-2">
+          {project.tracks.slice(0, 2).map((track) => (
+            <span class="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-xs text-neutral-200">{track}</span>
+          ))}
+        </div>
+
+        <h2 class="mt-4 text-xl font-semibold leading-tight text-white">{project.title}</h2>
+        <p class="mt-3 text-sm leading-relaxed text-neutral-300">{project.summary}</p>
+
+        <div class="mt-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.12em] text-cyan-200">{content.labels.demonstrates}</p>
+          <p class="mt-2 text-sm leading-relaxed text-neutral-200">{project.demonstrates}</p>
+        </div>
+
+        <div class="mt-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.12em] text-neutral-400">{content.labels.skills}</p>
+          <div class="mt-3 flex flex-wrap gap-2" aria-label={`${content.labels.skills}: ${project.title}`}>
+            {project.skills.map((skill) => (
+              <span class="capability-tag">{skill}</span>
+            ))}
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.12em] text-neutral-400">{content.labels.tracks}</p>
+          <div class="mt-3 flex flex-wrap gap-2" aria-label={`${content.labels.tracks}: ${project.title}`}>
+            {project.tracks.map((track) => (
+              <span class="capability-tag">{track}</span>
+            ))}
+          </div>
+        </div>
+
+        {(project.href || project.liveUrl) && (
+          <div class="mt-auto flex flex-wrap gap-3 pt-6">
+            {project.href && (
+              <a href={project.href} class="inline-flex text-sm font-semibold text-cyan-300 transition hover:text-cyan-200">
+                {content.labels.read}
+              </a>
+            )}
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex text-sm font-semibold text-cyan-300 transition hover:text-cyan-200"
+              >
+                {content.labels.visit} <span aria-hidden="true">↗</span>
+              </a>
+            )}
+          </div>
+        )}
+      </article>
+    ))}
+  </div>
+</section>

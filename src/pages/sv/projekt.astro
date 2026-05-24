@@ -1,22 +1,26 @@
-﻿---
+---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectProofIndex from '../../components/projects/ProjectProofIndex.astro';
+import { getCollection } from 'astro:content';
+
+const projects = (await getCollection('projects')).sort((a, b) => {
+  if (a.data.featured !== b.data.featured) {
+    return a.data.featured ? -1 : 1;
+  }
+  return a.data.title.localeCompare(b.data.title, 'sv');
+});
+
+const breadcrumbs = [
+  { name: 'Hem', path: '/' },
+  { name: 'Projekt', path: '/sv/projekt' },
+];
 ---
 
 <BaseLayout
-  title="Projekt – svensk översikt"
-  description="Svensk projektingång med utvalda case inom SEO, webbutveckling och automation."
+  title="Projekt som visar hur jag arbetar"
+  description="Projekt som visar praktisk kompetens inom SEO, webb, CMS, AI, automation och digitala arbetsflöden."
   lang="sv"
+  structuredData={{ breadcrumbs }}
 >
-  <section class="band band--surface" aria-labelledby="projekt-title">
-    <h1 id="projekt-title" class="section-title">Projekt</h1>
-    <p class="section-lead">
-      Här hittar du case som visar hur jag går från strategi till teknisk implementation i verkliga miljöer.
-    </p>
-    <div class="mt-8 flex justify-center">
-      <a href="/projekt/" class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm">
-        Se alla projekt
-        <span aria-hidden="true">-&gt;</span>
-      </a>
-    </div>
-  </section>
+  <ProjectProofIndex lang="sv" projects={projects} />
 </BaseLayout>
