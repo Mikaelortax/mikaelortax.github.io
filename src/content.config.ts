@@ -11,6 +11,24 @@ const projectSchema = z.object({
   liveUrl: z.string().url().optional(),
   repoUrl: z.string().url().optional(),
   caseImage: z.string().optional(),
+  projectType: z.string().optional(),
+  skills: z.array(z.string()).optional(),
+  tracks: z.array(z.string()).optional(),
+  purpose: z.string().optional(),
+  myRole: z.string().optional(),
+  keyParts: z.array(z.string()).optional(),
+  methods: z.array(z.string()).optional(),
+  demonstrates: z.string().optional(),
+  employmentRelevance: z.string().optional(),
+  screenshots: z
+    .array(
+      z.object({
+        label: z.string(),
+        src: z.string().optional(),
+        alt: z.string().optional(),
+      }),
+    )
+    .optional(),
 });
 
 const projects = defineCollection({

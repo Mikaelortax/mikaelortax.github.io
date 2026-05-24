@@ -44,7 +44,7 @@ const content = isEn
         demonstrates: 'What the project demonstrates',
         skills: 'Skills',
         tracks: 'Supports roles within',
-        read: 'Read project',
+        read: 'Read more about the project',
         visit: 'Visit site',
       },
       personalProjects: [
@@ -57,6 +57,7 @@ const content = isEn
             'Shows my ability to think in systems, user roles, workflows, UI structure, AI features, and practical implementation.',
           skills: ['Laravel', 'SaaS', 'AI workflows', 'UI/UX', 'Automation', 'Product thinking'],
           tracks: ['Product-oriented development', 'AI/Automation', 'Digital coordination', 'IT/Web management'],
+          href: '/en/projects/mystnet-saas-ai-dashboard/',
           priority: 1,
         },
         {
@@ -68,6 +69,7 @@ const content = isEn
             'Shows how I combine SEO, WordPress, AI, content structure, and practical editorial workflows.',
           skills: ['WordPress', 'SEO', 'AI', 'Chrome extension', 'CMS workflows', 'Content operations'],
           tracks: ['SEO/Growth', 'Web/CMS', 'WordPress', 'AI/Automation'],
+          href: '/en/projects/wordpress-assistant-ai-content-workflow/',
           priority: 2,
         },
         {
@@ -181,7 +183,7 @@ const content = isEn
         demonstrates: 'Vad projektet visar',
         skills: 'Kompetenser',
         tracks: 'Stärker roller inom',
-        read: 'Läs projekt',
+        read: 'Läs mer om projektet',
         visit: 'Besök sajt',
       },
       personalProjects: [
@@ -194,6 +196,7 @@ const content = isEn
             'Visar min förmåga att tänka i system, användarroller, arbetsflöden, UI-struktur, AI-funktioner och praktisk implementation.',
           skills: ['Laravel', 'SaaS', 'AI workflows', 'UI/UX', 'Automation', 'Product thinking'],
           tracks: ['Produktnära utveckling', 'AI/Automation', 'Digital koordinering', 'IT-förvaltning'],
+          href: '/projekt/mystnet-saas-ai-dashboard/',
           priority: 1,
         },
         {
@@ -205,6 +208,7 @@ const content = isEn
             'Visar hur jag kombinerar SEO, WordPress, AI, innehållsstruktur och praktiska redaktörsflöden.',
           skills: ['WordPress', 'SEO', 'AI', 'Chrome extension', 'CMS workflows', 'Content operations'],
           tracks: ['SEO/Growth', 'Webb/CMS', 'WordPress', 'AI/Automation'],
+          href: '/projekt/wordpress-assistant-ai-content-workflow/',
           priority: 2,
         },
         {
@@ -311,8 +315,9 @@ const content = isEn
 const projectPath = isEn ? '/en/projects' : '/projekt';
 const overrides = content.overrides as Record<string, Partial<ProofItem>>;
 const personalItems = content.personalProjects as ProofItem[];
+const personalIds = new Set(personalItems.map((item) => item.id));
 
-const collectionItems: ProofItem[] = projects.map((project) => {
+const collectionItems: ProofItem[] = projects.filter((project) => !personalIds.has(project.slug)).map((project) => {
   const override = overrides[project.slug] ?? {};
 
   return {
